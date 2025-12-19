@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, Mail, MapPin, Phone, User, Eye, EyeOff } from "lucide-react";
+import { Building2, Mail, MapPin, Phone, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -150,7 +150,7 @@ export default function RegisterPage() {
             <span className="text-2xl font-black text-white">KL</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Partner with KL Fashion</h1>
-          <p className="text-slate-500 mt-3 font-medium">Create your supplier account to start your journey with us</p>
+          <p className="text-slate-700 mt-3 font-medium">Create your supplier account to start your journey with us</p>
         </div>
 
         <Card className="rounded-3xl border border-white bg-white/80 backdrop-blur-xl shadow-2xl shadow-slate-200/50 overflow-hidden">
@@ -162,7 +162,7 @@ export default function RegisterPage() {
             <form className="space-y-8" onSubmit={handleSubmit(onSubmit, onError)}>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Your Full Name *
                   </label>
                   <div className="relative">
@@ -186,7 +186,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Company Name *
                   </label>
                   <div className="relative">
@@ -210,7 +210,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Primary Phone *
                   </label>
                   <div className="flex gap-3">
@@ -256,7 +256,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="additionalPhone" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="additionalPhone" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Emergency/Alt Phone *
                   </label>
                   <div className="flex gap-3">
@@ -302,7 +302,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2 md:col-span-2">
-                  <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Business Email *
                   </label>
                   <div className="relative">
@@ -326,7 +326,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2 md:col-span-2">
-                  <label htmlFor="companyAddress" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="companyAddress" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Company Registered Address *
                   </label>
                   <div className="relative">
@@ -351,7 +351,7 @@ export default function RegisterPage() {
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Create Password *
                   </label>
                   <div className="relative">
@@ -386,7 +386,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                  <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
                     Confirm Password *
                   </label>
                   <div className="relative">
@@ -453,15 +453,15 @@ export default function RegisterPage() {
         </Card>
 
         <div className="mt-10 pt-8 text-center border-t border-slate-200/50">
-          <p className="text-sm font-semibold text-slate-500">
+          <p className="text-sm font-semibold text-slate-700">
             Already have a partner account?{" "}
-            <Link className="text-app-accent hover:text-indigo-700 transition-colors" href="/login">
+            <Link className="text-app-accent hover:text-indigo-700 transition-colors font-bold" href="/login">
               Sign in here
             </Link>
           </p>
         </div>
 
-        <p className="mt-10 text-center text-xs font-bold text-slate-400 uppercase tracking-widest pb-10">
+        <p className="mt-10 text-center text-xs font-bold text-slate-600 uppercase tracking-widest pb-10">
           © 2025 KL Fashion CRM • Partner Network
         </p>
       </div>

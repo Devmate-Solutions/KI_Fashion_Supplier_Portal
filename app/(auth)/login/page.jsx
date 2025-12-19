@@ -59,13 +59,13 @@ export default function LoginPage() {
             <span className="text-2xl font-black text-white">KL</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">Supplier Portal</h2>
-          <p className="text-slate-500 mt-3 font-medium">Manage your KL Fashion inventory and settlements</p>
+          <p className="text-slate-700 mt-3 font-medium">Manage your KL Fashion inventory and settlements</p>
         </div>
 
         <div className="rounded-3xl border border-white bg-white/80 backdrop-blur-xl shadow-2xl shadow-slate-200/50 p-8 md:p-10">
           <div className="mb-8">
             <h3 className="text-xl font-bold text-slate-900">Welcome back</h3>
-            <p className="text-sm text-slate-500 mt-1 font-medium">Please enter your credentials to continue</p>
+            <p className="text-sm text-slate-700 mt-1 font-medium">Please enter your credentials to continue</p>
           </div>
 
           {/* Error Alert */}
@@ -82,7 +82,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label 
                 htmlFor="email" 
-                className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1"
+                className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1"
               >
                 Email Address
               </label>
@@ -113,7 +113,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between ml-1">
                 <label 
                   htmlFor="password" 
-                  className="text-xs font-bold uppercase tracking-widest text-slate-500"
+                  className="text-xs font-bold uppercase tracking-widest text-slate-700"
                 >
                   Password
                 </label>
@@ -168,7 +168,7 @@ export default function LoginPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="ml-3 text-sm font-semibold text-slate-500 group-hover:text-slate-700 transition-colors">Keep me signed in</span>
+                <span className="ml-3 text-sm font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">Keep me signed in</span>
               </label>
             </div>
 
@@ -200,16 +200,16 @@ export default function LoginPage() {
 
           {/* Register Link */}
           <div className="mt-10 pt-8 border-t border-slate-100 text-center">
-            <p className="text-sm font-semibold text-slate-500">
+            <p className="text-sm font-semibold text-slate-700">
               New to KL Fashion?{" "}
-              <Link href="/register" className="text-app-accent hover:text-indigo-700 transition-colors">
+              <Link href="/register" className="text-app-accent hover:text-indigo-700 transition-colors font-bold">
                 Create an account
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="mt-10 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <p className="mt-10 text-center text-xs font-bold text-slate-600 uppercase tracking-widest">
           © 2025 KL Fashion CRM • Secure Access
         </p>
       </div>
