@@ -15,9 +15,9 @@
 
 Add this single environment variable to Vercel:
 
-| Variable Name | Value | Required | Environments |
-|--------------|-------|----------|--------------|
-| `NEXT_PUBLIC_API_BASE_URL` | `https://kl-backend-v2-production-5f50.up.railway.app/api` | ✅ Yes | Production, Preview, Development |
+| Variable Name              | Value                                                  | Required | Environments                     |
+| -------------------------- | ------------------------------------------------------ | -------- | -------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | `https://kl-backend-v2-production-5f50.up.railway.app` | ✅ Yes   | Production, Preview, Development |
 
 ---
 
@@ -59,7 +59,7 @@ Vercel will auto-detect Next.js. Confirm these settings:
 1. In the import screen, expand **"Environment Variables"**
 2. Add the variable:
    - **Name:** `NEXT_PUBLIC_API_BASE_URL`
-   - **Value:** `https://kl-backend-v2-production-5f50.up.railway.app/api`
+   - **Value:** `https://kl-backend-v2-production-5f50.up.railway.app`
 3. Select environments: ✅ Production, ✅ Preview, ✅ Development
 4. Click **"Add"**
 
@@ -88,14 +88,14 @@ Your backend MUST allow requests from your Vercel domain. Update your backend CO
 // Example backend CORS configuration (Node.js/Express)
 const corsOptions = {
   origin: [
-    'http://localhost:3000',
-    'https://your-project-name.vercel.app',
-    'https://your-custom-domain.com',
+    "http://localhost:3000",
+    "https://your-project-name.vercel.app",
+    "https://your-custom-domain.com",
     // Add all your Vercel preview URLs or use a pattern
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -134,9 +134,9 @@ After getting your Vercel domain, update backend CORS to allow it:
 
 ```javascript
 origin: [
-  'https://kl-supplier-portal.vercel.app',
+  "https://kl-supplier-portal.vercel.app",
   // ... other domains
-]
+];
 ```
 
 ### 3. Configure Environment Variables for Multiple Environments
@@ -144,12 +144,15 @@ origin: [
 If you need different API URLs for preview vs production:
 
 **Production:**
+
 - `NEXT_PUBLIC_API_BASE_URL` = `https://your-production-backend.com/api`
 
 **Preview:**
+
 - `NEXT_PUBLIC_API_BASE_URL` = `https://your-staging-backend.com/api`
 
 **Development:**
+
 - `NEXT_PUBLIC_API_BASE_URL` = `http://localhost:5000/api`
 
 ---
@@ -161,6 +164,7 @@ If you need different API URLs for preview vs production:
 **Error:** `NEXT_PUBLIC_API_BASE_URL is not defined`
 
 **Solution:**
+
 1. Go to **Project Settings** → **Environment Variables**
 2. Add the missing variable
 3. Redeploy: **Deployments** → **⋯** → **Redeploy**
@@ -170,6 +174,7 @@ If you need different API URLs for preview vs production:
 **Error:** `Module not found` or dependency errors
 
 **Solution:**
+
 ```bash
 # Locally test the build
 npm run build
@@ -185,6 +190,7 @@ git push origin main
 **Error:** CORS error in browser console
 
 **Solution:**
+
 1. Update backend CORS to allow your Vercel domain
 2. Ensure `credentials: true` is set in backend CORS
 3. Verify API URL is correct (no trailing slashes)
@@ -194,6 +200,7 @@ git push origin main
 **Error:** 404 on API calls
 
 **Solution:**
+
 1. Verify `NEXT_PUBLIC_API_BASE_URL` is set correctly
 2. Check backend is accessible from the internet
 3. Test API URL directly in browser: `https://your-backend/api/auth/me`
@@ -205,6 +212,7 @@ git push origin main
 **Error:** Login works locally but not on Vercel
 
 **Solution:**
+
 1. Check cookie settings in backend (ensure `sameSite`, `secure` are correct)
 2. Verify backend allows credentials from Vercel domain
 3. Check browser console for cookie errors
@@ -216,6 +224,7 @@ git push origin main
 **Error:** Images not uploading or displaying
 
 **Solution:**
+
 1. Verify backend image upload endpoint is working
 2. Check image size limits (both frontend and backend)
 3. Ensure backend returns correct image URLs
@@ -233,6 +242,7 @@ git push origin main
 ### Environment Variables
 
 Update variables:
+
 1. **Settings** → **Environment Variables**
 2. Edit or add variables
 3. **Save**
@@ -241,6 +251,7 @@ Update variables:
 ### Analytics (Optional)
 
 Enable Vercel Analytics:
+
 1. **Analytics** tab in dashboard
 2. Click **"Enable"**
 3. Add analytics script (automatic with Vercel)
@@ -248,6 +259,7 @@ Enable Vercel Analytics:
 ### Logs
 
 View runtime logs:
+
 1. **Deployments** → Click on a deployment
 2. **View Function Logs**
 3. Filter by timeframe and severity
@@ -289,10 +301,12 @@ View runtime logs:
 ### Recommended
 
 1. **Enable Vercel Speed Insights:**
+
    - Go to **Speed Insights** tab
    - Click **"Enable"**
 
 2. **Monitor Core Web Vitals:**
+
    - Check **Analytics** → **Web Vitals**
    - Optimize pages with poor scores
 
@@ -338,11 +352,13 @@ vercel env rm NEXT_PUBLIC_API_BASE_URL
 ## 📧 Support & Resources
 
 ### Vercel Documentation
+
 - [Next.js on Vercel](https://vercel.com/docs/frameworks/nextjs)
 - [Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
 - [Custom Domains](https://vercel.com/docs/concepts/projects/domains)
 
 ### Project Support
+
 - **Email:** support@klfashion.com
 - **GitHub Issues:** [Create an issue](https://github.com/Devmate-Solutions/KI_Fashion_Supplier_Portal/issues)
 
@@ -384,23 +400,27 @@ Your deployment is successful when:
 ## 📝 Quick Reference
 
 **Environment Variable:**
+
 ```
-NEXT_PUBLIC_API_BASE_URL=https://kl-backend-v2-production-5f50.up.railway.app/api
+NEXT_PUBLIC_API_BASE_URL=https://kl-backend-v2-production-5f50.up.railway.app
 ```
 
 **Vercel Dashboard:**
+
 ```
 https://vercel.com/dashboard
 ```
 
 **GitHub Repository:**
+
 ```
 https://github.com/Devmate-Solutions/KI_Fashion_Supplier_Portal
 ```
 
 **Backend API:**
+
 ```
-https://kl-backend-v2-production-5f50.up.railway.app/api
+https://kl-backend-v2-production-5f50.up.railway.app
 ```
 
 ---
@@ -408,4 +428,3 @@ https://kl-backend-v2-production-5f50.up.railway.app/api
 **Last Updated:** December 2025
 **Version:** 2.0.0
 **Status:** Production Ready ✅
-

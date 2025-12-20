@@ -14,7 +14,7 @@ Before deploying to Vercel, ensure you have:
 
 | Variable Name | Description | Example |
 |--------------|-------------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KL Fashion backend API | `https://kl-backend-v2-production-5f50.up.railway.app/api` |
+| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KL Fashion backend API | `https://kl-backend-v2-production-5f50.up.railway.app` |
 
 > **Note:** The `NEXT_PUBLIC_` prefix makes this variable accessible in the browser. This is required for API calls from the client side.
 
@@ -39,7 +39,7 @@ Before deploying to Vercel, ensure you have:
    - In the "Configure Project" step, expand "Environment Variables"
    - Add the following variable:
      - **Name:** `NEXT_PUBLIC_API_BASE_URL`
-     - **Value:** Your backend API URL (e.g., `https://kl-backend-v2-production-5f50.up.railway.app/api`)
+     - **Value:** Your backend API URL (e.g., `https://kl-backend-v2-production-5f50.up.railway.app`)
      - **Environment:** Select all (Production, Preview, Development)
 
 4. **Deploy**
@@ -205,7 +205,7 @@ vercel logs [deployment-url]
 
 The application is pre-configured with the default backend:
 ```
-https://kl-backend-v2-production-5f50.up.railway.app/api
+https://kl-backend-v2-production-5f50.up.railway.app
 ```
 
 If you're using this default backend, you can skip setting `NEXT_PUBLIC_API_BASE_URL` as it will use the default value.

@@ -520,7 +520,7 @@ This comprehensive QA test report covers all features, user flows, and functiona
 - **Framework:** Next.js 14.2.33
 - **React Version:** 18.x
 - **Node Version:** (Not specified)
-- **API Base URL:** https://kl-backend-v2-production-5f50.up.railway.app/api
+- **API Base URL:** https://kl-backend-v2-production-5f50.up.railway.app
 - **Testing Method:** Static code analysis, flow analysis, component review
 
 ---
