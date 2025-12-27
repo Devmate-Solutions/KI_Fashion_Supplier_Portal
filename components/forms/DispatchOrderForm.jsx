@@ -140,13 +140,13 @@ export default function DispatchOrderForm({
         primaryColor: Array.isArray(item.primaryColor)
           ? item.primaryColor
           : item.primaryColor
-          ? [item.primaryColor]
-          : [],
+            ? [item.primaryColor]
+            : [],
         size: Array.isArray(item.size)
           ? item.size
           : item.size
-          ? [item.size]
-          : [],
+            ? [item.size]
+            : [],
         quantity: item.quantity || "",
         boxes: item.boxes || [],
       }));
@@ -155,9 +155,9 @@ export default function DispatchOrderForm({
         date:
           initialOrder.date || initialOrder.dispatchDate
             ? new Date(initialOrder.date || initialOrder.dispatchDate)
-                .toISOString()
-                .split("T")[0]
-          : new Date().toISOString().split("T")[0],
+              .toISOString()
+              .split("T")[0]
+            : new Date().toISOString().split("T")[0],
         logisticsCompany:
           initialOrder.logisticsCompany?._id ||
           initialOrder.logisticsCompany ||
@@ -198,9 +198,9 @@ export default function DispatchOrderForm({
   // This will automatically update when any field in products array changes
   const watchedProducts =
     useWatch({
-    control,
-    name: "products",
-  }) || [];
+      control,
+      name: "products",
+    }) || [];
 
   const date = watch("date");
   const logisticsCompany = watch("logisticsCompany");
@@ -425,13 +425,13 @@ export default function DispatchOrderForm({
           // Check if we need to restore from ref
           const needsRestore = Object.keys(initialImageUrlsRef.current).some(
             (index) => {
-            const idx = parseInt(index);
+              const idx = parseInt(index);
               const hasPreviews =
                 prevPreviews[idx] &&
                 Object.keys(prevPreviews[idx]).some((key) =>
                   key.startsWith("existing-")
                 );
-            return !hasPreviews && initialImageUrlsRef.current[index];
+              return !hasPreviews && initialImageUrlsRef.current[index];
             }
           );
 
@@ -529,13 +529,13 @@ export default function DispatchOrderForm({
       costPrice: newProduct.costPrice || "0",
       primaryColor: Array.isArray(newProduct.primaryColor)
         ? newProduct.primaryColor
-            .filter((c) => c && typeof c === "string" && c.trim())
-            .map((c) => c.trim())
+          .filter((c) => c && typeof c === "string" && c.trim())
+          .map((c) => c.trim())
         : [],
       size: Array.isArray(newProduct.size)
         ? newProduct.size
-            .filter((s) => s && typeof s === "string" && s.trim())
-            .map((s) => s.trim())
+          .filter((s) => s && typeof s === "string" && s.trim())
+          .map((s) => s.trim())
         : [],
       quantity: parseInt(newProduct.quantity) || 1,
       boxes: [],
@@ -684,9 +684,9 @@ export default function DispatchOrderForm({
 
       setProductPackets((prev) => {
         const updated = {
-        ...prev,
-        [index]: {
-          useVariantTracking: true,
+          ...prev,
+          [index]: {
+            useVariantTracking: true,
             packets: deepCopiedPackets,
           },
         };
@@ -807,15 +807,15 @@ export default function DispatchOrderForm({
     const updatedImages = { ...productImages };
     updatedImages[productIndex] = (updatedImages[productIndex] || []).filter(
       (f) => {
-      const fId = getFileId(f);
-      // Clean up object URL if it was created
-      if (fId === fileId && f instanceof File) {
-        const preview = imagePreviews[productIndex]?.[fileId];
+        const fId = getFileId(f);
+        // Clean up object URL if it was created
+        if (fId === fileId && f instanceof File) {
+          const preview = imagePreviews[productIndex]?.[fileId];
           if (preview && preview.startsWith("blob:")) {
-          URL.revokeObjectURL(preview);
+            URL.revokeObjectURL(preview);
+          }
         }
-      }
-      return fId !== fileId;
+        return fId !== fileId;
       }
     );
     setProductImages(updatedImages);
@@ -970,8 +970,8 @@ export default function DispatchOrderForm({
       const currentArray = Array.isArray(watchedProducts[rowIndex]?.[fieldName])
         ? watchedProducts[rowIndex][fieldName]
         : watchedProducts[rowIndex]?.[fieldName]
-        ? [watchedProducts[rowIndex][fieldName]]
-        : [];
+          ? [watchedProducts[rowIndex][fieldName]]
+          : [];
       const trimmedValue = editValue.trim();
       if (trimmedValue && !currentArray.includes(trimmedValue)) {
         valueToSave = [...currentArray, trimmedValue];
@@ -1130,7 +1130,8 @@ export default function DispatchOrderForm({
             ? product.costPrice
             : parseFloat(product.costPrice) || 0,
         quantity: product.quantity,
-        boxes: boxes, // All items get the same boxes array (just box numbers)
+        quantity: product.quantity,
+        boxes: [], // Don't assign all boxes to every item to avoid multiplication issue
         unitWeight: 0,
       };
 
@@ -1240,6 +1241,7 @@ export default function DispatchOrderForm({
       logisticsCompany: values.logisticsCompany,
       items,
       totalDiscount: discountAmount, // Use calculated discount amount
+      totalBoxes: parseInt(totalBoxes) || 0,
     };
 
     // Store the submit data and show confirmation dialog
@@ -1347,11 +1349,10 @@ export default function DispatchOrderForm({
               <input
                 type="date"
                 id="date"
-                className={`${inputClasses} ${
-                  errors.date
+                className={`${inputClasses} ${errors.date
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 {...register("date")}
                 aria-invalid={errors.date ? "true" : "false"}
                 aria-describedby={errors.date ? "date-error" : undefined}
@@ -1379,11 +1380,10 @@ export default function DispatchOrderForm({
               </label>
               <select
                 id="logisticsCompany"
-                className={`${selectClasses} ${
-                  errors.logisticsCompany
+                className={`${selectClasses} ${errors.logisticsCompany
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 {...register("logisticsCompany")}
                 aria-invalid={errors.logisticsCompany ? "true" : "false"}
                 aria-describedby={
@@ -1438,11 +1438,10 @@ export default function DispatchOrderForm({
               <input
                 id="new-product-name"
                 type="text"
-                className={`${inputClasses} ${
-                  newProductErrors.productName
+                className={`${inputClasses} ${newProductErrors.productName
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 value={newProduct.productName}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, productName: e.target.value })
@@ -1468,11 +1467,10 @@ export default function DispatchOrderForm({
               <input
                 id="new-product-code"
                 type="text"
-                className={`${inputClasses} ${
-                  newProductErrors.productCode
+                className={`${inputClasses} ${newProductErrors.productCode
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 value={newProduct.productCode}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, productCode: e.target.value })
@@ -1498,11 +1496,10 @@ export default function DispatchOrderForm({
               <div className="flex gap-2">
                 <select
                   id="new-product-type"
-                  className={`${selectClasses} flex-1 ${
-                    newProductErrors.productType
+                  className={`${selectClasses} flex-1 ${newProductErrors.productType
                       ? "border-red-500 focus:ring-red-500"
                       : "border-slate-300"
-                  }`}
+                    }`}
                   value={newProduct.productType}
                   onChange={(e) =>
                     setNewProduct({
@@ -1555,11 +1552,10 @@ export default function DispatchOrderForm({
                 type="number"
                 step="0.01"
                 min="0"
-                className={`${inputClasses} ${
-                  newProductErrors.costPrice
+                className={`${inputClasses} ${newProductErrors.costPrice
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 value={newProduct.costPrice}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, costPrice: e.target.value })
@@ -1746,11 +1742,10 @@ export default function DispatchOrderForm({
                 id="new-quantity"
                 type="number"
                 min="1"
-                className={`${inputClasses} ${
-                  newProductErrors.quantity
+                className={`${inputClasses} ${newProductErrors.quantity
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
-                }`}
+                  }`}
                 value={newProduct.quantity}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, quantity: e.target.value })
@@ -1919,9 +1914,8 @@ export default function DispatchOrderForm({
                       return (
                         <tr
                           key={field.id}
-                          className={`hover:bg-slate-50 transition-colors ${
-                            isEditing ? "bg-blue-50" : ""
-                          }`}
+                          className={`hover:bg-slate-50 transition-colors ${isEditing ? "bg-blue-50" : ""
+                            }`}
                         >
                           {/* Image Column */}
                           <td className="px-4 py-3">
@@ -2027,11 +2021,10 @@ export default function DispatchOrderForm({
                                   maxImages={20}
                                   showAddButton={true}
                                   emptyMessage="No images"
-                                  title={`Product Images - ${
-                                    product?.productName ||
+                                  title={`Product Images - ${product?.productName ||
                                     product?.productCode ||
                                     `Item ${productIndex + 1}`
-                                  }`}
+                                    }`}
                                 />
                               );
                             })()}
@@ -2052,7 +2045,7 @@ export default function DispatchOrderForm({
                           {/* Product Name Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
-                            editingCell.fieldName === "productName" ? (
+                              editingCell.fieldName === "productName" ? (
                               <div className="flex items-center gap-2">
                                 <input
                                   type="text"
@@ -2107,11 +2100,10 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${
-                                  productErrors?.productName
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productName
                                     ? "border border-red-300"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "productName")
                                 }
@@ -2132,7 +2124,7 @@ export default function DispatchOrderForm({
                           {/* SKU/Code Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
-                            editingCell.fieldName === "productCode" ? (
+                              editingCell.fieldName === "productCode" ? (
                               <div className="flex items-center gap-2">
                                 <input
                                   type="text"
@@ -2187,11 +2179,10 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${
-                                  productErrors?.productCode
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productCode
                                     ? "border border-red-300"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "productCode")
                                 }
@@ -2212,7 +2203,7 @@ export default function DispatchOrderForm({
                           {/* Product Type Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
-                            editingCell.fieldName === "productType" ? (
+                              editingCell.fieldName === "productType" ? (
                               <div className="flex items-center gap-2">
                                 <select
                                   value={editValue}
@@ -2276,11 +2267,10 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${
-                                  productErrors?.productType
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productType
                                     ? "border border-red-300"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "productType")
                                 }
@@ -2301,7 +2291,7 @@ export default function DispatchOrderForm({
                           {/* Cost Price Column */}
                           <td className="px-4 py-3 text-right">
                             {isEditing &&
-                            editingCell.fieldName === "costPrice" ? (
+                              editingCell.fieldName === "costPrice" ? (
                               <div className="flex items-center gap-2 justify-end">
                                 <input
                                   type="number"
@@ -2355,19 +2345,18 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${
-                                  productErrors?.costPrice
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${productErrors?.costPrice
                                     ? "border border-red-300"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "costPrice")
                                 }
                                 title="Click to edit"
                               >
                                 {product?.costPrice !== undefined &&
-                                product?.costPrice !== null &&
-                                product?.costPrice !== "" ? (
+                                  product?.costPrice !== null &&
+                                  product?.costPrice !== "" ? (
                                   parseFloat(product.costPrice).toFixed(2)
                                 ) : (
                                   <span className="text-slate-400">—</span>
@@ -2384,7 +2373,7 @@ export default function DispatchOrderForm({
                           {/* Primary Color Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
-                            editingCell.fieldName === "primaryColor" ? (
+                              editingCell.fieldName === "primaryColor" ? (
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                   <input
@@ -2452,17 +2441,17 @@ export default function DispatchOrderForm({
                                 </div>
                                 {Array.isArray(product?.primaryColor) &&
                                   product.primaryColor.length > 0 && (
-                                  <div className="flex flex-wrap gap-1">
+                                    <div className="flex flex-wrap gap-1">
                                       {product.primaryColor.map(
                                         (color, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
-                                      >
-                                        {color}
-                                        <button
-                                          type="button"
-                                          onClick={() => {
+                                          <span
+                                            key={idx}
+                                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
+                                          >
+                                            {color}
+                                            <button
+                                              type="button"
+                                              onClick={() => {
                                                 const updated =
                                                   product.primaryColor.filter(
                                                     (_, i) => i !== idx
@@ -2471,16 +2460,16 @@ export default function DispatchOrderForm({
                                                   `products.${productIndex}.primaryColor`,
                                                   updated
                                                 );
-                                          }}
-                                          className="hover:text-blue-600"
-                                        >
-                                          <X className="h-2.5 w-2.5" />
-                                        </button>
-                                      </span>
+                                              }}
+                                              className="hover:text-blue-600"
+                                            >
+                                              <X className="h-2.5 w-2.5" />
+                                            </button>
+                                          </span>
                                         )
                                       )}
-                                  </div>
-                                )}
+                                    </div>
+                                  )}
                               </div>
                             ) : (
                               <div
@@ -2490,35 +2479,34 @@ export default function DispatchOrderForm({
                                 }
                                 title={
                                   Array.isArray(product?.primaryColor) &&
-                                  product.primaryColor.length > 0
+                                    product.primaryColor.length > 0
                                     ? `All colors: ${product.primaryColor.join(
-                                        ", "
-                                      )}`
+                                      ", "
+                                    )}`
                                     : "Click to add/edit colors"
                                 }
                               >
                                 {Array.isArray(product?.primaryColor) &&
-                                product.primaryColor.length > 0 ? (
+                                  product.primaryColor.length > 0 ? (
                                   <div className="flex flex-wrap gap-1 max-w-[200px]">
                                     {product.primaryColor
                                       .slice(0, 2)
                                       .map((color, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs truncate max-w-[90px]"
-                                        title={color}
-                                      >
-                                        {color}
-                                      </span>
-                                    ))}
+                                        <span
+                                          key={idx}
+                                          className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs truncate max-w-[90px]"
+                                          title={color}
+                                        >
+                                          {color}
+                                        </span>
+                                      ))}
                                     {product.primaryColor.length > 2 && (
                                       <span
                                         className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
-                                        title={`+${
-                                          product.primaryColor.length - 2
-                                        } more: ${product.primaryColor
-                                          .slice(2)
-                                          .join(", ")}`}
+                                        title={`+${product.primaryColor.length - 2
+                                          } more: ${product.primaryColor
+                                            .slice(2)
+                                            .join(", ")}`}
                                       >
                                         +{product.primaryColor.length - 2}
                                       </span>
@@ -2595,16 +2583,16 @@ export default function DispatchOrderForm({
                                 </div>
                                 {Array.isArray(product?.size) &&
                                   product.size.length > 0 && (
-                                  <div className="flex flex-wrap gap-1">
-                                    {product.size.map((size, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs"
-                                      >
-                                        {size}
-                                        <button
-                                          type="button"
-                                          onClick={() => {
+                                    <div className="flex flex-wrap gap-1">
+                                      {product.size.map((size, idx) => (
+                                        <span
+                                          key={idx}
+                                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs"
+                                        >
+                                          {size}
+                                          <button
+                                            type="button"
+                                            onClick={() => {
                                               const updated =
                                                 product.size.filter(
                                                   (_, i) => i !== idx
@@ -2613,15 +2601,15 @@ export default function DispatchOrderForm({
                                                 `products.${productIndex}.size`,
                                                 updated
                                               );
-                                          }}
-                                          className="hover:text-green-600"
-                                        >
-                                          <X className="h-2.5 w-2.5" />
-                                        </button>
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
+                                            }}
+                                            className="hover:text-green-600"
+                                          >
+                                            <X className="h-2.5 w-2.5" />
+                                          </button>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
                               </div>
                             ) : (
                               <div
@@ -2631,33 +2619,32 @@ export default function DispatchOrderForm({
                                 }
                                 title={
                                   Array.isArray(product?.size) &&
-                                  product.size.length > 0
+                                    product.size.length > 0
                                     ? `All sizes: ${product.size.join(", ")}`
                                     : "Click to add/edit sizes"
                                 }
                               >
                                 {Array.isArray(product?.size) &&
-                                product.size.length > 0 ? (
+                                  product.size.length > 0 ? (
                                   <div className="flex flex-wrap gap-1 max-w-[200px]">
                                     {product.size
                                       .slice(0, 2)
                                       .map((size, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="inline-block px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs truncate max-w-[90px]"
-                                        title={size}
-                                      >
-                                        {size}
-                                      </span>
-                                    ))}
+                                        <span
+                                          key={idx}
+                                          className="inline-block px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs truncate max-w-[90px]"
+                                          title={size}
+                                        >
+                                          {size}
+                                        </span>
+                                      ))}
                                     {product.size.length > 2 && (
                                       <span
                                         className="inline-block px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs"
-                                        title={`+${
-                                          product.size.length - 2
-                                        } more: ${product.size
-                                          .slice(2)
-                                          .join(", ")}`}
+                                        title={`+${product.size.length - 2
+                                          } more: ${product.size
+                                            .slice(2)
+                                            .join(", ")}`}
                                       >
                                         +{product.size.length - 2}
                                       </span>
@@ -2673,7 +2660,7 @@ export default function DispatchOrderForm({
                           {/* Quantity Column */}
                           <td className="px-4 py-3 text-right">
                             {isEditing &&
-                            editingCell.fieldName === "quantity" ? (
+                              editingCell.fieldName === "quantity" ? (
                               <div className="flex items-center gap-2 justify-end">
                                 <input
                                   type="number"
@@ -2731,11 +2718,10 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${
-                                  productErrors?.quantity
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${productErrors?.quantity
                                     ? "border border-red-300"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "quantity")
                                 }
@@ -2775,28 +2761,26 @@ export default function DispatchOrderForm({
                                         {productPackets[productIndex]?.packets
                                           ?.length > 0 ? (
                                           <>
-                                          <div className="flex items-center justify-between gap-2">
-                                            <span className="text-xs font-medium text-slate-600">
+                                            <div className="flex items-center justify-between gap-2">
+                                              <span className="text-xs font-medium text-slate-600">
                                                 {productPackets[productIndex]
                                                   .packets[0].isLoose
-                                                ? null
-                                                  : `${
-                                                      productPackets[
-                                                        productIndex
-                                                      ].packets.length
-                                                    } Packet${
-                                                      productPackets[
-                                                        productIndex
-                                                      ].packets.length !== 1
-                                                        ? "s"
-                                                        : ""
-                                                    }`}
-                                            </span>
+                                                  ? null
+                                                  : `${productPackets[
+                                                    productIndex
+                                                  ].packets.length
+                                                  } Packet${productPackets[
+                                                    productIndex
+                                                  ].packets.length !== 1
+                                                    ? "s"
+                                                    : ""
+                                                  }`}
+                                              </span>
                                             </div>
-                                                <Button
-                                                  type="button"
+                                            <Button
+                                              type="button"
                                               variant="outline"
-                                                  size="sm"
+                                              size="sm"
                                               onClick={() =>
                                                 handleOpenPacketModal(
                                                   productIndex
@@ -2806,7 +2790,7 @@ export default function DispatchOrderForm({
                                             >
                                               <Pencil className="h-3.5 w-3.5 mr-2 text-blue-500" />
                                               Edit Configuration
-                                                </Button>
+                                            </Button>
                                           </>
                                         ) : (
                                           <Button
@@ -2875,13 +2859,12 @@ export default function DispatchOrderForm({
                                               )}
                                               <div className="flex flex-wrap gap-1">
                                                 {parts.map(([key, qty]) => (
-                                                  <span 
-                                                    key={key} 
-                                                    className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${
-                                                      hasMismatch 
+                                                  <span
+                                                    key={key}
+                                                    className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
                                                         ? "bg-red-100 text-red-700 border-red-300"
                                                         : "bg-slate-100 text-slate-700 border-slate-200"
-                                                    }`}
+                                                      }`}
                                                   >
                                                     {key}: {qty}
                                                   </span>
@@ -2952,9 +2935,8 @@ export default function DispatchOrderForm({
                       id="total-boxes"
                       type="number"
                       min="1"
-                      className={`${inputClasses} ${
-                        boxError ? "border-red-500 focus:ring-red-500" : ""
-                      }`}
+                      className={`${inputClasses} ${boxError ? "border-red-500 focus:ring-red-500" : ""
+                        }`}
                       value={totalBoxes}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -3065,10 +3047,9 @@ export default function DispatchOrderForm({
                         <button
                           type="button"
                           onClick={() => setDiscountType("percentage")}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            discountType === "percentage"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${discountType === "percentage"
+                              ? "bg-blue-600 text-white"
+                              : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                             }`}
                         >
                           Percentage
@@ -3076,10 +3057,9 @@ export default function DispatchOrderForm({
                         <button
                           type="button"
                           onClick={() => setDiscountType("amount")}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            discountType === "amount"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${discountType === "amount"
+                              ? "bg-blue-600 text-white"
+                              : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                             }`}
                         >
                           Amount
@@ -3203,8 +3183,8 @@ export default function DispatchOrderForm({
                 ? "Updating..."
                 : "Creating..."
               : initialOrder
-              ? "Update Order"
-              : "Create Order"}
+                ? "Update Order"
+                : "Create Order"}
           </Button>
         </div>
       </form>
@@ -3283,9 +3263,9 @@ export default function DispatchOrderForm({
           }));
 
           return {
-          ...p,
-          id: i.toString(),
-          index: i,
+            ...p,
+            id: i.toString(),
+            index: i,
             packets: deepCopiedPackets,
           };
         })}
