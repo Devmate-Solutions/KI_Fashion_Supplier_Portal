@@ -12,9 +12,9 @@ Before deploying to Vercel, ensure you have:
 
 ### Required Variables
 
-| Variable Name | Description | Example |
-|--------------|-------------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KL Fashion backend API | `https://kl-backend-v2-production-5f50.up.railway.app` |
+| Variable Name              | Description                                 | Example                                               |
+| -------------------------- | ------------------------------------------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KL Fashion backend API | `https://kifashionbackend2-production.up.railway.app` |
 
 > **Note:** The `NEXT_PUBLIC_` prefix makes this variable accessible in the browser. This is required for API calls from the client side.
 
@@ -23,6 +23,7 @@ Before deploying to Vercel, ensure you have:
 ### Method 1: Deploy via Vercel Dashboard (Recommended)
 
 1. **Push your code to GitHub/GitLab/Bitbucket**
+
    ```bash
    git add .
    git commit -m "Prepare for Vercel deployment"
@@ -30,16 +31,18 @@ Before deploying to Vercel, ensure you have:
    ```
 
 2. **Import Project to Vercel**
+
    - Go to https://vercel.com/new
    - Click "Import Project"
    - Select your repository
    - Vercel will automatically detect it's a Next.js project
 
 3. **Configure Environment Variables**
+
    - In the "Configure Project" step, expand "Environment Variables"
    - Add the following variable:
-     - **Name:** `NEXT_PUBLIC_API_BASE_URL`
-     - **Value:** Your backend API URL (e.g., `https://kl-backend-v2-production-5f50.up.railway.app`)
+   - **Name:** `NEXT_PUBLIC_API_BASE_URL`
+   - **Value:** Your backend API URL (e.g., `https://kifashionbackend2-production.up.railway.app`)
      - **Environment:** Select all (Production, Preview, Development)
 
 4. **Deploy**
@@ -50,24 +53,29 @@ Before deploying to Vercel, ensure you have:
 ### Method 2: Deploy via Vercel CLI
 
 1. **Install Vercel CLI**
+
    ```bash
    npm i -g vercel
    ```
 
 2. **Login to Vercel**
+
    ```bash
    vercel login
    ```
 
 3. **Deploy**
+
    ```bash
    vercel
    ```
 
 4. **Add Environment Variables**
+
    ```bash
    vercel env add NEXT_PUBLIC_API_BASE_URL
    ```
+
    When prompted, enter your backend API URL.
 
 5. **Deploy to Production**
@@ -92,11 +100,11 @@ Ensure your backend API allows requests from your Vercel domain:
 // Example backend CORS configuration
 const corsOptions = {
   origin: [
-    'http://localhost:3000',
-    'https://your-project-name.vercel.app',
-    'https://supplier.klfashion.com' // Your custom domain
+    "http://localhost:3000",
+    "https://your-project-name.vercel.app",
+    "https://supplier.klfashion.com", // Your custom domain
   ],
-  credentials: true
+  credentials: true,
 };
 ```
 
@@ -105,11 +113,13 @@ const corsOptions = {
 To update environment variables after deployment:
 
 **Via Dashboard:**
+
 - Go to Project Settings → Environment Variables
 - Edit the variable
 - Redeploy for changes to take effect
 
 **Via CLI:**
+
 ```bash
 vercel env rm NEXT_PUBLIC_API_BASE_URL production
 vercel env add NEXT_PUBLIC_API_BASE_URL production
@@ -172,10 +182,12 @@ The project uses the following build settings (automatically detected by Vercel)
 ## Support
 
 For deployment issues:
+
 - Vercel Documentation: https://vercel.com/docs
 - Next.js Documentation: https://nextjs.org/docs
 
 For application issues:
+
 - Contact: suppliers@klfashion.com
 
 ## Quick Reference Commands
@@ -204,8 +216,9 @@ vercel logs [deployment-url]
 ## Default Backend API
 
 The application is pre-configured with the default backend:
+
 ```
-https://kl-backend-v2-production-5f50.up.railway.app
+https://kifashionbackend2-production.up.railway.app
 ```
 
 If you're using this default backend, you can skip setting `NEXT_PUBLIC_API_BASE_URL` as it will use the default value.
@@ -214,4 +227,3 @@ If you're using this default backend, you can skip setting `NEXT_PUBLIC_API_BASE
 
 **Last Updated:** December 2025
 **Version:** 1.0.0
-

@@ -150,32 +150,33 @@ export default function RegisterPage() {
             <span className="text-2xl font-black text-white">KL</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Partner with KL Fashion</h1>
-          <p className="text-slate-700 mt-3 font-medium">Create your supplier account to start your journey with us</p>
+          <p className="text-slate-800 mt-3 font-semibold">Create your supplier account to start your journey with us</p>
         </div>
 
-        <Card className="rounded-3xl border border-white bg-white/80 backdrop-blur-xl shadow-2xl shadow-slate-200/50 overflow-hidden">
-          <CardHeader className="p-8 border-b border-slate-50">
+        <Card className="rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/50 overflow-hidden">
+          <CardHeader className="p-8 border-b border-slate-200">
             <CardTitle>Supplier Onboarding</CardTitle>
-            <CardDescription className="font-medium mt-1">We'll use these details to create your secure login and business profile.</CardDescription>
+            <CardDescription className="font-semibold mt-1 text-slate-700">We'll use these details to create your secure login and business profile.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 md:p-10">
             <form className="space-y-8" onSubmit={handleSubmit(onSubmit, onError)}>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Your Full Name *
                   </label>
                   <div className="relative">
-                    <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
                       {...register("name")}
                       id="name"
                       type="text"
                       placeholder="John Doe"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                        ${errors.name ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        ${errors.name ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                        placeholder:text-slate-500
                       `}
                       autoComplete="name"
                     />
@@ -186,20 +187,21 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Company Name *
                   </label>
                   <div className="relative">
-                    <Building2 className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Building2 className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
                       {...register("company")}
                       id="company"
                       type="text"
                       placeholder="Acme Textiles Ltd."
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                        ${errors.company ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        ${errors.company ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                        placeholder:text-slate-500
                       `}
                       autoComplete="organization"
                     />
@@ -210,21 +212,22 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Primary Phone *
                   </label>
                   <div className="flex gap-3">
                     <div className="relative w-28 flex-shrink-0">
-                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                       <input
                         {...register("phoneAreaCode")}
                         id="phoneAreaCode"
                         type="tel"
                         placeholder="+88"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                          ${errors.phoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                          ${errors.phoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                          placeholder:text-slate-500
                         `}
                         maxLength={5}
                         onChange={(e) => {
@@ -242,9 +245,10 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="01712345678"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900
-                          ${errors.phone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                          ${errors.phone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                          placeholder:text-slate-500
                         `}
                         autoComplete="tel"
                       />
@@ -256,21 +260,22 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="additionalPhone" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="additionalPhone" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Emergency/Alt Phone *
                   </label>
                   <div className="flex gap-3">
                     <div className="relative w-28 flex-shrink-0">
-                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                       <input
                         {...register("additionalPhoneAreaCode")}
                         id="additionalPhoneAreaCode"
                         type="tel"
                         placeholder="+88"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                          ${errors.additionalPhoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                          ${errors.additionalPhoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                          placeholder:text-slate-500
                         `}
                         maxLength={5}
                         onChange={(e) => {
@@ -288,9 +293,10 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="01812345678"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900
-                          ${errors.additionalPhone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                          ${errors.additionalPhone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                          focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                          placeholder:text-slate-500
                         `}
                         autoComplete="tel"
                       />
@@ -302,20 +308,21 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2 md:col-span-2">
-                  <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Business Email *
                   </label>
                   <div className="relative">
-                    <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
                       {...register("email")}
                       id="email"
                       type="email"
                       placeholder="supplier@company.com"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                        ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                        placeholder:text-slate-500
                       `}
                       autoComplete="email"
                     />
@@ -326,20 +333,21 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="space-y-2 md:col-span-2">
-                  <label htmlFor="companyAddress" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="companyAddress" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Company Registered Address *
                   </label>
                   <div className="relative">
-                    <MapPin className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                    <MapPin className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-500" />
                     <textarea
                       {...register("companyAddress")}
                       id="companyAddress"
                       rows={3}
                       placeholder="123 Textile Ave, Dhaka, Bangladesh"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900 pl-11
-                        ${errors.companyAddress ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium resize-none
+                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        ${errors.companyAddress ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold resize-none
+                        placeholder:text-slate-500
                       `}
                     />
                   </div>
@@ -351,7 +359,7 @@ export default function RegisterPage() {
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Create Password *
                   </label>
                   <div className="relative">
@@ -361,16 +369,17 @@ export default function RegisterPage() {
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white/50 text-slate-900
-                        ${errors.password ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white text-slate-900
+                        ${errors.password ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                        placeholder:text-slate-500
                       `}
                       autoComplete="new-password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
                       tabIndex={-1}
                     >
                       {showPassword ? (
@@ -386,7 +395,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1">
+                  <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
                     Confirm Password *
                   </label>
                   <div className="relative">
@@ -396,16 +405,17 @@ export default function RegisterPage() {
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white/50 text-slate-900
-                        ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
+                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white text-slate-900
+                        ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                        placeholder:text-slate-500
                       `}
                       autoComplete="new-password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
                       tabIndex={-1}
                     >
                       {showConfirmPassword ? (
@@ -452,8 +462,8 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-10 pt-8 text-center border-t border-slate-200/50">
-          <p className="text-sm font-semibold text-slate-700">
+        <div className="mt-10 pt-8 text-center border-t border-slate-200">
+          <p className="text-sm font-semibold text-slate-900">
             Already have a partner account?{" "}
             <Link className="text-app-accent hover:text-indigo-700 transition-colors font-bold" href="/login">
               Sign in here
@@ -461,7 +471,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <p className="mt-10 text-center text-xs font-bold text-slate-600 uppercase tracking-widest pb-10">
+        <p className="mt-10 text-center text-xs font-bold text-slate-800 uppercase tracking-widest pb-10">
           © 2025 KL Fashion CRM • Partner Network
         </p>
       </div>

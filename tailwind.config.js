@@ -22,6 +22,8 @@ module.exports = {
         "muted-foreground": "var(--muted-foreground)",
         accent: "var(--accent)",
         "accent-foreground": "var(--accent-foreground)",
+        "app-accent": "var(--app-accent)",
+        "app-accent-foreground": "var(--app-accent-foreground)",
         destructive: "var(--destructive)",
         "destructive-foreground": "var(--destructive-foreground)",
         border: "var(--border)",

@@ -11,7 +11,7 @@ Variable Name:
 NEXT_PUBLIC_API_BASE_URL
 
 Variable Value:
-https://kl-backend-v2-production-5f50.up.railway.app
+https://kifashionbackend2-production.up.railway.app
 
 Environments:
 ☑ Production
@@ -29,7 +29,7 @@ Environments:
    
 3. Add Environment Variable:
    → Name: NEXT_PUBLIC_API_BASE_URL
-   → Value: https://kl-backend-v2-production-5f50.up.railway.app
+   → Value: https://kifashionbackend2-production.up.railway.app
    → Select: Production, Preview, Development
    
 4. Click "Deploy"

@@ -49,13 +49,13 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="rounded-[4px] border border-border bg-card shadow-sm px-8 pt-8 pb-8">
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/50 px-8 pt-8 pb-8">
           {/* Header */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-semibold text-card-foreground">Forgot Password</h2>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h2 className="text-2xl font-bold text-slate-900">Forgot Password</h2>
+            <p className="text-sm text-slate-800 mt-2 font-semibold">
               Enter your email address and we'll create a password reset request for you
             </p>
           </div>
@@ -89,21 +89,21 @@ export default function ForgotPasswordPage() {
               <div>
                 <label 
                   htmlFor="email" 
-                  className="block text-sm font-medium text-foreground mb-2"
+                  className="block text-xs font-bold uppercase tracking-widest text-slate-900 mb-2 ml-1"
                 >
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
                     {...register('email')}
                     type="email"
                     id="email"
                     className={`
-                      w-full pl-10 pr-3 py-2 rounded-[4px] border bg-background text-foreground
-                      ${errors.email ? 'border-destructive focus:ring-destructive' : 'border-input focus:ring-ring'}
-                      focus:ring-2 focus:outline-none transition text-sm
-                      placeholder:text-muted-foreground
+                      w-full pl-11 pr-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                      ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                      focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                      placeholder:text-slate-500
                       disabled:opacity-50 disabled:cursor-not-allowed
                     `}
                     placeholder="you@supplier.com"
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 {errors.email && (
-                  <p className="mt-2 text-sm text-destructive">{errors.email.message}</p>
+                  <p className="mt-1.5 text-xs font-bold text-red-500 ml-1">{errors.email.message}</p>
                 )}
               </div>
 
@@ -121,15 +121,16 @@ export default function ForgotPasswordPage() {
                 type="submit"
                 disabled={isSubmitting}
                 className="
-                  w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium 
-                  py-2.5 px-4 rounded-[4px] transition duration-200 text-sm
+                  w-full bg-app-accent hover:bg-app-accent/90 text-white font-bold 
+                  py-4 px-6 rounded-2xl transition-all duration-200 text-sm
                   disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center
+                  flex items-center justify-center shadow-lg shadow-app-accent/25
+                  hover:shadow-app-accent/40 active:scale-[0.98]
                 "
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2" />
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3" />
                     Submitting...
                   </>
                 ) : (
@@ -143,7 +144,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-6 text-center">
             <Link 
               href="/login" 
-              className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+              className="text-sm text-app-accent hover:text-indigo-700 transition-colors font-bold"
             >
               Back to Login
             </Link>

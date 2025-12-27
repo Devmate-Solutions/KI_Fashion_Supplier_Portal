@@ -7,15 +7,15 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
       {
-        protocol: 'http',
-        hostname: 'localhost',
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
-    domains: ['kl-backend-v2-production-5f50.up.railway.app'],
+    domains: ["kifashionbackend2-production.up.railway.app"],
   },
 
   // Environment variables validation
@@ -28,7 +28,7 @@ const nextConfig = {
   poweredByHeader: false,
 
   // Output configuration for Vercel
-  output: 'standalone',
+  output: "standalone",
 };
 
 export default nextConfig;

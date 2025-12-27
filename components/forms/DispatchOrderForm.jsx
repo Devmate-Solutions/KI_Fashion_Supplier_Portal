@@ -102,6 +102,7 @@ export default function DispatchOrderForm({
   // Discount management state
   const [discountType, setDiscountType] = useState("amount"); // "percentage" or "amount"
   const [discountValue, setDiscountValue] = useState(0);
+  const [discountError, setDiscountError] = useState("");
 
   // Single product form state (for adding new products)
   const [newProduct, setNewProduct] = useState({
@@ -229,6 +230,33 @@ export default function DispatchOrderForm({
         : parseFloat(discountValue) || 0;
     // Round to 2 decimal places to ensure precision and consistency
     return Math.round(calculated * 100) / 100;
+  }, [discountType, discountValue, grandTotal]);
+
+  // Validate discount - check if it exceeds grand total
+  useEffect(() => {
+    if (grandTotal > 0 && discountValue !== "" && discountValue !== null) {
+      if (discountType === "percentage") {
+        if (parseFloat(discountValue) > 100) {
+          setDiscountError("Discount percentage cannot exceed 100%");
+        } else {
+          const calculatedDiscount = (grandTotal * parseFloat(discountValue)) / 100;
+          if (calculatedDiscount > grandTotal) {
+            setDiscountError("Discount amount cannot exceed grand total");
+          } else {
+            setDiscountError("");
+          }
+        }
+      } else {
+        // Amount type
+        if (parseFloat(discountValue) > grandTotal) {
+          setDiscountError(`Discount amount cannot exceed grand total (${grandTotal.toFixed(2)})`);
+        } else {
+          setDiscountError("");
+        }
+      }
+    } else {
+      setDiscountError("");
+    }
   }, [discountType, discountValue, grandTotal]);
 
   // Update form discount value whenever discount changes
@@ -1108,6 +1136,22 @@ export default function DispatchOrderForm({
 
     // Round to 2 decimal places to ensure precision
     const discountAmount = Math.round(calculatedDiscount * 100) / 100;
+
+    // Validate discount doesn't exceed grand total
+    if (discountAmount > grandTotal) {
+      showError(
+        discountType === "percentage"
+          ? `Discount percentage results in an amount (${discountAmount.toFixed(2)}) that exceeds the grand total (${grandTotal.toFixed(2)}). Maximum allowed: 100%`
+          : `Discount amount (${discountAmount.toFixed(2)}) cannot exceed the grand total (${grandTotal.toFixed(2)})`
+      );
+      return; // Prevent submission
+    }
+
+    // Validate percentage doesn't exceed 100%
+    if (discountType === "percentage" && parseFloat(discountValue) > 100) {
+      showError("Discount percentage cannot exceed 100%");
+      return; // Prevent submission
+    }
 
     // Create boxes array with just box numbers (no items per box)
     const boxes = [];
@@ -3096,16 +3140,41 @@ export default function DispatchOrderForm({
                         type="number"
                         min="0"
                         step={discountType === "percentage" ? "0.1" : "0.01"}
-                        max={discountType === "percentage" ? "100" : undefined}
-                        className={inputClasses}
+                        max={discountType === "percentage" ? "100" : grandTotal > 0 ? grandTotal : undefined}
+                        className={`${inputClasses} ${discountError ? "border-red-500 focus:ring-red-500" : ""}`}
                         value={discountValue}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val === "") {
                             setDiscountValue("");
+                            setDiscountError("");
                           } else {
                             const value = parseFloat(val);
-                            setDiscountValue(isNaN(value) ? 0 : value);
+                            if (isNaN(value)) {
+                              setDiscountValue(0);
+                            } else {
+                              setDiscountValue(value);
+                              // Real-time validation
+                              if (discountType === "percentage") {
+                                if (value > 100) {
+                                  setDiscountError("Discount percentage cannot exceed 100%");
+                                } else {
+                                  const calculatedDiscount = (grandTotal * value) / 100;
+                                  if (calculatedDiscount > grandTotal) {
+                                    setDiscountError("Discount amount cannot exceed grand total");
+                                  } else {
+                                    setDiscountError("");
+                                  }
+                                }
+                              } else {
+                                // Amount type
+                                if (value > grandTotal) {
+                                  setDiscountError(`Discount cannot exceed grand total (${grandTotal.toFixed(2)})`);
+                                } else {
+                                  setDiscountError("");
+                                }
+                              }
+                            }
                           }
                         }}
                         placeholder={
@@ -3124,10 +3193,28 @@ export default function DispatchOrderForm({
                           }
                         }}
                       />
-                      {discountType === "percentage" && discountValue > 0 && (
+                      {discountError && (
+                        <p className="text-xs text-red-600 font-semibold mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {discountError}
+                        </p>
+                      )}
+                      {!discountError && discountType === "percentage" && discountValue > 0 && (
                         <p className="text-xs text-slate-500 mt-1">
                           Discount Amount:{" "}
                           {((grandTotal * discountValue) / 100).toLocaleString(
+                            undefined,
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )}
+                        </p>
+                      )}
+                      {!discountError && discountType === "amount" && discountValue > 0 && grandTotal > 0 && (
+                        <p className="text-xs text-slate-500 mt-1">
+                          Remaining:{" "}
+                          {(grandTotal - discountValue).toLocaleString(
                             undefined,
                             {
                               minimumFractionDigits: 2,
@@ -3197,7 +3284,7 @@ export default function DispatchOrderForm({
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSaving} className="px-6">
+          <Button type="submit" disabled={isSaving || !!discountError} className="px-6">
             {isSaving
               ? initialOrder
                 ? "Updating..."

@@ -59,13 +59,13 @@ export default function LoginPage() {
             <span className="text-2xl font-black text-white">KL</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">Supplier Portal</h2>
-          <p className="text-slate-700 mt-3 font-medium">Manage your KL Fashion inventory and settlements</p>
+          <p className="text-slate-800 mt-3 font-semibold">Manage your KL Fashion inventory and settlements</p>
         </div>
 
-        <div className="rounded-3xl border border-white bg-white/80 backdrop-blur-xl shadow-2xl shadow-slate-200/50 p-8 md:p-10">
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/50 p-8 md:p-10">
           <div className="mb-8">
             <h3 className="text-xl font-bold text-slate-900">Welcome back</h3>
-            <p className="text-sm text-slate-700 mt-1 font-medium">Please enter your credentials to continue</p>
+            <p className="text-sm text-slate-800 mt-1 font-semibold">Please enter your credentials to continue</p>
           </div>
 
           {/* Error Alert */}
@@ -82,7 +82,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label 
                 htmlFor="email" 
-                className="text-xs font-bold uppercase tracking-widest text-slate-700 ml-1"
+                className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1"
               >
                 Email Address
               </label>
@@ -93,10 +93,10 @@ export default function LoginPage() {
                   id="email"
                   placeholder="name@company.com"
                   className={`
-                    w-full px-4 py-3.5 rounded-2xl border bg-white/50 text-slate-900
-                    ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                    focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
-                    placeholder:text-slate-400
+                    w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                    ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                    focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                    placeholder:text-slate-500
                     disabled:opacity-50 disabled:cursor-not-allowed
                   `}
                   disabled={isSubmitting || isLoading}
@@ -113,7 +113,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between ml-1">
                 <label 
                   htmlFor="password" 
-                  className="text-xs font-bold uppercase tracking-widest text-slate-700"
+                  className="text-xs font-bold uppercase tracking-widest text-slate-900"
                 >
                   Password
                 </label>
@@ -128,10 +128,10 @@ export default function LoginPage() {
                   id="password"
                   placeholder="••••••••"
                   className={`
-                    w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white/50 text-slate-900
-                    ${errors.password ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 focus:border-app-accent focus:ring-app-accent/10'}
-                    focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-medium
-                    placeholder:text-slate-400
+                    w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white text-slate-900
+                    ${errors.password ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
+                    focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
+                    placeholder:text-slate-500
                     disabled:opacity-50 disabled:cursor-not-allowed
                   `}
                   disabled={isSubmitting || isLoading}
@@ -163,12 +163,12 @@ export default function LoginPage() {
                     type="checkbox"
                     className="peer sr-only"
                   />
-                  <div className="h-5 w-5 rounded-md border-2 border-slate-200 peer-checked:bg-app-accent peer-checked:border-app-accent transition-all duration-200"></div>
-                  <svg className="absolute top-1 left-1 h-3 w-3 text-white scale-0 peer-checked:scale-100 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
+                  <div className="h-5 w-5 rounded-md border-2 border-slate-300 peer-checked:bg-app-accent peer-checked:border-app-accent transition-all duration-200 bg-white"></div>
+                  <svg className="absolute top-1 left-1 h-3 w-3 text-white scale-0 peer-checked:scale-100 transition-transform duration-200 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="ml-3 text-sm font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">Keep me signed in</span>
+                <span className="ml-3 text-sm font-semibold text-slate-900 group-hover:text-slate-950 transition-colors">Keep me signed in</span>
               </label>
             </div>
 
@@ -199,8 +199,8 @@ export default function LoginPage() {
           </form>
 
           {/* Register Link */}
-          <div className="mt-10 pt-8 border-t border-slate-100 text-center">
-            <p className="text-sm font-semibold text-slate-700">
+          <div className="mt-10 pt-8 border-t border-slate-200 text-center">
+            <p className="text-sm font-semibold text-slate-900">
               New to KL Fashion?{" "}
               <Link href="/register" className="text-app-accent hover:text-indigo-700 transition-colors font-bold">
                 Create an account
@@ -209,7 +209,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="mt-10 text-center text-xs font-bold text-slate-600 uppercase tracking-widest">
+        <p className="mt-10 text-center text-xs font-bold text-slate-800 uppercase tracking-widest">
           © 2025 KL Fashion CRM • Secure Access
         </p>
       </div>

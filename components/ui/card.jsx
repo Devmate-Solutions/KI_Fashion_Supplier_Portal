@@ -26,7 +26,7 @@ export function CardTitle({ className, ...props }) {
 }
 
 export function CardDescription({ className, ...props }) {
-  return <p className={clsx("text-sm font-medium text-slate-500", className)} {...props} />;
+  return <p className={clsx("text-sm font-medium text-slate-700", className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }) {

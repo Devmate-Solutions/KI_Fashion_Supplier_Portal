@@ -5,8 +5,9 @@
 **Location:** `lib/constants.js`
 
 ```javascript
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 
-  "https://kl-backend-v2-production-5f50.up.railway.app";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://kifashionbackend2-production.up.railway.app";
 ```
 
 ## ⚠️ Important: No `/api` Suffix
@@ -21,20 +22,22 @@ The backend API base URL should **NOT** include `/api` at the end because:
 
 ### Example: Login Request
 
-**Base URL:** `https://kl-backend-v2-production-5f50.up.railway.app`  
+**Base URL:** `https://kifashionbackend2-production.up.railway.app`  
 **API Path:** `/auth/login`  
-**Final URL:** `https://kl-backend-v2-production-5f50.up.railway.app/auth/login`
+**Final URL:** `https://kifashionbackend2-production.up.railway.app/auth/login`
 
 ### Code Flow
 
 1. **API Client** (`lib/apiClient.js`):
+
    ```javascript
    const apiClient = axios.create({
-     baseURL: API_BASE_URL,  // No /api here
+     baseURL: API_BASE_URL, // No /api here
    });
    ```
 
 2. **API Functions** (`lib/api/auth.js`):
+
    ```javascript
    export async function login(credentials) {
      const { data } = await apiClient.post("/auth/login", credentials);
@@ -44,26 +47,28 @@ The backend API base URL should **NOT** include `/api` at the end because:
    ```
 
 3. **Result:**
-   - Base: `https://kl-backend-v2-production-5f50.up.railway.app`
+   - Base: `https://kifashionbackend2-production.up.railway.app`
    - Path: `/auth/login`
-   - **Final:** `https://kl-backend-v2-production-5f50.up.railway.app/auth/login`
+   - **Final:** `https://kifashionbackend2-production.up.railway.app/auth/login`
 
 ## 🔧 Environment Variable
 
 ### For Vercel
 
 **Variable Name:** `NEXT_PUBLIC_API_BASE_URL`  
-**Value:** `https://kl-backend-v2-production-5f50.up.railway.app`  
+**Value:** `https://kifashionbackend2-production.up.railway.app`  
 **⚠️ Note:** Do NOT include `/api` at the end
 
 ### For Local Development
 
 Create `.env.local`:
+
 ```bash
-NEXT_PUBLIC_API_BASE_URL=https://kl-backend-v2-production-5f50.up.railway.app
+NEXT_PUBLIC_API_BASE_URL=https://kifashionbackend2-production.up.railway.app
 ```
 
 Or use local backend:
+
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
 ```
@@ -86,16 +91,18 @@ lib/
 To verify the API configuration is correct:
 
 1. **Check base URL:**
+
    ```javascript
    // In browser console
    console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
    ```
 
 2. **Test API call:**
+
    ```javascript
    // In browser console
-   fetch('https://kl-backend-v2-production-5f50.up.railway.app/auth/me')
-     .then(r => r.json())
+   fetch("https://kifashionbackend2-production.up.railway.app/auth/me")
+     .then((r) => r.json())
      .then(console.log)
      .catch(console.error);
    ```
@@ -108,16 +115,18 @@ To verify the API configuration is correct:
 ## 🚨 Common Mistakes
 
 ### ❌ Wrong Configuration
+
 ```javascript
 // DON'T DO THIS
-API_BASE_URL = "https://kl-backend-v2-production-5f50.up.railway.app/api"
+API_BASE_URL = "https://kifashionbackend2-production.up.railway.app/api";
 // Results in: /api/api/auth/login (double /api)
 ```
 
 ### ✅ Correct Configuration
+
 ```javascript
 // DO THIS
-API_BASE_URL = "https://kl-backend-v2-production-5f50.up.railway.app"
+API_BASE_URL = "https://kifashionbackend2-production.up.railway.app";
 // Results in: /auth/login (correct)
 ```
 
@@ -139,4 +148,3 @@ All paths are relative to the base URL defined in `lib/constants.js`.
 
 **Last Updated:** December 2025  
 **Status:** ✅ Configured Correctly
-

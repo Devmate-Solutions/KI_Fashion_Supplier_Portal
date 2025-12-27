@@ -15,9 +15,9 @@
 
 Add this single environment variable to Vercel:
 
-| Variable Name              | Value                                                  | Required | Environments                     |
-| -------------------------- | ------------------------------------------------------ | -------- | -------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL` | `https://kl-backend-v2-production-5f50.up.railway.app` | ✅ Yes   | Production, Preview, Development |
+| Variable Name              | Value                                                 | Required | Environments                     |
+| -------------------------- | ----------------------------------------------------- | -------- | -------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | `https://kifashionbackend2-production.up.railway.app` | ✅ Yes   | Production, Preview, Development |
 
 ---
 
@@ -59,7 +59,7 @@ Vercel will auto-detect Next.js. Confirm these settings:
 1. In the import screen, expand **"Environment Variables"**
 2. Add the variable:
    - **Name:** `NEXT_PUBLIC_API_BASE_URL`
-   - **Value:** `https://kl-backend-v2-production-5f50.up.railway.app`
+   - **Value:** `https://kifashionbackend2-production.up.railway.app`
 3. Select environments: ✅ Production, ✅ Preview, ✅ Development
 4. Click **"Add"**
 
@@ -402,7 +402,7 @@ Your deployment is successful when:
 **Environment Variable:**
 
 ```
-NEXT_PUBLIC_API_BASE_URL=https://kl-backend-v2-production-5f50.up.railway.app
+NEXT_PUBLIC_API_BASE_URL=https://kifashionbackend2-production.up.railway.app
 ```
 
 **Vercel Dashboard:**
@@ -420,7 +420,7 @@ https://github.com/Devmate-Solutions/KI_Fashion_Supplier_Portal
 **Backend API:**
 
 ```
-https://kl-backend-v2-production-5f50.up.railway.app
+https://kifashionbackend2-production.up.railway.app
 ```
 
 ---

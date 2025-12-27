@@ -21,6 +21,9 @@
   --accent: #e9ecef;
   --accent-foreground: #212529;
 
+  --app-accent: #4f46e5; /* indigo-600 - vibrant blue for buttons and highlights */
+  --app-accent-foreground: #ffffff;
+
   --destructive: #d64545; /* soft red */
   --destructive-foreground: #ffffff;
 
