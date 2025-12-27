@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Package, Receipt, RefreshCcw, TrendingUp, ArrowDownCircle, CreditCard, LayoutDashboard, AlertCircle, Wallet } from "lucide-react";
+import { Plus, Package, TrendingUp, ArrowDownCircle, CreditCard, AlertCircle, Receipt, RefreshCcwDot } from "lucide-react";
 import useSWR from "swr";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -103,28 +103,53 @@ export default function DashboardPage() {
 
 
 
-      {/* Financial Statistics */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+
+      {/* Financial Statistics - 3 Cards */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Remaining Balance - What Admin Owes Supplier */}
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-green-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Payments</CardTitle>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Remaining Balance</CardTitle>
             <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
               <TrendingUp className="h-4 w-4 text-green-600" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-green-600">
               {ledgerLoading ? (
                 <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
               ) : currency(pendingReceivables)}
             </div>
             <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${pendingReceivables > 0 ? 'text-green-600' : 'text-slate-500'}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${pendingReceivables > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
-              {pendingReceivables > 0 ? 'Awaiting payment from admin' : 'All payments received'}
+              {pendingReceivables > 0 ? 'Admin owes you this amount' : 'No pending balance'}
             </p>
           </CardContent>
         </Card>
 
+        {/* Outstanding Balance - What Supplier Owes Admin */}
+        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${supplierOwesAdmin ? 'ring-2 ring-amber-400/50' : ''}`}>
+          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${supplierOwesAdmin ? 'bg-gradient-to-br from-white to-amber-50/50' : 'bg-gradient-to-br from-white to-slate-50/30'}`}>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Outstanding Balance</CardTitle>
+            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${supplierOwesAdmin ? 'bg-amber-50' : 'bg-slate-100'}`}>
+              <CreditCard className={`h-4 w-4 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`} />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className={`text-2xl font-bold ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`}>
+              {ledgerLoading ? (
+                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+              ) : currency(amountOwed)}
+            </div>
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-500'}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${supplierOwesAdmin ? 'bg-amber-500' : 'bg-slate-300'}`}></span>
+              {supplierOwesAdmin ? 'You owe admin this amount' : 'No outstanding balance'}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Returns & Adjustments */}
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-orange-50/30">
             <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Returns & Adjustments</CardTitle>
@@ -140,48 +165,7 @@ export default function DashboardPage() {
             </div>
             <p className="mt-1 text-xs text-orange-600 font-medium flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
-              {totalReturnedAmount > 0 ? 'Deducted from your account' : 'No adjustments'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${currentBalance < 0 ? 'ring-2 ring-amber-400/50' : ''}`}>
-          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${currentBalance < 0 ? 'bg-gradient-to-br from-white to-amber-50/50' : 'bg-gradient-to-br from-white to-indigo-50/30'}`}>
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              {currentBalance < 0 ? 'Account Balance' : 'Ledger Balance'}
-            </CardTitle>
-            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${currentBalance < 0 ? 'bg-amber-50' : 'bg-indigo-50'}`}>
-              <CreditCard className={`h-4 w-4 ${currentBalance < 0 ? 'text-amber-600' : 'text-indigo-600'}`} />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className={`text-2xl font-bold ${currentBalance >= 0 ? 'text-green-600' : 'text-amber-600'}`}>
-              {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : currency(Math.abs(currentBalance))}
-            </div>
-            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${currentBalance < 0 ? 'text-amber-600' : 'text-slate-500'}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${currentBalance < 0 ? 'bg-amber-500' : currentBalance > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
-              {currentBalance > 0 ? 'Owed to You' : currentBalance < 0 ? 'You Owe Admin' : 'Account Balanced'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-slate-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Recent Activity</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center">
-              <Receipt className="h-4 w-4 text-slate-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-slate-900">
-              {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : recentTransactionsCount}
-            </div>
-            <p className="mt-1 text-xs text-slate-500 font-medium">
-              Transactions recorded
+              {totalReturnedAmount > 0 ? 'Total returns processed' : 'No returns'}
             </p>
           </CardContent>
         </Card>
@@ -217,7 +201,7 @@ export default function DashboardPage() {
             </Button>
             <Button asChild variant="outline" className="w-full justify-start h-11 px-4 hover:bg-slate-50 border-slate-200">
               <Link href="/returns" className="flex items-center gap-3">
-                <RefreshCcw className="h-4.5 w-4.5 text-slate-400" />
+                <RefreshCcwDot className="h-4.5 w-4.5 text-slate-400" />
                 Monitor Returns
               </Link>
             </Button>
