@@ -1,51 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Package, Receipt, RefreshCcw, TrendingUp, ArrowDownCircle, CreditCard, LayoutDashboard } from "lucide-react";
+import { Plus, Package, Receipt, RefreshCcw, TrendingUp, ArrowDownCircle, CreditCard, LayoutDashboard, AlertCircle, Wallet } from "lucide-react";
 import useSWR from "swr";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { getSupplierLedger } from "@/lib/api/ledger";
-import { getPendingBalances } from "@/lib/api/balances";
 import { getProducts } from "@/lib/api/products";
 import { currency } from "@/lib/utils/currency";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const supplierId = user?.supplier?._id || user?.supplier || user?.supplierId;
 
-  // Fetch ledger data for statistics
-  const { data: ledgerData, isLoading: ledgerLoading } = useSWR(
+  // Note: Backend returns supplier.id (not _id), and supplierId at top level
+  const supplierId = user?.supplierId || user?.supplier?.id || user?.supplier?._id || user?.supplier;
+
+  // SINGLE SOURCE OF TRUTH: Fetch ledger data for all statistics
+  const { data: ledgerData, isLoading: ledgerLoading, error: ledgerError } = useSWR(
     supplierId ? ["supplier-ledger-stats", supplierId] : null,
-    () => getSupplierLedger(supplierId, { limit: 1000 })
+    () => getSupplierLedger(supplierId, { limit: 1000 }),
+    { onError: (err) => console.error('Ledger fetch error:', err) }
   );
 
-  // Fetch pending balances
-  const { data: pendingBalancesData, isLoading: pendingLoading } = useSWR(
-    supplierId ? ["pending-balances-stats", supplierId] : null,
-    () => getPendingBalances(supplierId)
-  );
-
-  // Fetch recent products
-  const { data: productsData, isLoading: productsLoading } = useSWR(
+  // Fetch recent products (separate concern, OK to keep)
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useSWR(
     supplierId ? ["recent-products", supplierId] : null,
-    () => getProducts({ limit: 5, supplier: supplierId })
+    () => getProducts({ limit: 5, supplier: supplierId }),
+    { onError: (err) => console.error('Products fetch error:', err) }
   );
 
-  const pendingBalances = pendingBalancesData?.balances || [];
-  const totalReceivables = pendingBalances.reduce((sum, balance) => sum + (balance.amount || 0), 0);
-  const currentBalance = ledgerData?.currentBalance || ledgerData?.totalBalance || 0;
-  const recentTransactionsCount = ledgerData?.entries?.length || 0;
+  // ===== DERIVED VALUES FROM LEDGER DATA (Single Source of Truth) =====
+  const entries = ledgerData?.entries || [];
 
-  // Calculate total returned amount from ledger entries (confirmed returns)
-  const totalReturnedAmount = useMemo(() => {
-    const entries = ledgerData?.entries || ledgerData?.data?.entries || [];
+  // Current balance from backend (already calculated)
+  const currentBalance = ledgerData?.currentBalance || ledgerData?.totalBalance || 0;
+
+  // Transaction count
+  const recentTransactionsCount = entries.length;
+
+  // Calculate total purchases (what supplier has sold)
+  const totalPurchases = useMemo(() => {
     return entries
-      .filter(entry => entry.transactionType === 'return' && entry.referenceModel === 'Return')
+      .filter(entry => entry.transactionType === 'purchase')
+      .reduce((sum, entry) => sum + (entry.debit || 0), 0);
+  }, [entries]);
+
+  // Calculate total payments received
+  const totalPaymentsReceived = useMemo(() => {
+    return entries
+      .filter(entry => entry.transactionType === 'payment')
       .reduce((sum, entry) => sum + (entry.credit || 0), 0);
-  }, [ledgerData]);
+  }, [entries]);
+
+  // Calculate total returns/adjustments (deducted from supplier)
+  const totalReturnedAmount = useMemo(() => {
+    return entries
+      .filter(entry => entry.transactionType === 'return')
+      .reduce((sum, entry) => sum + (entry.credit || 0), 0);
+  }, [entries]);
+
+  // Pending Receivables: If currentBalance > 0, admin owes supplier
+  // If currentBalance <= 0, nothing pending (or supplier owes admin)
+  const pendingReceivables = Math.max(0, currentBalance);
+
+  // Amount supplier owes admin (if any)
+  const supplierOwesAdmin = currentBalance < 0;
+  const amountOwed = Math.abs(Math.min(0, currentBalance));
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
@@ -56,31 +78,56 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      {/* Debug: Show errors if any API fails */}
+      {ledgerError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="font-semibold text-red-800">Error loading dashboard data</p>
+          <p className="text-sm text-red-700">Ledger: {ledgerError.message}</p>
+          <p className="text-xs text-red-600 mt-2">Supplier ID: {supplierId || 'Not found'}</p>
+        </div>
+      )}
+
+      {/* Alert Banner - Show when supplier owes admin */}
+      {supplierOwesAdmin && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-amber-800">Outstanding Balance</p>
+            <p className="text-sm text-amber-700 mt-1">
+              Your account shows a balance of <strong>{currency(amountOwed)}</strong> owed to admin.
+              This may be from overpayments or returns on paid items. This amount will be adjusted from future payments.
+            </p>
+          </div>
+        </div>
+      )}
+
+
+
       {/* Financial Statistics */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-green-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Receivables</CardTitle>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Payments</CardTitle>
             <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
               <TrendingUp className="h-4 w-4 text-green-600" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="text-2xl font-bold text-slate-900">
-              {pendingLoading ? (
+              {ledgerLoading ? (
                 <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : currency(totalReceivables)}
+              ) : currency(pendingReceivables)}
             </div>
-            <p className="mt-1 text-xs text-green-600 font-medium flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-              Payment pending from admin
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${pendingReceivables > 0 ? 'text-green-600' : 'text-slate-500'}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${pendingReceivables > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
+              {pendingReceivables > 0 ? 'Awaiting payment from admin' : 'All payments received'}
             </p>
           </CardContent>
         </Card>
 
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-orange-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Returned Value</CardTitle>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Returns & Adjustments</CardTitle>
             <div className="h-8 w-8 rounded-lg bg-orange-50 flex items-center justify-center">
               <ArrowDownCircle className="h-4 w-4 text-orange-600" />
             </div>
@@ -93,26 +140,29 @@ export default function DashboardPage() {
             </div>
             <p className="mt-1 text-xs text-orange-600 font-medium flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
-              Total adjusted value
+              {totalReturnedAmount > 0 ? 'Deducted from your account' : 'No adjustments'}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-indigo-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Ledger Balance</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-indigo-600" />
+        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${currentBalance < 0 ? 'ring-2 ring-amber-400/50' : ''}`}>
+          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${currentBalance < 0 ? 'bg-gradient-to-br from-white to-amber-50/50' : 'bg-gradient-to-br from-white to-indigo-50/30'}`}>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {currentBalance < 0 ? 'Account Balance' : 'Ledger Balance'}
+            </CardTitle>
+            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${currentBalance < 0 ? 'bg-amber-50' : 'bg-indigo-50'}`}>
+              <CreditCard className={`h-4 w-4 ${currentBalance < 0 ? 'text-amber-600' : 'text-indigo-600'}`} />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className={`text-2xl font-bold ${currentBalance >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <div className={`text-2xl font-bold ${currentBalance >= 0 ? 'text-green-600' : 'text-amber-600'}`}>
               {ledgerLoading ? (
                 <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
               ) : currency(Math.abs(currentBalance))}
             </div>
-            <p className="mt-1 text-xs font-medium text-slate-500">
-              Current status: <span className={currentBalance >= 0 ? 'text-red-500' : 'text-green-500'}>{currentBalance >= 0 ? 'Debit' : 'Credit'}</span>
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${currentBalance < 0 ? 'text-amber-600' : 'text-slate-500'}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${currentBalance < 0 ? 'bg-amber-500' : currentBalance > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
+              {currentBalance > 0 ? 'Owed to You' : currentBalance < 0 ? 'You Owe Admin' : 'Account Balanced'}
             </p>
           </CardContent>
         </Card>
@@ -174,7 +224,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-md shadow-slate-200/50">
+        {/* <Card className="border-none shadow-md shadow-slate-200/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div className="space-y-1">
               <CardTitle className="text-lg">Recent Products</CardTitle>
@@ -225,14 +275,14 @@ export default function DashboardPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card className="border-none shadow-md shadow-slate-200/50 flex flex-col h-full overflow-hidden">
           <CardHeader className="bg-slate-900 text-white pb-6">
             <CardTitle className="text-lg">Account Summary</CardTitle>
             <CardDescription className="text-slate-400">Supplier identification</CardDescription>
           </CardHeader>
-          <CardContent className="pt-6 flex-1 bg-white relative -mt-4 rounded-t-2xl shadow-inner">
+          {/* <CardContent className="pt-6 flex-1 bg-white relative -mt-4 rounded-t-2xl shadow-inner">
             <div className="space-y-5 text-sm">
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 transition-colors hover:border-slate-200">
                 <div className="flex items-center gap-3">
@@ -243,7 +293,7 @@ export default function DashboardPage() {
                 </div>
                 <span className="font-bold text-slate-900">{user?.name || "—"}</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 transition-colors hover:border-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400">
@@ -266,13 +316,13 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-            
+
             <div className="mt-8">
               <Button asChild variant="outline" className="w-full h-10 border-slate-200 hover:bg-slate-50 text-slate-600 text-xs uppercase font-bold tracking-widest">
                 <Link href="/settings">Account Settings</Link>
               </Button>
             </div>
-          </CardContent>
+          </CardContent> */}
         </Card>
       </div>
     </div>

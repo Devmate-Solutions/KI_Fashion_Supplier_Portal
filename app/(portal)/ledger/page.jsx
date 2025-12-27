@@ -16,8 +16,9 @@ import { currency } from "@/lib/utils/currency";
 export default function LedgerPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const supplierId = user?.supplier?._id || user?.supplier || user?.supplierId;
-  
+  // Note: Backend returns supplier.id (not _id), and supplierId at top level
+  const supplierId = user?.supplierId || user?.supplier?.id || user?.supplier?._id || user?.supplier;
+
   const [activeTab, setActiveTab] = useState(0);
 
   // Fetch ledger entries
@@ -72,7 +73,7 @@ export default function LedgerPage() {
   const allLedgerTransactions = useMemo(() => {
     // Handle different response structures
     const entries = ledgerData?.entries || ledgerData?.data?.entries || (Array.isArray(ledgerData) ? ledgerData : []);
-    
+
     if (!entries || entries.length === 0) {
       return [];
     }
@@ -422,9 +423,9 @@ export default function LedgerPage() {
       </div>
 
       <div className="bg-white rounded-3xl shadow-md shadow-slate-200/50 overflow-hidden">
-        <Tabs 
-          tabs={tabs} 
-          activeTab={activeTab} 
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
           onTabChange={setActiveTab}
           className="p-1"
         />
