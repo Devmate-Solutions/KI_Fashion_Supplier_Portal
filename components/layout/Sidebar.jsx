@@ -17,8 +17,8 @@ import { useAuth } from "@/components/providers/AuthProvider";
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dispatch-orders", label: "Dispatch Orders", icon: Truck },
-  { href: "/products", label: "Products", icon: Package },
-  { href: "/purchase-orders", label: "Purchase Orders", icon: ClipboardList },
+  // { href: "/products", label: "Products", icon: Package },
+  // { href: "/purchase-orders", label: "Purchase Orders", icon: ClipboardList },
   { href: "/returns", label: "Returns", icon: RefreshCcw },
   { href: "/ledger", label: "Ledger", icon: Receipt },
   { href: "/settings", label: "Settings", icon: Settings },

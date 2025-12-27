@@ -413,7 +413,7 @@ export default function DispatchOrderDetailPage() {
             </CardContent>
           </Card>
 
-          <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+          {/* <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
             <h4 className="text-lg font-bold mb-2">Need a copy?</h4>
             <p className="text-indigo-100 text-sm mb-6 leading-relaxed">
@@ -422,7 +422,7 @@ export default function DispatchOrderDetailPage() {
             <Button className="w-full bg-white text-indigo-600 font-bold hover:bg-indigo-50 shadow-none">
               Download Challan PDF
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

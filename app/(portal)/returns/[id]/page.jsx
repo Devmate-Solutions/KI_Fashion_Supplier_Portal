@@ -173,7 +173,7 @@ export default function ReturnDetailPage() {
                     return (
                       <tr key={idx}>
                         <td className="px-4 py-3 font-medium text-slate-900">
-                          {item.itemIndex}
+                          {(item.itemIndex ?? 0) + 1}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-600 tabular-nums">
                           {item.originalQuantity || 0}
