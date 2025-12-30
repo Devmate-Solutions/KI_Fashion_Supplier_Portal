@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Package, TrendingUp, ArrowDownCircle, CreditCard, AlertCircle, Receipt, RefreshCcwDot } from "lucide-react";
+import { Plus, Package, TrendingUp, ArrowDownCircle, CreditCard, AlertCircle, Receipt, RefreshCcwDot, Banknote } from "lucide-react";
 import useSWR from "swr";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,10 @@ export default function DashboardPage() {
   // Transaction count
   const recentTransactionsCount = entries.length;
 
+  // Totals from backend
+  const totalCashPayment = ledgerData?.totalCashPayment || 0;
+  const totalBankPayment = ledgerData?.totalBankPayment || 0;
+  
   // Calculate total purchases (what supplier has sold)
   const totalPurchases = useMemo(() => {
     return entries
@@ -47,27 +51,20 @@ export default function DashboardPage() {
       .reduce((sum, entry) => sum + (entry.debit || 0), 0);
   }, [entries]);
 
-  // Calculate total payments received
-  const totalPaymentsReceived = useMemo(() => {
-    return entries
-      .filter(entry => entry.transactionType === 'payment')
-      .reduce((sum, entry) => sum + (entry.credit || 0), 0);
-  }, [entries]);
+  // Remaining Balance from backend (sum of remaining balances across all confirmed dispatch orders)
+  // This matches the CRM calculation: totalAmount - totalPaid for each order
+  const totalRemainingBalance = ledgerData?.totalRemainingBalance || 0;
 
-  // Calculate total returns/adjustments (deducted from supplier)
-  const totalReturnedAmount = useMemo(() => {
-    return entries
-      .filter(entry => entry.transactionType === 'return')
-      .reduce((sum, entry) => sum + (entry.credit || 0), 0);
-  }, [entries]);
+  // Outstanding Balance from backend (sum of overpayments across all confirmed dispatch orders)
+  // When totalPaid > totalAmount, the difference is outstanding (supplier owes admin)
+  const totalOutstandingBalance = ledgerData?.totalOutstandingBalance || 0;
 
-  // Pending Receivables: If currentBalance > 0, admin owes supplier
-  // If currentBalance <= 0, nothing pending (or supplier owes admin)
-  const pendingReceivables = Math.max(0, currentBalance);
+  // For display: Pending Receivables = what admin owes supplier
+  const pendingReceivables = totalRemainingBalance;
 
-  // Amount supplier owes admin (if any)
-  const supplierOwesAdmin = currentBalance < 0;
-  const amountOwed = Math.abs(Math.min(0, currentBalance));
+  // Outstanding Balance: Amount supplier owes admin from overpayments
+  const supplierOwesAdmin = totalOutstandingBalance > 0;
+  const amountOwed = totalOutstandingBalance;
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
@@ -101,12 +98,48 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Financial Statistics - 4 Cards */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Cash Payment */}
+        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-blue-50/30">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Cash Payment</CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <Banknote className="h-4 w-4 text-blue-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-slate-900">
+              {ledgerLoading ? (
+                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+              ) : currency(totalCashPayment)}
+            </div>
+            <p className="mt-1 text-xs text-slate-500 font-medium">
+              Total cash received
+            </p>
+          </CardContent>
+        </Card>
 
+        {/* Bank Payment */}
+        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-indigo-50/30">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Bank Payment</CardTitle>
+            <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <CreditCard className="h-4 w-4 text-indigo-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-slate-900">
+              {ledgerLoading ? (
+                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+              ) : currency(totalBankPayment)}
+            </div>
+            <p className="mt-1 text-xs text-slate-500 font-medium">
+              Total bank transfers
+            </p>
+          </CardContent>
+        </Card>
 
-
-
-      {/* Financial Statistics - 3 Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
         {/* Remaining Balance - What Admin Owes Supplier */}
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-green-50/30">
@@ -123,7 +156,7 @@ export default function DashboardPage() {
             </div>
             <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${pendingReceivables > 0 ? 'text-green-600' : 'text-slate-500'}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${pendingReceivables > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
-              {pendingReceivables > 0 ? 'Admin owes you this amount' : 'No pending balance'}
+              {pendingReceivables > 0 ? 'Admin owes you' : 'No balance'}
             </p>
           </CardContent>
         </Card>
@@ -133,7 +166,7 @@ export default function DashboardPage() {
           <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${supplierOwesAdmin ? 'bg-gradient-to-br from-white to-amber-50/50' : 'bg-gradient-to-br from-white to-slate-50/30'}`}>
             <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Outstanding Balance</CardTitle>
             <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${supplierOwesAdmin ? 'bg-amber-50' : 'bg-slate-100'}`}>
-              <CreditCard className={`h-4 w-4 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`} />
+              <AlertCircle className={`h-4 w-4 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`} />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
@@ -144,28 +177,7 @@ export default function DashboardPage() {
             </div>
             <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-500'}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${supplierOwesAdmin ? 'bg-amber-500' : 'bg-slate-300'}`}></span>
-              {supplierOwesAdmin ? 'You owe admin this amount' : 'No outstanding balance'}
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Returns & Adjustments */}
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-orange-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Returns & Adjustments</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-orange-50 flex items-center justify-center">
-              <ArrowDownCircle className="h-4 w-4 text-orange-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-slate-900">
-              {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : currency(totalReturnedAmount)}
-            </div>
-            <p className="mt-1 text-xs text-orange-600 font-medium flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
-              {totalReturnedAmount > 0 ? 'Total returns processed' : 'No returns'}
+              {supplierOwesAdmin ? 'You owe admin' : 'No outstanding'}
             </p>
           </CardContent>
         </Card>
@@ -261,12 +273,12 @@ export default function DashboardPage() {
           </CardContent>
         </Card> */}
 
-        <Card className="border-none shadow-md shadow-slate-200/50 flex flex-col h-full overflow-hidden">
+        {/* <Card className="border-none shadow-md shadow-slate-200/50 flex flex-col h-full overflow-hidden">
           <CardHeader className="bg-slate-900 text-white pb-6">
             <CardTitle className="text-lg">Account Summary</CardTitle>
             <CardDescription className="text-slate-400">Supplier identification</CardDescription>
           </CardHeader>
-          {/* <CardContent className="pt-6 flex-1 bg-white relative -mt-4 rounded-t-2xl shadow-inner">
+          <CardContent className="pt-6 flex-1 bg-white relative -mt-4 rounded-t-2xl shadow-inner">
             <div className="space-y-5 text-sm">
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 transition-colors hover:border-slate-200">
                 <div className="flex items-center gap-3">
@@ -306,8 +318,8 @@ export default function DashboardPage() {
                 <Link href="/settings">Account Settings</Link>
               </Button>
             </div>
-          </CardContent> */}
-        </Card>
+          </CardContent>
+        </Card> */}
       </div>
     </div>
   );
