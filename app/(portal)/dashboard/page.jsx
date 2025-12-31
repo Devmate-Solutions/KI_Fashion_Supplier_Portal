@@ -266,7 +266,9 @@ export default function DashboardPage() {
                       <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-app-accent transition-colors">{product.name}</p>
                       <p className="text-[11px] text-slate-500 font-mono flex items-center gap-1">
                         <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 leading-none">{product.sku}</span>
-                        {product.productType?.name || product.category}
+                        {Array.isArray(product.season) && product.season.length > 0 
+                          ? product.season.join(", ") 
+                          : product.category}
                       </p>
                     </div>
                   </div>

@@ -19,9 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import ImageGallery from "@/components/ui/ImageGallery";
-import { createProductType } from "@/lib/api/productTypes";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { showError, showWarning } from "@/lib/utils/toast";
-import ProductTypeForm from "./ProductTypeForm";
+import { SEASON_OPTIONS } from "@/lib/constants/seasons";
 import PacketConfigurationModal from "@/components/modals/PacketConfigurationModal";
 
 const boxSchema = z.object({
@@ -32,7 +32,7 @@ const boxSchema = z.object({
 const productItemSchema = z.object({
   productName: z.string().min(1, "Product name is required"),
   productCode: z.string().min(1, "SKU/Product code is required"),
-  productType: z.string().min(1, "Product type is required"),
+  season: z.array(z.string()).min(1, "At least one season is required"),
   costPrice: z
     .union([z.string(), z.number()])
     .transform((val) => {
@@ -75,9 +75,6 @@ export default function DispatchOrderForm({
   user,
   initialOrder = null,
 }) {
-  const [isProductTypeModalOpen, setIsProductTypeModalOpen] = useState(false);
-  const [isCreatingProductType, setIsCreatingProductType] = useState(false);
-  const [productTypesList, setProductTypesList] = useState(productTypes);
   const [productImages, setProductImages] = useState({}); // { productIndex: File[] }
   const [imagePreviews, setImagePreviews] = useState({}); // { productIndex: { fileId: string } }
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -108,7 +105,7 @@ export default function DispatchOrderForm({
   const [newProduct, setNewProduct] = useState({
     productName: "",
     productCode: "",
-    productType: "",
+    season: [],
     costPrice: "",
     primaryColor: [],
     size: [],
@@ -136,7 +133,13 @@ export default function DispatchOrderForm({
       const products = initialOrder.items.map((item) => ({
         productName: item.productName || "",
         productCode: item.productCode || "",
-        productType: item.productType?._id || item.productType || "",
+        season: Array.isArray(item.season) 
+          ? item.season 
+          : item.season 
+            ? [item.season] 
+            : item.productType 
+              ? (Array.isArray(item.productType) ? item.productType : [item.productType])
+              : [],
         costPrice: item.costPrice || "",
         primaryColor: Array.isArray(item.primaryColor)
           ? item.primaryColor
@@ -534,8 +537,8 @@ export default function DispatchOrderForm({
       errors.productName = "Product name is required";
     if (!newProduct.productCode.trim())
       errors.productCode = "SKU/Product code is required";
-    if (!newProduct.productType)
-      errors.productType = "Product type is required";
+    if (!newProduct.season || newProduct.season.length === 0)
+      errors.season = "At least one season is required";
     if (!newProduct.costPrice || parseFloat(newProduct.costPrice) < 0)
       errors.costPrice = "Cost price must be zero or greater";
     if (!newProduct.quantity || parseInt(newProduct.quantity) < 1)
@@ -553,7 +556,7 @@ export default function DispatchOrderForm({
     const productData = {
       productName: newProduct.productName.trim(),
       productCode: newProduct.productCode.trim(),
-      productType: newProduct.productType,
+      season: Array.isArray(newProduct.season) ? newProduct.season : [],
       costPrice: newProduct.costPrice || "0",
       primaryColor: Array.isArray(newProduct.primaryColor)
         ? newProduct.primaryColor
@@ -585,7 +588,7 @@ export default function DispatchOrderForm({
     setNewProduct({
       productName: "",
       productCode: "",
-      productType: "",
+      season: [],
       costPrice: "",
       primaryColor: [],
       size: [],
@@ -663,7 +666,7 @@ export default function DispatchOrderForm({
     setPacketModalProduct({
       index: productIndex,
       productName: product.productName || `Product ${productIndex + 1}`,
-      productType: product.productType,
+      season: Array.isArray(product.season) ? product.season : [],
       quantity: product.quantity || 0,
       availableSizes: Array.isArray(product.size) ? product.size : [],
       availableColors: Array.isArray(product.primaryColor)
@@ -728,20 +731,6 @@ export default function DispatchOrderForm({
       });
     }
     // Don't auto-close here to allow "Save & Next" flow
-  };
-
-  const handleCreateProductType = async (productTypeData) => {
-    setIsCreatingProductType(true);
-    try {
-      const newProductType = await createProductType(productTypeData);
-      setProductTypesList([...productTypesList, newProductType]);
-      setIsProductTypeModalOpen(false);
-    } catch (error) {
-      console.error("Error creating product type:", error);
-      showError(error.message || "Failed to create product type");
-    } finally {
-      setIsCreatingProductType(false);
-    }
   };
 
   const handleImageChange = (e, productIndex) => {
@@ -946,9 +935,9 @@ export default function DispatchOrderForm({
   const handleCellClick = (rowIndex, fieldName) => {
     const currentValue = watch(`products.${rowIndex}.${fieldName}`);
     setEditingCell({ rowIndex, fieldName });
-    if (fieldName === "primaryColor" || fieldName === "size") {
-      // For arrays, show empty string to start adding
-      setEditValue("");
+    if (fieldName === "primaryColor" || fieldName === "size" || fieldName === "season") {
+      // For arrays, use the array value or empty array
+      setEditValue(Array.isArray(currentValue) ? currentValue : []);
     } else {
       setEditValue(currentValue || "");
     }
@@ -965,8 +954,8 @@ export default function DispatchOrderForm({
       if (!editValue.trim()) {
         isValid = false;
       }
-    } else if (fieldName === "productType") {
-      if (!editValue) {
+    } else if (fieldName === "season") {
+      if (!editValue || (Array.isArray(editValue) && editValue.length === 0)) {
         isValid = false;
       }
     } else if (fieldName === "costPrice") {
@@ -1006,6 +995,9 @@ export default function DispatchOrderForm({
       } else {
         valueToSave = currentArray;
       }
+    } else if (fieldName === "season") {
+      // For season, use the array value directly
+      valueToSave = Array.isArray(editValue) ? editValue : [];
     }
 
     // Update the form value - use shouldDirty and shouldValidate to trigger re-renders
@@ -1040,12 +1032,10 @@ export default function DispatchOrderForm({
     setEditValue("");
   };
 
-  // Get product type name
-  const getProductTypeName = (productTypeId) => {
-    const type = productTypesList.find(
-      (t) => (t._id || t.id) === productTypeId
-    );
-    return type?.name || productTypeId || "";
+  // Get season names for display (replaces getProductTypeName)
+  const getSeasonNames = (seasons) => {
+    if (!seasons || !Array.isArray(seasons)) return "";
+    return seasons.join(", ");
   };
 
   // Helper function to focus next input field
@@ -1168,7 +1158,7 @@ export default function DispatchOrderForm({
       const item = {
         productName: product.productName,
         productCode: product.productCode,
-        productType: product.productType,
+        season: Array.isArray(product.season) ? product.season : [],
         costPrice:
           typeof product.costPrice === "number"
             ? product.costPrice
@@ -1534,55 +1524,24 @@ export default function DispatchOrderForm({
             </div>
 
             <div>
-              <label htmlFor="new-product-type" className={labelClasses}>
-                Product Type <span className="text-red-500">*</span>
+              <label htmlFor="new-product-season" className={labelClasses}>
+                Season <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-2">
-                <select
-                  id="new-product-type"
-                  className={`${selectClasses} flex-1 ${newProductErrors.productType
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-slate-300"
-                    }`}
-                  value={newProduct.productType}
-                  onChange={(e) =>
-                    setNewProduct({
-                      ...newProduct,
-                      productType: e.target.value,
-                    })
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      focusNextInput("new-product-type", "new-cost-price");
-                    }
-                  }}
-                >
-                  <option value="">Select type</option>
-                  {productTypesList.map((type) => (
-                    <option
-                      key={type._id || type.id}
-                      value={type._id || type.id}
-                    >
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsProductTypeModalOpen(true)}
-                  className="px-3"
-                  title="Add new product type"
-                  aria-label="Add new product type"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              {newProductErrors.productType && (
+              <MultiSelect
+                options={SEASON_OPTIONS}
+                value={newProduct.season || []}
+                onChange={(selectedSeasons) =>
+                  setNewProduct({
+                    ...newProduct,
+                    season: selectedSeasons,
+                  })
+                }
+                placeholder="Select seasons"
+                disabled={isSaving}
+              />
+              {newProductErrors.season && (
                 <p className="text-xs text-red-600 mt-1">
-                  {newProductErrors.productType}
+                  {newProductErrors.season}
                 </p>
               )}
             </div>
@@ -1938,7 +1897,7 @@ export default function DispatchOrderForm({
                       <th className="px-4 py-3">Image</th>
                       <th className="px-4 py-3">Product Name</th>
                       <th className="px-4 py-3">SKU/Code</th>
-                      <th className="px-4 py-3">Product Type</th>
+                      <th className="px-4 py-3">Season</th>
                       <th className="px-4 py-3 text-right">Cost Price</th>
                       <th className="px-4 py-3">Primary Color</th>
                       <th className="px-4 py-3">Size</th>
@@ -2244,56 +2203,28 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Product Type Column */}
+                          {/* Season Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
-                              editingCell.fieldName === "productType" ? (
+                              editingCell.fieldName === "season" ? (
                               <div className="flex items-center gap-2">
-                                <select
-                                  value={editValue}
-                                  onChange={(e) =>
-                                    handleCellChange(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      e.preventDefault();
-                                      handleCellSave(
-                                        productIndex,
-                                        "productType"
-                                      );
-                                      // Focus next field
-                                      setTimeout(() => {
-                                        handleCellClick(
-                                          productIndex,
-                                          "costPrice"
-                                        );
-                                      }, 100);
-                                    } else if (e.key === "Escape") {
-                                      handleCellCancel();
+                                <div className="flex-1">
+                                  <MultiSelect
+                                    options={SEASON_OPTIONS}
+                                    value={Array.isArray(editValue) ? editValue : []}
+                                    onChange={(selectedSeasons) =>
+                                      handleCellChange(selectedSeasons)
                                     }
-                                  }}
-                                  onBlur={() =>
-                                    handleCellSave(productIndex, "productType")
-                                  }
-                                  className="w-full px-2 py-1 border border-blue-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  autoFocus
-                                >
-                                  <option value="">Select type</option>
-                                  {productTypesList.map((type) => (
-                                    <option
-                                      key={type._id || type.id}
-                                      value={type._id || type.id}
-                                    >
-                                      {type.name}
-                                    </option>
-                                  ))}
-                                </select>
+                                    placeholder="Select seasons"
+                                    disabled={isSaving}
+                                  />
+                                </div>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   onClick={() =>
-                                    handleCellSave(productIndex, "productType")
+                                    handleCellSave(productIndex, "season")
                                   }
                                   className="h-6 w-6 p-0"
                                 >
@@ -2311,21 +2242,21 @@ export default function DispatchOrderForm({
                               </div>
                             ) : (
                               <div
-                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productType
+                                className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.season
                                     ? "border border-red-300"
                                     : ""
                                   }`}
                                 onClick={() =>
-                                  handleCellClick(productIndex, "productType")
+                                  handleCellClick(productIndex, "season")
                                 }
                                 title="Click to edit"
                               >
-                                {getProductTypeName(product?.productType) || (
+                                {getSeasonNames(product?.season) || (
                                   <span className="text-slate-400">—</span>
                                 )}
-                                {productErrors?.productType && (
+                                {productErrors?.season && (
                                   <p className="text-xs text-red-600 mt-1">
-                                    {productErrors.productType.message}
+                                    {productErrors.season.message}
                                   </p>
                                 )}
                               </div>
@@ -3276,19 +3207,6 @@ export default function DispatchOrderForm({
         </div>
       </form>
 
-      {/* Product Type Creation Modal */}
-      <Modal
-        open={isProductTypeModalOpen}
-        onClose={() => setIsProductTypeModalOpen(false)}
-        title="Create New Product Type"
-        description="Add a new product type that will be available for selection"
-      >
-        <ProductTypeForm
-          onSubmit={handleCreateProductType}
-          onCancel={() => setIsProductTypeModalOpen(false)}
-          isSaving={isCreatingProductType}
-        />
-      </Modal>
 
       {/* Confirmation Dialog */}
       <Modal

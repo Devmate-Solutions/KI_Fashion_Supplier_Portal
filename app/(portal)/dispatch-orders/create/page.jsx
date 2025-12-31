@@ -16,7 +16,6 @@ import DispatchOrderForm from "@/components/forms/DispatchOrderForm";
 import ProductForm from "@/components/forms/ProductForm";
 import UploadProgressModal from "@/components/ui/UploadProgressModal";
 import { createDispatchOrder, uploadDispatchOrderItemImage } from "@/lib/api/dispatchOrders";
-import { getProductTypes } from "@/lib/api/productTypes";
 import { getLogisticsCompanies } from "@/lib/api/logisticsCompanies";
 import { handleApiError, showError } from "@/lib/utils/toast";
 
@@ -35,11 +34,6 @@ export default function CreateDispatchOrderPage() {
   const [failedImages, setFailedImages] = useState(0);
   const [imageProgress, setImageProgress] = useState([]);
   const [uploadErrors, setUploadErrors] = useState([]);
-
-  const { data: productTypes, isLoading: productTypesLoading } = useSWR(
-    "product-types",
-    () => getProductTypes({ limit: 100 })
-  );
 
   const { data: logisticsCompanies, isLoading: logisticsLoading } = useSWR(
     "logistics-companies",
@@ -216,7 +210,7 @@ export default function CreateDispatchOrderPage() {
     router.push("/dispatch-orders");
   };
 
-  if (productTypesLoading || logisticsLoading) {
+  if (logisticsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <p className="text-slate-600">Loading...</p>
@@ -253,7 +247,6 @@ export default function CreateDispatchOrderPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isSaving={isSaving}
-            productTypes={productTypes || []}
             logisticsCompanies={logisticsCompanies || []}
             user={user}
           />

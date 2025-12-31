@@ -261,7 +261,7 @@ export default function RegisterPage() {
                 
                 <div className="space-y-2">
                   <label htmlFor="additionalPhone" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
-                    Emergency/Alt Phone *
+                    Secondary Phone
                   </label>
                   <div className="flex gap-3">
                     <div className="relative w-28 flex-shrink-0">

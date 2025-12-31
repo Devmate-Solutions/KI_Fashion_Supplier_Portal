@@ -6,11 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
-import ProductTypeForm from "./ProductTypeForm";
-import { createProductType } from "@/lib/api/productTypes";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { deleteProductImage } from "@/lib/api/products";
 import { showError, showWarning } from "@/lib/utils/toast";
+import { SEASON_OPTIONS } from "@/lib/constants/seasons";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").min(2, "Name must be at least 2 characters"),
@@ -20,7 +19,7 @@ const productSchema = z.object({
     .min(2, "SKU must be at least 2 characters")
     .transform((value) => value.toUpperCase()),
   category: z.string().min(1, "Category is required"),
-  productType: z.string().min(1, "Product type is required"),
+  season: z.array(z.string()).min(1, "At least one season is required"),
   unit: z.string().min(1, "Unit is required"),
   description: z.string().optional().or(z.literal("")),
   costPrice: z
@@ -85,9 +84,6 @@ export default function ProductForm({
   const [newImageFiles, setNewImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState({});
   const [deletingImages, setDeletingImages] = useState([]);
-  const [isProductTypeModalOpen, setIsProductTypeModalOpen] = useState(false);
-  const [isCreatingProductType, setIsCreatingProductType] = useState(false);
-  const [productTypesList, setProductTypesList] = useState(productTypes);
   const [lastAddedCount, setLastAddedCount] = useState(0);
   const fileInputRef = useRef(null);
 
@@ -101,10 +97,13 @@ export default function ProductForm({
       name: initialProduct?.name || "",
       sku: initialProduct?.sku || "",
       category: initialProduct?.category || "",
-      productType:
-        typeof initialProduct?.productType === "object"
-          ? initialProduct.productType?._id || initialProduct.productType?.id || ""
-          : initialProduct?.productType || "",
+      season: Array.isArray(initialProduct?.season) 
+        ? initialProduct.season 
+        : initialProduct?.season 
+          ? [initialProduct.season] 
+          : initialProduct?.productType 
+            ? (Array.isArray(initialProduct.productType) ? initialProduct.productType : [initialProduct.productType])
+            : [],
       unit: initialProduct?.unit || "piece",
       description: initialProduct?.description || "",
       costPrice: initialProduct?.pricing?.costPrice ?? "",
@@ -122,6 +121,7 @@ export default function ProductForm({
     formState: { errors, isSubmitting },
     reset,
     setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(productSchema),
     defaultValues,
@@ -130,10 +130,6 @@ export default function ProductForm({
     criteriaMode: "firstError",
   });
 
-  // Update productTypesList when productTypes prop changes
-  useEffect(() => {
-    setProductTypesList(productTypes);
-  }, [productTypes]);
 
   // Reset form when initialProduct changes or modal opens
   useEffect(() => {
@@ -149,32 +145,12 @@ export default function ProductForm({
     }
   }, [reset, defaultValues, initialProduct]);
 
-  const handleCreateProductType = async (productTypeData) => {
-    setIsCreatingProductType(true);
-    try {
-      const newProductType = await createProductType(productTypeData);
-      const updatedList = [...productTypesList, newProductType];
-      setProductTypesList(updatedList);
-      setValue("productType", newProductType._id || newProductType.id);
-      setIsProductTypeModalOpen(false);
-      // Notify parent if callback is provided
-      if (onProductTypesUpdate) {
-        onProductTypesUpdate(updatedList);
-      }
-    } catch (error) {
-      console.error("Error creating product type:", error);
-      showError(error.message || "Failed to create product type");
-    } finally {
-      setIsCreatingProductType(false);
-    }
-  };
-
   const fillTestData = () => {
     const testProduct = {
       name: "Premium Denim Jacket",
       sku: "PDJ-001",
       category: "Outerwear",
-      productType: productTypes.length > 0 ? productTypes[0]._id : "",
+      season: ["Winter", "Autumn"],
       unit: "piece",
       description: "High-quality denim jacket with comfortable fit. Machine washable. Available in multiple sizes.",
       costPrice: "45.50",
@@ -297,7 +273,7 @@ export default function ProductForm({
       name: values.name,
       sku: values.sku,
       category: values.category,
-      productType: values.productType, // This is the MongoDB ObjectId as a string
+      season: values.season, // Array of season strings
       unit: values.unit,
       description: values.description || undefined,
       pricing: {
@@ -377,33 +353,17 @@ export default function ProductForm({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="productType" className={labelClasses}>
-            Product type <span className="text-red-600">*</span>
+          <label htmlFor="season" className={labelClasses}>
+            Season <span className="text-red-600">*</span>
           </label>
-          <div className="flex gap-2">
-            <select id="productType" className={`${selectClasses} flex-1`} {...register("productType")}>
-              <option value="">Select type</option>
-              {productTypesList.map((type) => (
-                <option key={type._id || type.id} value={type._id || type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsProductTypeModalOpen(true)}
-              className="px-2"
-              title="Add new product type"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-          {errors.productType && <p className="text-sm text-red-600">{errors.productType.message}</p>}
-          {productTypesList.length === 0 && (
-            <p className="text-xs text-amber-600">No product types available. You can create one using the + button.</p>
-          )}
+          <MultiSelect
+            options={SEASON_OPTIONS}
+            value={watch("season") || []}
+            onChange={(selectedSeasons) => setValue("season", selectedSeasons, { shouldValidate: true })}
+            placeholder="Select seasons"
+            disabled={isSaving || isSubmitting}
+          />
+          {errors.season && <p className="text-sm text-red-600">{errors.season.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -674,25 +634,11 @@ export default function ProductForm({
           <Button type="button" variant="ghost" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting || isSaving || productTypesList.length === 0}>
+          <Button type="submit" disabled={isSubmitting || isSaving}>
             {initialProduct ? "Save changes" : "Create product"}
           </Button>
         </div>
       </div>
-
-      {/* Product Type Creation Modal */}
-      <Modal
-        open={isProductTypeModalOpen}
-        onClose={() => setIsProductTypeModalOpen(false)}
-        title="Create New Product Type"
-        description="Add a new product type that will be available for selection"
-      >
-        <ProductTypeForm
-          onSubmit={handleCreateProductType}
-          onCancel={() => setIsProductTypeModalOpen(false)}
-          isSaving={isCreatingProductType}
-        />
-      </Modal>
     </form>
   );
 }

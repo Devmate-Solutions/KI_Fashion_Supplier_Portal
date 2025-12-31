@@ -27,7 +27,6 @@ import {
   // generateProductQr,
   uploadProductImage,
 } from "@/lib/api/products";
-import { getProductTypes } from "@/lib/api/productTypes";
 import { showSuccess, showWarning, handleApiError } from "@/lib/utils/toast";
 import { currency } from "@/lib/utils/currency";
 
@@ -58,9 +57,6 @@ export default function ProductsPage() {
       })
   );
 
-  const { data: productTypes } = useSWR("product-types", () =>
-    getProductTypes({ limit: 100 })
-  );
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
@@ -368,7 +364,6 @@ export default function ProductsPage() {
             initialProduct={selectedProduct}
             onSubmit={handleSubmit}
             onCancel={handleCloseModal}
-            productTypes={productTypes || []}
             isSaving={isSaving}
             supplierId={supplierId}
           />

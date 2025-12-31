@@ -16,7 +16,6 @@ import {
 import DispatchOrderForm from "@/components/forms/DispatchOrderForm";
 import UploadProgressModal from "@/components/ui/UploadProgressModal";
 import { getDispatchOrder, updateDispatchOrder, uploadDispatchOrderItemImage } from "@/lib/api/dispatchOrders";
-import { getProductTypes } from "@/lib/api/productTypes";
 import { getLogisticsCompanies } from "@/lib/api/logisticsCompanies";
 import { handleApiError, showError } from "@/lib/utils/toast";
 
@@ -41,11 +40,6 @@ export default function EditDispatchOrderPage() {
   const { data: dispatchOrder, isLoading: orderLoading } = useSWR(
     orderId ? `dispatch-order-${orderId}` : null,
     () => getDispatchOrder(orderId)
-  );
-
-  const { data: productTypes, isLoading: productTypesLoading } = useSWR(
-    "product-types",
-    () => getProductTypes({ limit: 100 })
   );
 
   const { data: logisticsCompanies, isLoading: logisticsLoading } = useSWR(
@@ -237,7 +231,7 @@ export default function EditDispatchOrderPage() {
     router.push("/dispatch-orders");
   };
 
-  if (orderLoading || productTypesLoading || logisticsLoading) {
+  if (orderLoading || logisticsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <p className="text-slate-600">Loading...</p>
@@ -290,7 +284,6 @@ export default function EditDispatchOrderPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isSaving={isSaving}
-            productTypes={productTypes || []}
             logisticsCompanies={logisticsCompanies || []}
             user={user}
           />
