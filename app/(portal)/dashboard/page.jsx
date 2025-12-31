@@ -59,12 +59,10 @@ export default function DashboardPage() {
   // When totalPaid > totalAmount, the difference is outstanding (supplier owes admin)
   const totalOutstandingBalance = ledgerData?.totalOutstandingBalance || 0;
 
-  // For display: Pending Receivables = what admin owes supplier
-  const pendingReceivables = totalRemainingBalance;
-
-  // Outstanding Balance: Amount supplier owes admin from overpayments
-  const supplierOwesAdmin = totalOutstandingBalance > 0;
-  const amountOwed = totalOutstandingBalance;
+  // Total Balance: Positive = admin owes supplier, Negative = supplier owes admin
+  const totalBalance = totalRemainingBalance - totalOutstandingBalance;
+  const isPositive = totalBalance > 0;
+  const isNegative = totalBalance < 0;
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
@@ -84,22 +82,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Alert Banner - Show when supplier owes admin */}
-      {supplierOwesAdmin && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-amber-800">Outstanding Balance</p>
-            <p className="text-sm text-amber-700 mt-1">
-              Your account shows a balance of <strong>{currency(amountOwed)}</strong> owed to admin.
-              This may be from overpayments or returns on paid items. This amount will be adjusted from future payments.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Financial Statistics - 4 Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Financial Statistics - 3 Cards */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Cash Payment */}
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-blue-50/30">
@@ -140,44 +124,68 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Remaining Balance - What Admin Owes Supplier */}
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-green-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Remaining Balance</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+        {/* Total Balance - Combined Remaining and Outstanding */}
+        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${isNegative ? 'ring-2 ring-red-400/50' : ''}`}>
+          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${
+            isPositive 
+              ? 'bg-gradient-to-br from-white to-green-50/30' 
+              : isNegative 
+              ? 'bg-gradient-to-br from-white to-red-50/30' 
+              : 'bg-gradient-to-br from-white to-slate-50/30'
+          }`}>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Balance</CardTitle>
+            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+              isPositive 
+                ? 'bg-green-50' 
+                : isNegative 
+                ? 'bg-red-50' 
+                : 'bg-slate-100'
+            }`}>
+              {isPositive ? (
+                <TrendingUp className="h-4 w-4 text-green-600" />
+              ) : isNegative ? (
+                <AlertCircle className="h-4 w-4 text-red-600" />
+              ) : (
+                <TrendingUp className="h-4 w-4 text-slate-400" />
+              )}
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">
+            <div className={`text-2xl font-bold ${
+              isPositive 
+                ? 'text-green-600' 
+                : isNegative 
+                ? 'text-red-600' 
+                : 'text-slate-400'
+            }`}>
               {ledgerLoading ? (
                 <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : currency(pendingReceivables)}
+              ) : (
+                <span>
+                  {isNegative && '-'}
+                  {currency(Math.abs(totalBalance))}
+                </span>
+              )}
             </div>
-            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${pendingReceivables > 0 ? 'text-green-600' : 'text-slate-500'}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${pendingReceivables > 0 ? 'bg-green-500' : 'bg-slate-300'}`}></span>
-              {pendingReceivables > 0 ? 'Admin owes you' : 'No balance'}
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Outstanding Balance - What Supplier Owes Admin */}
-        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${supplierOwesAdmin ? 'ring-2 ring-amber-400/50' : ''}`}>
-          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${supplierOwesAdmin ? 'bg-gradient-to-br from-white to-amber-50/50' : 'bg-gradient-to-br from-white to-slate-50/30'}`}>
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Outstanding Balance</CardTitle>
-            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${supplierOwesAdmin ? 'bg-amber-50' : 'bg-slate-100'}`}>
-              <AlertCircle className={`h-4 w-4 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`} />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className={`text-2xl font-bold ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-400'}`}>
-              {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
-              ) : currency(amountOwed)}
-            </div>
-            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${supplierOwesAdmin ? 'text-amber-600' : 'text-slate-500'}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${supplierOwesAdmin ? 'bg-amber-500' : 'bg-slate-300'}`}></span>
-              {supplierOwesAdmin ? 'You owe admin' : 'No outstanding'}
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${
+              isPositive 
+                ? 'text-green-600' 
+                : isNegative 
+                ? 'text-red-600' 
+                : 'text-slate-500'
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${
+                isPositive 
+                  ? 'bg-green-500' 
+                  : isNegative 
+                  ? 'bg-red-500' 
+                  : 'bg-slate-300'
+              }`}></span>
+              {isPositive 
+                ? 'Admin owes you' 
+                : isNegative 
+                ? 'You owe admin' 
+                : 'No balance'}
             </p>
           </CardContent>
         </Card>
