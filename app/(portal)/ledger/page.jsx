@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { getSupplierLedger } from "@/lib/api/ledger";
 import { getPendingBalances } from "@/lib/api/balances";
-import { TrendingUp, TrendingDown, RefreshCcw } from "lucide-react";
 import Tabs from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,46 +26,18 @@ export default function LedgerPage() {
     () => getSupplierLedger(supplierId, { limit: 1000 })
   );
 
-  // Fetch pending balances (always load for summary cards)
+  // Fetch pending balances
   const { data: pendingBalancesData, isLoading: pendingBalancesLoading } = useSWR(
     supplierId ? ["pending-balances", supplierId] : null,
     () => getPendingBalances(supplierId)
   );
 
   const pendingBalances = pendingBalancesData?.balances || [];
-  const pendingTotals = pendingBalancesData?.totals || { cashPending: 0, bankPending: 0, totalPending: 0 };
-
-  // Calculate totals from displayed rows (receivables - supplier is on receiving end)
-  const calculatedReceivables = pendingBalances.reduce((sum, balance) => {
-    return sum + (balance.amount || 0);
-  }, 0);
-
-  // Calculate total payables (returns and deductions)
-  const totalPayables = useMemo(() => {
-    const entries = ledgerData?.entries || ledgerData?.data?.entries || (Array.isArray(ledgerData) ? ledgerData : []);
-    return entries
-      .filter(entry => entry.transactionType === 'return')
-      .reduce((sum, entry) => sum + (entry.debit || 0), 0);
-  }, [ledgerData]);
-
-  // Count of return transactions
-  const payablesCount = useMemo(() => {
-    const entries = ledgerData?.entries || ledgerData?.data?.entries || (Array.isArray(ledgerData) ? ledgerData : []);
-    return entries.filter(entry => entry.transactionType === 'return').length;
-  }, [ledgerData]);
-
-  // Calculate total received so far (payments received from admin)
-  const totalReceived = useMemo(() => {
-    return pendingBalances.reduce((sum, balance) => sum + (balance.totalPaid || 0), 0);
-  }, [pendingBalances]);
-
-  // Calculate total paid so far (from ledger payment entries)
-  const totalPaid = useMemo(() => {
-    const entries = ledgerData?.entries || ledgerData?.data?.entries || (Array.isArray(ledgerData) ? ledgerData : []);
-    return entries
-      .filter(entry => entry.transactionType === 'payment')
-      .reduce((sum, entry) => sum + (entry.credit || 0), 0);
-  }, [ledgerData]);
+  
+  // Debug: Log the first balance to see what data we're receiving
+  if (pendingBalances.length > 0 && !pendingBalancesLoading) {
+    console.log('First pending balance data:', pendingBalances[0]);
+  }
 
   // Transform ledger entries for Tab 1
   // Show all ledger entries (purchases, payments, etc.)
@@ -267,7 +238,10 @@ export default function LedgerPage() {
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Reference</th>
                     <th className="px-4 py-3 text-right">Total Amount</th>
-                    <th className="px-4 py-3 text-right">Paid Amount</th>
+                    <th className="px-4 py-3 text-right">Discount</th>
+                    <th className="px-4 py-3 text-right">Bank Paid</th>
+                    <th className="px-4 py-3 text-right">Cash Paid</th>
+                    <th className="px-4 py-3 text-right">Return Items Amount</th>
                     <th className="px-4 py-3 text-right">Remaining</th>
                     <th className="px-4 py-3">Status</th>
                   </tr>
@@ -291,11 +265,24 @@ export default function LedgerPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="font-semibold">{currency(row.totalAmount || row.amount || 0)}</span>
+                        <span className="font-semibold tabular-nums">{currency(row.totalAmount || 0)}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="tabular-nums text-slate-600">{currency(row.discount || 0)}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span className="tabular-nums text-green-600 font-medium">
-                          {currency(row.totalPaid || 0)}
+                          {currency(row.bankPaid || 0)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="tabular-nums text-green-600 font-medium">
+                          {currency(row.cashPaid || 0)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="tabular-nums text-orange-600 font-medium">
+                          {currency(row.returnAmount || 0)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -345,82 +332,6 @@ export default function LedgerPage() {
         </div>
       </div>
 
-      {/* Financial Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden bg-white">
-          <div className="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-9 w-9 rounded-xl bg-green-50 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Receivables</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">
-              {currency(calculatedReceivables)}
-            </p>
-            <p className="text-[11px] font-medium text-green-600 mt-2 flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-              {pendingBalances.length} pending shipments
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden bg-white">
-          <div className="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-9 w-9 rounded-xl bg-orange-50 flex items-center justify-center">
-                <TrendingDown className="h-5 w-5 text-orange-600" />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Payables</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">
-              {currency(totalPayables)}
-            </p>
-            <p className="text-[11px] font-medium text-orange-600 mt-2 flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
-              {payablesCount} recorded returns
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden bg-white">
-          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                <div className="h-5 w-5 text-blue-600 font-bold flex items-center justify-center">৳</div>
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Settled to Date</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">
-              {currency(totalReceived)}
-            </p>
-            <p className="text-[11px] font-medium text-blue-600 mt-2">
-              Payments from KL Fashion
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden bg-white">
-          <div className="absolute top-0 left-0 w-full h-1 bg-slate-900"></div>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center">
-                <RefreshCcw className="h-5 w-5 text-slate-600" />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Current Balance</span>
-            </div>
-            <p className={`text-2xl font-bold ${(ledgerData?.currentBalance || 0) >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {currency(Math.abs(ledgerData?.currentBalance || 0))}
-            </p>
-            <p className="text-[11px] font-medium text-slate-400 mt-2 uppercase tracking-tighter">
-              Account Status: <span className="text-slate-900 font-bold">{(ledgerData?.currentBalance || 0) >= 0 ? 'Debit' : 'Credit'}</span>
-            </p>
-          </CardContent>
-        </Card>
-      </div>
 
       <div className="bg-white rounded-3xl shadow-md shadow-slate-200/50 overflow-hidden">
         <Tabs

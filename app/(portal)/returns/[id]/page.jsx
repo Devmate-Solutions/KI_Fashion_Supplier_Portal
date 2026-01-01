@@ -160,16 +160,13 @@ export default function ReturnDetailPage() {
                     <th className="px-4 py-3 text-right">Original Qty</th>
                     <th className="px-4 py-3 text-right">Returned Qty</th>
                     <th className="px-4 py-3 text-right">Cost Price</th>
-                    <th className="px-4 py-3 text-right">Landed Price</th>
-                    <th className="px-4 py-3 text-right">Line Total</th>
+                    <th className="px-4 py-3 text-right">Total Return Amount</th>
                     <th className="px-4 py-3">Reason</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-app-border bg-white">
                   {returnDoc.items.map((item, idx) => {
-                    const lineTotal =
-                      (item.landedPrice || item.costPrice || 0) *
-                      (item.returnedQuantity || 0);
+                    const totalReturnAmount = (item.costPrice || 0) * (item.returnedQuantity || 0);
                     return (
                       <tr key={idx}>
                         <td className="px-4 py-3 font-medium text-slate-900">
@@ -184,11 +181,8 @@ export default function ReturnDetailPage() {
                         <td className="px-4 py-3 text-right text-slate-600 tabular-nums">
                           {currency(item.costPrice || 0)}
                         </td>
-                        <td className="px-4 py-3 text-right text-slate-600 tabular-nums">
-                          {currency(item.landedPrice || item.costPrice || 0)}
-                        </td>
                         <td className="px-4 py-3 text-right font-medium text-slate-900 tabular-nums">
-                          {currency(lineTotal)}
+                          {currency(totalReturnAmount)}
                         </td>
                         <td className="px-4 py-3 text-slate-600">
                           {item.reason || "—"}
