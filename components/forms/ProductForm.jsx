@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { deleteProductImage } from "@/lib/api/products";
 import { showError, showWarning } from "@/lib/utils/toast";
-import { SEASON_OPTIONS } from "@/lib/constants/seasons";
+import { SEASON_OPTIONS, normalizeSeasonArray } from "@/lib/constants/seasons";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").min(2, "Name must be at least 2 characters"),
@@ -97,13 +97,15 @@ export default function ProductForm({
       name: initialProduct?.name || "",
       sku: initialProduct?.sku || "",
       category: initialProduct?.category || "",
-      season: Array.isArray(initialProduct?.season) 
-        ? initialProduct.season 
-        : initialProduct?.season 
-          ? [initialProduct.season] 
-          : initialProduct?.productType 
-            ? (Array.isArray(initialProduct.productType) ? initialProduct.productType : [initialProduct.productType])
-            : [],
+      season: normalizeSeasonArray(
+        Array.isArray(initialProduct?.season) 
+          ? initialProduct.season 
+          : initialProduct?.season 
+            ? [initialProduct.season] 
+            : initialProduct?.productType 
+              ? (Array.isArray(initialProduct.productType) ? initialProduct.productType : [initialProduct.productType])
+              : []
+      ),
       unit: initialProduct?.unit || "piece",
       description: initialProduct?.description || "",
       costPrice: initialProduct?.pricing?.costPrice ?? "",
@@ -150,7 +152,7 @@ export default function ProductForm({
       name: "Premium Denim Jacket",
       sku: "PDJ-001",
       category: "Outerwear",
-      season: ["Winter", "Autumn"],
+      season: ["winter", "autumn"],
       unit: "piece",
       description: "High-quality denim jacket with comfortable fit. Machine washable. Available in multiple sizes.",
       costPrice: "45.50",
@@ -273,7 +275,7 @@ export default function ProductForm({
       name: values.name,
       sku: values.sku,
       category: values.category,
-      season: values.season, // Array of season strings
+      season: normalizeSeasonArray(values.season || []), // Array of season strings (normalized to lowercase)
       unit: values.unit,
       description: values.description || undefined,
       pricing: {
@@ -386,11 +388,17 @@ export default function ProductForm({
           </label>
           <input
             id="costPrice"
-            type="number"
-            step="0.01"
-            min="0"
+            type="text"
+            inputMode="decimal"
             className={inputClasses}
             {...register("costPrice")}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only numbers and one decimal point
+              const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+              e.target.value = sanitized;
+              register("costPrice").onChange(e);
+            }}
           />
           {errors.costPrice && <p className="text-sm text-red-600">{errors.costPrice.message}</p>}
         </div>
@@ -401,11 +409,17 @@ export default function ProductForm({
           </label>
           <input
             id="sellingPrice"
-            type="number"
-            step="0.01"
-            min="0"
+            type="text"
+            inputMode="decimal"
             className={inputClasses}
             {...register("sellingPrice")}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only numbers and one decimal point
+              const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+              e.target.value = sanitized;
+              register("sellingPrice").onChange(e);
+            }}
           />
           {errors.sellingPrice && <p className="text-sm text-red-600">{errors.sellingPrice.message}</p>}
         </div>
@@ -416,11 +430,17 @@ export default function ProductForm({
           </label>
           <input
             id="wholesalePrice"
-            type="number"
-            step="0.01"
-            min="0"
+            type="text"
+            inputMode="decimal"
             className={inputClasses}
             {...register("wholesalePrice")}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only numbers and one decimal point
+              const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+              e.target.value = sanitized;
+              register("wholesalePrice").onChange(e);
+            }}
           />
           {errors.wholesalePrice && <p className="text-sm text-red-600">{errors.wholesalePrice.message}</p>}
         </div>

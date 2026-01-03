@@ -21,7 +21,7 @@ import { Modal } from "@/components/ui/modal";
 import ImageGallery from "@/components/ui/ImageGallery";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { showError, showWarning } from "@/lib/utils/toast";
-import { SEASON_OPTIONS } from "@/lib/constants/seasons";
+import { SEASON_OPTIONS, normalizeSeasonArray } from "@/lib/constants/seasons";
 import PacketConfigurationModal from "@/components/modals/PacketConfigurationModal";
 
 const boxSchema = z.object({
@@ -133,13 +133,15 @@ export default function DispatchOrderForm({
       const products = initialOrder.items.map((item) => ({
         productName: item.productName || "",
         productCode: item.productCode || "",
-        season: Array.isArray(item.season) 
-          ? item.season 
-          : item.season 
-            ? [item.season] 
-            : item.productType 
-              ? (Array.isArray(item.productType) ? item.productType : [item.productType])
-              : [],
+        season: normalizeSeasonArray(
+          Array.isArray(item.season) 
+            ? item.season 
+            : item.season 
+              ? [item.season] 
+              : item.productType 
+                ? (Array.isArray(item.productType) ? item.productType : [item.productType])
+                : []
+        ),
         costPrice: item.costPrice || "",
         primaryColor: Array.isArray(item.primaryColor)
           ? item.primaryColor
@@ -1158,7 +1160,7 @@ export default function DispatchOrderForm({
       const item = {
         productName: product.productName,
         productCode: product.productCode,
-        season: Array.isArray(product.season) ? product.season : [],
+        season: normalizeSeasonArray(product.season || []),
         costPrice:
           typeof product.costPrice === "number"
             ? product.costPrice
@@ -1552,17 +1554,19 @@ export default function DispatchOrderForm({
               </label>
               <input
                 id="new-cost-price"
-                type="number"
-                step="0.01"
-                min="0"
+                type="text"
+                inputMode="decimal"
                 className={`${inputClasses} ${newProductErrors.costPrice
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
                   }`}
                 value={newProduct.costPrice}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, costPrice: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow only numbers and one decimal point
+                  const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+                  setNewProduct({ ...newProduct, costPrice: sanitized });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -1743,16 +1747,19 @@ export default function DispatchOrderForm({
               </label>
               <input
                 id="new-quantity"
-                type="number"
-                min="1"
+                type="text"
+                inputMode="numeric"
                 className={`${inputClasses} ${newProductErrors.quantity
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
                   }`}
                 value={newProduct.quantity}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, quantity: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow only numbers
+                  const sanitized = value.replace(/[^0-9]/g, '');
+                  setNewProduct({ ...newProduct, quantity: sanitized });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -2269,13 +2276,15 @@ export default function DispatchOrderForm({
                               editingCell.fieldName === "costPrice" ? (
                               <div className="flex items-center gap-2 justify-end">
                                 <input
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
+                                  type="text"
+                                  inputMode="decimal"
                                   value={editValue}
-                                  onChange={(e) =>
-                                    handleCellChange(e.target.value)
-                                  }
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Allow only numbers and one decimal point
+                                    const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+                                    handleCellChange(sanitized);
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                       e.preventDefault();
@@ -2638,12 +2647,15 @@ export default function DispatchOrderForm({
                               editingCell.fieldName === "quantity" ? (
                               <div className="flex items-center gap-2 justify-end">
                                 <input
-                                  type="number"
-                                  min="1"
+                                  type="text"
+                                  inputMode="numeric"
                                   value={editValue}
-                                  onChange={(e) =>
-                                    handleCellChange(e.target.value)
-                                  }
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    // Allow only numbers
+                                    const sanitized = value.replace(/[^0-9]/g, '');
+                                    handleCellChange(sanitized);
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                       e.preventDefault();
@@ -2908,21 +2920,23 @@ export default function DispatchOrderForm({
                     </label>
                     <input
                       id="total-boxes"
-                      type="number"
-                      min="1"
+                      type="text"
+                      inputMode="numeric"
                       className={`${inputClasses} ${boxError ? "border-red-500 focus:ring-red-500" : ""
                         }`}
                       value={totalBoxes}
                       onChange={(e) => {
                         const val = e.target.value;
-                        if (val === "") {
+                        // Allow only numbers
+                        const sanitized = val.replace(/[^0-9]/g, '');
+                        if (sanitized === "") {
                           setTotalBoxes("");
                         } else {
-                          const numBoxes = parseInt(val);
-                          setTotalBoxes(isNaN(numBoxes) ? 0 : numBoxes);
+                          const numBoxes = parseInt(sanitized);
+                          setTotalBoxes(isNaN(numBoxes) ? "" : sanitized);
                         }
                         // Clear error when user enters specific valid number
-                        const num = parseInt(val);
+                        const num = parseInt(sanitized);
                         if (boxError && !isNaN(num) && num > 0) {
                           setBoxError(null);
                         }
@@ -3048,23 +3062,24 @@ export default function DispatchOrderForm({
                       </label>
                       <input
                         id="discount-value"
-                        type="number"
-                        min="0"
-                        step={discountType === "percentage" ? "0.1" : "0.01"}
+                        type="text"
+                        inputMode="decimal"
                         max={discountType === "percentage" ? "100" : grandTotal > 0 ? grandTotal : undefined}
                         className={`${inputClasses} ${discountError ? "border-red-500 focus:ring-red-500" : ""}`}
                         value={discountValue}
                         onChange={(e) => {
                           const val = e.target.value;
-                          if (val === "") {
+                          // Allow only numbers and one decimal point
+                          const sanitized = val.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+                          if (sanitized === "") {
                             setDiscountValue("");
                             setDiscountError("");
                           } else {
-                            const value = parseFloat(val);
+                            const value = parseFloat(sanitized);
                             if (isNaN(value)) {
-                              setDiscountValue(0);
+                              setDiscountValue("");
                             } else {
-                              setDiscountValue(value);
+                              setDiscountValue(sanitized);
                               // Real-time validation
                               if (discountType === "percentage") {
                                 if (value > 100) {
