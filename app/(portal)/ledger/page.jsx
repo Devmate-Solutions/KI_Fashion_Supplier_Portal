@@ -249,7 +249,7 @@ export default function LedgerPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="font-semibold tabular-nums">{currency(row.totalAmount || 0)}</span>
+                        <span className="font-semibold tabular-nums">{currency(row.grossTotal || row.totalValue || ((row.totalAmount || 0) + (row.discount || 0) + (row.returnAmount || 0)))}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span className="tabular-nums text-slate-600">{currency(row.discount || 0)}</span>

@@ -45,16 +45,12 @@ export default function DispatchOrderDetailPage() {
     isLoading,
     error,
     mutate,
-  } = useSWR(
-    orderId ? `dispatch-order-${orderId}` : null,
-    () => getDispatchOrderWithQRCode(orderId)
+  } = useSWR(orderId ? `dispatch-order-${orderId}` : null, () =>
+    getDispatchOrderWithQRCode(orderId)
   );
 
   // Fetch returns for this dispatch order
-  const {
-    data: returns,
-    isLoading: isLoadingReturns,
-  } = useSWR(
+  const { data: returns, isLoading: isLoadingReturns } = useSWR(
     orderId ? `returns-dispatch-order-${orderId}` : null,
     () => getReturnsByDispatchOrder(orderId)
   );
@@ -68,28 +64,31 @@ export default function DispatchOrderDetailPage() {
         grandTotal: 0,
         adjustedTotalQuantity: 0,
         adjustedGrandTotal: 0,
-        itemsWithSubtotals: []
+        itemsWithSubtotals: [],
       };
     }
 
     // Aggregate returned quantities and values by item index
     const returnAdjustments = {};
     if (returns && Array.isArray(returns)) {
-      returns.forEach(returnDoc => {
+      returns.forEach((returnDoc) => {
         if (returnDoc.items && Array.isArray(returnDoc.items)) {
-          returnDoc.items.forEach(returnItem => {
+          returnDoc.items.forEach((returnItem) => {
             const itemIndex = returnItem.itemIndex;
             if (itemIndex !== undefined && itemIndex !== null) {
               if (!returnAdjustments[itemIndex]) {
                 returnAdjustments[itemIndex] = {
                   returnedQuantity: 0,
-                  returnedValue: 0
+                  returnedValue: 0,
                 };
               }
-              returnAdjustments[itemIndex].returnedQuantity += returnItem.returnedQuantity || 0;
+              returnAdjustments[itemIndex].returnedQuantity +=
+                returnItem.returnedQuantity || 0;
               // Use landedPrice if available, otherwise costPrice
-              const returnPrice = returnItem.landedPrice || returnItem.costPrice || 0;
-              returnAdjustments[itemIndex].returnedValue += (returnItem.returnedQuantity || 0) * returnPrice;
+              const returnPrice =
+                returnItem.landedPrice || returnItem.costPrice || 0;
+              returnAdjustments[itemIndex].returnedValue +=
+                (returnItem.returnedQuantity || 0) * returnPrice;
             }
           });
         }
@@ -100,14 +99,20 @@ export default function DispatchOrderDetailPage() {
       const originalQuantity = item.quantity || 0;
       const originalCostPrice = item.costPrice || 0;
       const originalSubtotal = originalQuantity * originalCostPrice;
-      
+
       // Get return adjustments for this item (by index)
-      const adjustments = returnAdjustments[index] || { returnedQuantity: 0, returnedValue: 0 };
-      
+      const adjustments = returnAdjustments[index] || {
+        returnedQuantity: 0,
+        returnedValue: 0,
+      };
+
       // Calculate adjusted values
-      const adjustedQuantity = Math.max(0, originalQuantity - adjustments.returnedQuantity);
+      const adjustedQuantity = Math.max(
+        0,
+        originalQuantity - adjustments.returnedQuantity
+      );
       const adjustedSubtotal = originalSubtotal - adjustments.returnedValue;
-      
+
       return {
         ...item,
         subtotal: originalSubtotal,
@@ -116,16 +121,28 @@ export default function DispatchOrderDetailPage() {
         adjustedQuantity,
         adjustedSubtotal,
         returnedQuantity: adjustments.returnedQuantity,
-        returnedValue: adjustments.returnedValue
+        returnedValue: adjustments.returnedValue,
       };
     });
 
-    const grandTotal = itemsWithSubtotals.reduce((sum, item) => sum + item.subtotal, 0);
-    const totalQuantity = dispatchOrder.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    
+    const grandTotal = itemsWithSubtotals.reduce(
+      (sum, item) => sum + item.subtotal,
+      0
+    );
+    const totalQuantity = dispatchOrder.items.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0
+    );
+
     // Calculate adjusted totals
-    const adjustedGrandTotal = itemsWithSubtotals.reduce((sum, item) => sum + (item.adjustedSubtotal || item.subtotal), 0);
-    const adjustedTotalQuantity = itemsWithSubtotals.reduce((sum, item) => sum + (item.adjustedQuantity || item.quantity || 0), 0);
+    const adjustedGrandTotal = itemsWithSubtotals.reduce(
+      (sum, item) => sum + (item.adjustedSubtotal || item.subtotal),
+      0
+    );
+    const adjustedTotalQuantity = itemsWithSubtotals.reduce(
+      (sum, item) => sum + (item.adjustedQuantity || item.quantity || 0),
+      0
+    );
 
     return {
       itemCount: dispatchOrder.items.length,
@@ -133,9 +150,15 @@ export default function DispatchOrderDetailPage() {
       grandTotal,
       adjustedTotalQuantity,
       adjustedGrandTotal,
-      totalReturnedQuantity: Object.values(returnAdjustments).reduce((sum, adj) => sum + adj.returnedQuantity, 0),
-      totalReturnedValue: Object.values(returnAdjustments).reduce((sum, adj) => sum + adj.returnedValue, 0),
-      itemsWithSubtotals
+      totalReturnedQuantity: Object.values(returnAdjustments).reduce(
+        (sum, adj) => sum + adj.returnedQuantity,
+        0
+      ),
+      totalReturnedValue: Object.values(returnAdjustments).reduce(
+        (sum, adj) => sum + adj.returnedValue,
+        0
+      ),
+      itemsWithSubtotals,
     };
   }, [dispatchOrder, returns]);
 
@@ -186,7 +209,11 @@ export default function DispatchOrderDetailPage() {
   if (error || !dispatchOrder) {
     return (
       <div className="space-y-4">
-        <Alert variant="error" title="Error" description={error?.message || "Dispatch order not found"} />
+        <Alert
+          variant="error"
+          title="Error"
+          description={error?.message || "Dispatch order not found"}
+        />
         <Button onClick={() => router.push("/dispatch-orders")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Orders
@@ -212,7 +239,7 @@ export default function DispatchOrderDetailPage() {
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                 Order #{dispatchOrder.orderNumber || "N/A"}
               </h1>
-              <Badge 
+              <Badge
                 variant={STATUS_VARIANTS[dispatchOrder.status] || "warning"}
                 className="capitalize py-1 px-3 rounded-full text-[10px] font-bold tracking-wider shadow-sm ring-1 ring-inset ring-black/5"
               >
@@ -221,7 +248,12 @@ export default function DispatchOrderDetailPage() {
             </div>
             <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-              Generated on {new Date(dispatchOrder.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+              Generated on{" "}
+              {new Date(dispatchOrder.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
             </p>
           </div>
         </div>
@@ -233,10 +265,12 @@ export default function DispatchOrderDetailPage() {
             onClick={() => mutate()}
             disabled={isLoading}
           >
-            <RefreshCw className={clsx("h-4 w-4", isLoading && "animate-spin")} />
+            <RefreshCw
+              className={clsx("h-4 w-4", isLoading && "animate-spin")}
+            />
           </Button>
-          {dispatchOrder.status === 'pending' && (
-            <Button 
+          {dispatchOrder.status === "pending" && (
+            <Button
               onClick={() => router.push(`/dispatch-orders/${orderId}/edit`)}
               className="bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 px-6 rounded-xl shadow-lg shadow-slate-900/10"
             >
@@ -247,29 +281,48 @@ export default function DispatchOrderDetailPage() {
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Dispatch Date</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
+            Dispatch Date
+          </span>
           <p className="text-lg font-bold text-slate-900">
-            {dispatchOrder.dispatchDate 
-              ? new Date(dispatchOrder.dispatchDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            {dispatchOrder.dispatchDate
+              ? new Date(dispatchOrder.dispatchDate).toLocaleDateString(
+                  "en-GB",
+                  { day: "2-digit", month: "short", year: "numeric" }
+                )
               : "Not scheduled"}
           </p>
         </div>
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Logistics Partner</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
+            Logistics Partner
+          </span>
           <p className="text-lg font-bold text-slate-900 truncate">
             {dispatchOrder.logisticsCompany?.name || "Self-managed"}
           </p>
         </div>
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Volume metrics</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
+            Qty
+          </span>
           <p className="text-lg font-bold text-slate-900">
-            {orderCalculations.totalQuantity} Units / {dispatchOrder.totalBoxes || 0} Boxes
+            {orderCalculations.totalQuantity}
           </p>
         </div>
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Total Value</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
+            Boxes
+          </span>
+          <p className="text-lg font-bold text-slate-900">
+            {dispatchOrder.totalBoxes || 0}
+          </p>
+        </div>
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
+            Total Value
+          </span>
           <p className="text-lg font-bold text-indigo-600">
             {currency(orderCalculations.grandTotal)}
           </p>
@@ -284,7 +337,8 @@ export default function DispatchOrderDetailPage() {
                 <div>
                   <CardTitle className="text-lg">Manifest Items</CardTitle>
                   <CardDescription>
-                    {orderCalculations.itemCount} distinct product variants included
+                    {orderCalculations.itemCount} distinct product variants
+                    included
                   </CardDescription>
                 </div>
               </div>
@@ -294,29 +348,46 @@ export default function DispatchOrderDetailPage() {
                 <table className="w-full text-left text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/30">
-                      <th className="px-6 py-4 font-semibold text-slate-900">Product Details</th>
-                      <th className="px-6 py-4 font-semibold text-slate-900 text-center">Packaging</th>
-                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">Quantity</th>
-                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">Unit Price</th>
-                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">Subtotal</th>
+                      <th className="px-6 py-4 font-semibold text-slate-900">
+                        Product Details
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">
+                        Quantity
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">
+                        Unit Price
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">
+                        Return Value
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">
+                        Subtotal
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {orderCalculations.itemsWithSubtotals.map((item, index) => {
-                      const imageUrl = item.product?.images?.[0] || item.productImage || null;
-                      const boxNumbers = item.boxes && item.boxes.length > 0
-                        ? [...new Set(item.boxes.map(b => b.boxNumber))].sort((a, b) => a - b).join(", ")
-                        : "-";
+                      const imageUrl =
+                        item.product?.images?.[0] || item.productImage || null;
 
                       return (
-                        <tr key={index} className="group transition-colors hover:bg-slate-50/50">
+                        <tr
+                          key={index}
+                          className="group transition-colors hover:bg-slate-50/50"
+                        >
                           <td className="px-6 py-5">
                             <div className="flex items-center gap-4">
                               <div className="h-12 w-12 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                                 {imageUrl ? (
-                                  <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+                                  <img
+                                    src={imageUrl}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                  />
                                 ) : (
-                                  <span className="text-[8px] font-bold text-slate-300 uppercase">No Image</span>
+                                  <span className="text-[8px] font-bold text-slate-300 uppercase">
+                                    No Image
+                                  </span>
                                 )}
                               </div>
                               <div className="flex flex-col min-w-0">
@@ -329,17 +400,16 @@ export default function DispatchOrderDetailPage() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-5 text-center">
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-slate-700">Box Ref</span>
-                              <span className="text-[10px] text-slate-400 font-mono">[{boxNumbers}]</span>
-                            </div>
-                          </td>
                           <td className="px-6 py-5 text-right font-bold text-slate-900">
-                            {item.adjustedQuantity !== undefined && item.adjustedQuantity !== item.originalQuantity ? (
+                            {item.adjustedQuantity !== undefined &&
+                            item.adjustedQuantity !== item.originalQuantity ? (
                               <div className="flex flex-col items-end">
-                                <span className="text-[10px] text-slate-300 line-through">{item.originalQuantity}</span>
-                                <span className="text-red-500">{item.adjustedQuantity}</span>
+                                <span className="text-[10px] text-slate-300 line-through">
+                                  {item.originalQuantity}
+                                </span>
+                                <span className="text-red-500">
+                                  {item.adjustedQuantity}
+                                </span>
                               </div>
                             ) : (
                               <span>{item.quantity}</span>
@@ -348,11 +418,21 @@ export default function DispatchOrderDetailPage() {
                           <td className="px-6 py-5 text-right font-medium text-slate-500">
                             {currency(item.costPrice || 0)}
                           </td>
+                          <td className="px-6 py-5 text-right font-medium text-red-600">
+                            {item.returnedValue > 0
+                              ? currency(item.returnedValue)
+                              : "—"}
+                          </td>
                           <td className="px-6 py-5 text-right font-bold text-slate-900">
-                            {item.adjustedSubtotal !== undefined && item.adjustedSubtotal !== item.originalSubtotal ? (
+                            {item.adjustedSubtotal !== undefined &&
+                            item.adjustedSubtotal !== item.originalSubtotal ? (
                               <div className="flex flex-col items-end">
-                                <span className="text-[10px] text-slate-300 line-through">{currency(item.originalSubtotal)}</span>
-                                <span className="text-red-500">{currency(item.adjustedSubtotal)}</span>
+                                <span className="text-[10px] text-slate-300 line-through">
+                                  {currency(item.originalSubtotal)}
+                                </span>
+                                <span className="text-red-500">
+                                  {currency(item.adjustedSubtotal)}
+                                </span>
                               </div>
                             ) : (
                               <span>{currency(item.subtotal)}</span>
@@ -376,20 +456,28 @@ export default function DispatchOrderDetailPage() {
             <CardContent className="p-8 space-y-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-slate-500">Gross Subtotal</span>
-                  <span className="font-bold text-slate-900">{currency(orderCalculations.grandTotal)}</span>
+                  <span className="font-medium text-slate-500">
+                    Gross Subtotal
+                  </span>
+                  <span className="font-bold text-slate-900">
+                    {currency(orderCalculations.grandTotal)}
+                  </span>
                 </div>
-                
+
                 {orderCalculations.totalReturnedValue > 0 && (
                   <div className="flex justify-between items-center text-sm bg-red-50 p-3 rounded-xl border border-red-100 border-dashed">
-                    <span className="font-bold text-red-600">Inventory Returns</span>
-                    <span className="font-bold text-red-600">-{currency(orderCalculations.totalReturnedValue)}</span>
+                    <span className="font-bold text-red-600">Return Value</span>
+                    <span className="font-bold text-red-600">
+                      -{currency(orderCalculations.totalReturnedValue)}
+                    </span>
                   </div>
                 )}
 
                 <div className="pt-4 border-t border-slate-100 flex justify-between items-end">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Final Settlement</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
+                      Final Settlement
+                    </span>
                     <span className="text-3xl font-black tracking-tight text-slate-900">
                       {currency(orderCalculations.adjustedGrandTotal)}
                     </span>
@@ -400,9 +488,13 @@ export default function DispatchOrderDetailPage() {
               {dispatchOrder.trackingInfo?.trackingNumber && (
                 <div className="pt-6 border-t border-slate-100">
                   <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Carrier Tracking</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">
+                      Carrier Tracking
+                    </span>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-900">{dispatchOrder.trackingInfo.carrier}</span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {dispatchOrder.trackingInfo.carrier}
+                      </span>
                       <span className="text-xs font-mono font-bold bg-white px-2 py-1 rounded border border-slate-200">
                         {dispatchOrder.trackingInfo.trackingNumber}
                       </span>
@@ -428,4 +520,3 @@ export default function DispatchOrderDetailPage() {
     </div>
   );
 }
-

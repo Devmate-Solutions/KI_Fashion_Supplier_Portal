@@ -30,7 +30,9 @@ export default function ReturnDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Loading...</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              Loading...
+            </h1>
           </div>
         </div>
       </div>
@@ -45,12 +47,16 @@ export default function ReturnDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Return Not Found</h1>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              Return Not Found
+            </h1>
           </div>
         </div>
         <Card>
           <CardContent className="p-6">
-            <p className="text-slate-600">The return you're looking for doesn't exist.</p>
+            <p className="text-slate-600">
+              The return you're looking for doesn't exist.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -64,7 +70,9 @@ export default function ReturnDetailPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Return Details</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Return Details
+          </h1>
           <p className="mt-1 text-sm text-slate-600">
             Return ID: {returnDoc._id ? String(returnDoc._id).slice(-8) : "—"}
           </p>
@@ -88,7 +96,7 @@ export default function ReturnDetailPage() {
               <p className="text-sm text-slate-500">Return Date</p>
               <p className="font-medium text-slate-900">
                 {returnDoc.returnedAt
-                  ? new Date(returnDoc.returnedAt).toLocaleDateString('en-GB')
+                  ? new Date(returnDoc.returnedAt).toLocaleDateString("en-GB")
                   : "—"}
               </p>
             </div>
@@ -110,7 +118,9 @@ export default function ReturnDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>Related Dispatch Order</CardTitle>
-            <CardDescription>Dispatch order this return is associated with</CardDescription>
+            <CardDescription>
+              Dispatch order this return is associated with
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {returnDoc.dispatchOrder?._id ? (
@@ -123,7 +133,9 @@ export default function ReturnDetailPage() {
                 </div>
                 <div>
                   <Button asChild>
-                    <Link href={`/dispatch-orders/${returnDoc.dispatchOrder._id}`}>
+                    <Link
+                      href={`/dispatch-orders/${returnDoc.dispatchOrder._id}`}
+                    >
                       View Dispatch Order
                     </Link>
                   </Button>
@@ -142,8 +154,12 @@ export default function ReturnDetailPage() {
           <CardDescription>
             {returnDoc.items && returnDoc.items.length > 0 ? (
               <>
-                {returnDoc.items.length} item{returnDoc.items.length !== 1 ? "s" : ""} • Total Quantity:{" "}
-                {returnDoc.items.reduce((sum, item) => sum + (item.returnedQuantity || 0), 0)}
+                {returnDoc.items.length} item
+                {returnDoc.items.length !== 1 ? "s" : ""} • Total Quantity:{" "}
+                {returnDoc.items.reduce(
+                  (sum, item) => sum + (item.returnedQuantity || 0),
+                  0
+                )}
               </>
             ) : (
               "Items included in this return"
@@ -160,13 +176,11 @@ export default function ReturnDetailPage() {
                     <th className="px-4 py-3 text-right">Original Qty</th>
                     <th className="px-4 py-3 text-right">Returned Qty</th>
                     <th className="px-4 py-3 text-right">Cost Price</th>
-                    <th className="px-4 py-3 text-right">Total Return Amount</th>
                     <th className="px-4 py-3">Reason</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-app-border bg-white">
                   {returnDoc.items.map((item, idx) => {
-                    const totalReturnAmount = (item.costPrice || 0) * (item.returnedQuantity || 0);
                     return (
                       <tr key={idx}>
                         <td className="px-4 py-3 font-medium text-slate-900">
@@ -180,9 +194,6 @@ export default function ReturnDetailPage() {
                         </td>
                         <td className="px-4 py-3 text-right text-slate-600 tabular-nums">
                           {currency(item.costPrice || 0)}
-                        </td>
-                        <td className="px-4 py-3 text-right font-medium text-slate-900 tabular-nums">
-                          {currency(totalReturnAmount)}
                         </td>
                         <td className="px-4 py-3 text-slate-600">
                           {item.reason || "—"}
@@ -214,4 +225,3 @@ export default function ReturnDetailPage() {
     </div>
   );
 }
-
