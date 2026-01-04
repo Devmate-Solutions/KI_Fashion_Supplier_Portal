@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { getSupplierLedger } from "@/lib/api/ledger";
 import { getPendingBalances } from "@/lib/api/balances";
@@ -10,6 +11,7 @@ import Tabs from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import { currency } from "@/lib/utils/currency";
 
 export default function LedgerPage() {
@@ -19,6 +21,7 @@ export default function LedgerPage() {
   const supplierId = user?.supplierId || user?.supplier?.id || user?.supplier?._id || user?.supplier;
 
   const [activeTab, setActiveTab] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch ledger entries
   const { data: ledgerData, isLoading: ledgerLoading } = useSWR(
@@ -33,6 +36,18 @@ export default function LedgerPage() {
   );
 
   const pendingBalances = pendingBalancesData?.balances || [];
+
+  // Filter pending balances by reference number
+  const filteredPendingBalances = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return pendingBalances;
+    }
+    const searchLower = searchTerm.toLowerCase().trim();
+    return pendingBalances.filter((row) => {
+      const reference = (row.reference || "").toLowerCase();
+      return reference.includes(searchLower);
+    });
+  }, [pendingBalances, searchTerm]);
 
   // Debug: Log the first balance to see what data we're receiving
   if (pendingBalances.length > 0 && !pendingBalancesLoading) {
@@ -214,6 +229,11 @@ export default function LedgerPage() {
               <p>No payment records found.</p>
               <p className="text-xs mt-2">No confirmed dispatch orders available.</p>
             </div>
+          ) : filteredPendingBalances.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">
+              <p>No results found for your search.</p>
+              <p className="text-xs mt-2">Try a different reference number.</p>
+            </div>
           ) : (
             <div className="overflow-hidden rounded-xl border border-app-border">
               <table className="min-w-full divide-y divide-app-border text-sm">
@@ -230,7 +250,7 @@ export default function LedgerPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-app-border bg-white">
-                  {pendingBalances.map((row) => (
+                  {filteredPendingBalances.map((row) => (
                     <tr key={row.id} className="hover:bg-slate-50">
                       <td className="px-4 py-3 whitespace-nowrap">
                         {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
@@ -313,7 +333,18 @@ export default function LedgerPage() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Ledger</CardTitle>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <CardTitle>Ledger</CardTitle>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    placeholder="Search reference number..."
+                    className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {pendingBalancesLoading ? (
@@ -325,6 +356,11 @@ export default function LedgerPage() {
                 <div className="p-8 text-center text-slate-500">
                   <p>No payment records found.</p>
                   <p className="text-xs mt-2">No confirmed dispatch orders available.</p>
+                </div>
+              ) : filteredPendingBalances.length === 0 ? (
+                <div className="p-8 text-center text-slate-500">
+                  <p>No results found for your search.</p>
+                  <p className="text-xs mt-2">Try a different reference number.</p>
                 </div>
               ) : (
                 <div className="overflow-hidden rounded-xl border border-app-border">
@@ -342,7 +378,7 @@ export default function LedgerPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-app-border bg-white">
-                      {pendingBalances.map((row) => (
+                      {filteredPendingBalances.map((row) => (
                         <tr key={row.id} className="hover:bg-slate-50">
                           <td className="px-4 py-3 whitespace-nowrap">
                             {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
@@ -432,7 +468,7 @@ export default function LedgerPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-app-border bg-white">
-                    {pendingBalances.map((row) => (
+                    {filteredPendingBalances.map((row) => (
                       <tr key={row.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 whitespace-nowrap">
                           {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}

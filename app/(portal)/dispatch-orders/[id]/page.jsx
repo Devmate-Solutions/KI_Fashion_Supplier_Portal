@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import clsx from "clsx";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, Info, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -331,7 +331,64 @@ export default function DispatchOrderDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">
+          {/* Order Information Section */}
           <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden">
+            <CardHeader className="p-6 border-b border-slate-50 bg-slate-50/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Info className="h-5 w-5 text-slate-600" />
+                Order Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">
+                    Discount
+                  </label>
+                  <p className="font-bold text-slate-900 text-lg">
+                    {currency(dispatchOrder?.totalDiscount || 0)}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">
+                    Total Boxes
+                  </label>
+                  <p className="font-bold text-slate-900 text-lg">
+                    {dispatchOrder?.totalBoxes || 0}
+                  </p>
+                </div>
+                {dispatchOrder?.paymentDetails && (
+                  <>
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">
+                        Cash Payment
+                      </label>
+                      <p className="font-bold text-slate-900 text-lg">
+                        {currency(dispatchOrder.paymentDetails.cashPayment || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">
+                        Bank Payment
+                      </label>
+                      <p className="font-bold text-slate-900 text-lg">
+                        {currency(dispatchOrder.paymentDetails.bankPayment || 0)}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Items Section */}
+          <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden">
+            <CardHeader className="p-6 border-b border-slate-50 bg-slate-50/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Package className="h-5 w-5 text-slate-600" />
+                Items
+              </CardTitle>
+            </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm border-collapse">
@@ -340,11 +397,29 @@ export default function DispatchOrderDetailPage() {
                       <th className="px-6 py-4 font-semibold text-slate-900">
                         Product Details
                       </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900">
+                        Code
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900">
+                        Colors
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900">
+                        Sizes
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900">
+                        Season
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-center">
+                        Packets
+                      </th>
                       <th className="px-6 py-4 font-semibold text-slate-900 text-right">
                         Quantity
                       </th>
                       <th className="px-6 py-4 font-semibold text-slate-900 text-right">
                         Unit Price
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-slate-900 text-right">
+                        Total Payment
                       </th>
                       <th className="px-6 py-4 font-semibold text-slate-900 text-right">
                         Return Value
@@ -358,6 +433,42 @@ export default function DispatchOrderDetailPage() {
                     {orderCalculations.itemsWithSubtotals.map((item, index) => {
                       const imageUrl =
                         item.product?.images?.[0] || item.productImage || null;
+                      
+                      // Get confirmed quantity (after returns)
+                      const confirmedQtyObj = dispatchOrder?.confirmedQuantities?.find(
+                        (cq) => cq.itemIndex === index
+                      );
+                      const confirmedQty = confirmedQtyObj?.quantity ?? item.quantity;
+                      
+                      // Calculate total payment (supplier payment amount * confirmed quantity)
+                      const totalPayment = (item.costPrice || 0) * confirmedQty;
+                      
+                      // Get colors, sizes, season, packets
+                      const colors = Array.isArray(item.primaryColor) 
+                        ? item.primaryColor 
+                        : item.primaryColor 
+                          ? [item.primaryColor] 
+                          : [];
+                      const sizes = Array.isArray(item.size) 
+                        ? item.size 
+                        : item.size 
+                          ? [item.size] 
+                          : [];
+                      const seasons = Array.isArray(item.season) 
+                        ? item.season 
+                        : item.season 
+                          ? [item.season] 
+                          : [];
+                      
+                      // Handle packets display
+                      let packetsDisplay = "—";
+                      if (item.packets && Array.isArray(item.packets) && item.packets.length > 0) {
+                        if (item.packets[0]?.isLoose) {
+                          packetsDisplay = "Loose Items";
+                        } else {
+                          packetsDisplay = `${item.packets.length} Packet${item.packets.length !== 1 ? 's' : ''}`;
+                        }
+                      }
 
                       return (
                         <tr
@@ -383,11 +494,69 @@ export default function DispatchOrderDetailPage() {
                                 <span className="font-bold text-slate-900 truncate">
                                   {item.productName || "Product"}
                                 </span>
-                                <span className="text-[11px] text-slate-500 font-mono mt-0.5">
-                                  {item.productCode} • {item.size || "FS"}
-                                </span>
                               </div>
                             </div>
+                          </td>
+                          <td className="px-6 py-5">
+                            <span className="text-sm font-mono text-slate-700">
+                              {item.productCode || "—"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5">
+                            {colors.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {colors.map((color, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border-blue-200"
+                                  >
+                                    {color}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-5">
+                            {sizes.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {sizes.map((size, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 border-green-200"
+                                  >
+                                    {size}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-5">
+                            {seasons.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {seasons.map((season, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0.5 bg-purple-50 text-purple-700 border-purple-200"
+                                  >
+                                    {season}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-5 text-center">
+                            <span className="text-sm text-slate-700">
+                              {packetsDisplay}
+                            </span>
                           </td>
                           <td className="px-6 py-5 text-right font-bold text-slate-900">
                             {item.adjustedQuantity !== undefined &&
@@ -406,6 +575,9 @@ export default function DispatchOrderDetailPage() {
                           </td>
                           <td className="px-6 py-5 text-right font-medium text-slate-500">
                             {currency(item.costPrice || 0)}
+                          </td>
+                          <td className="px-6 py-5 text-right font-bold text-slate-900">
+                            {currency(totalPayment)}
                           </td>
                           <td className="px-6 py-5 text-right font-medium text-red-600">
                             {item.returnedValue > 0
