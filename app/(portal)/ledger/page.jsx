@@ -227,7 +227,6 @@ export default function LedgerPage() {
                     <th className="px-4 py-3 text-right">Cash Paid</th>
                     <th className="px-4 py-3 text-right">Return Items Amount</th>
                     <th className="px-4 py-3 text-right">Remaining</th>
-                    <th className="px-4 py-3">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-app-border bg-white">
@@ -238,12 +237,14 @@ export default function LedgerPage() {
                       </td>
                       <td className="px-4 py-3">
                         {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
-                          <button
-                            onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
+                          <a
+                            href={`/dispatch-orders/${row.referenceId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
                           >
                             {row.reference || '-'}
-                          </button>
+                          </a>
                         ) : (
                           <span className="font-medium text-blue-600">{row.reference || '-'}</span>
                         )}
@@ -270,18 +271,9 @@ export default function LedgerPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-slate-400'}`}>
-                          {currency(row.amount || 0)}
+                        <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {currency(Math.abs(row.amount || 0))}
                         </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {row.status === 'paid' ? (
-                          <Badge className="bg-green-100 text-green-800">Paid</Badge>
-                        ) : row.status === 'partial' ? (
-                          <Badge className="bg-orange-100 text-orange-800">Partial</Badge>
-                        ) : (
-                          <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-                        )}
                       </td>
                     </tr>
                   ))}
@@ -347,7 +339,6 @@ export default function LedgerPage() {
                         <th className="px-4 py-3 text-right">Cash Paid</th>
                         <th className="px-4 py-3 text-right">Return Items Amount</th>
                         <th className="px-4 py-3 text-right">Remaining</th>
-                        <th className="px-4 py-3">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-app-border bg-white">
@@ -390,18 +381,9 @@ export default function LedgerPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-slate-400'}`}>
-                              {currency(row.amount || 0)}
+                            <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {currency(Math.abs(row.amount || 0))}
                             </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            {row.status === 'paid' ? (
-                              <Badge className="bg-green-100 text-green-800">Paid</Badge>
-                            ) : row.status === 'partial' ? (
-                              <Badge className="bg-orange-100 text-orange-800">Partial</Badge>
-                            ) : (
-                              <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-                            )}
                           </td>
                         </tr>
                       ))}
@@ -447,7 +429,6 @@ export default function LedgerPage() {
                       <th className="px-4 py-3 text-right">Cash Paid</th>
                       <th className="px-4 py-3 text-right">Return Items Amount</th>
                       <th className="px-4 py-3 text-right">Remaining</th>
-                      <th className="px-4 py-3">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-app-border bg-white">
@@ -490,18 +471,9 @@ export default function LedgerPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-slate-400'}`}>
-                            {currency(row.amount || 0)}
+                          <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {currency(Math.abs(row.amount || 0))}
                           </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          {row.status === 'paid' ? (
-                            <Badge className="bg-green-100 text-green-800">Paid</Badge>
-                          ) : row.status === 'partial' ? (
-                            <Badge className="bg-orange-100 text-orange-800">Partial</Badge>
-                          ) : (
-                            <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-                          )}
                         </td>
                       </tr>
                     ))}

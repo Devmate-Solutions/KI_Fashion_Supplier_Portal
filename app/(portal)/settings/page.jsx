@@ -1,11 +1,152 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { updateSupplierProfile } from "@/lib/api/suppliers";
+import { updateUser, changePassword } from "@/lib/api/auth";
+import { showSuccess, showError } from "@/lib/utils/toast";
+import { Save, Lock } from "lucide-react";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const supplierProfile = user?.supplier || user?.supplierProfile;
+  const supplierId = user?.supplierId || user?.supplier?.id || user?.supplier?._id;
+
+  // Account Information Form State
+  const [accountForm, setAccountForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || supplierProfile?.phone || "",
+    phoneAreaCode: user?.phoneAreaCode || supplierProfile?.phoneAreaCode || "",
+  });
+
+  // Business Information Form State
+  const [businessForm, setBusinessForm] = useState({
+    company: supplierProfile?.company || supplierProfile?.name || "",
+  });
+
+  // Password Change Form State
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [isSavingAccount, setIsSavingAccount] = useState(false);
+  const [isSavingBusiness, setIsSavingBusiness] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Update form state when user data changes
+  useEffect(() => {
+    if (user) {
+      setAccountForm({
+        name: user?.name || "",
+        email: user?.email || "",
+        phone: user?.phone || supplierProfile?.phone || "",
+        phoneAreaCode: user?.phoneAreaCode || supplierProfile?.phoneAreaCode || "",
+      });
+    }
+  }, [user, supplierProfile]);
+
+  useEffect(() => {
+    if (supplierProfile) {
+      setBusinessForm({
+        company: supplierProfile?.company || supplierProfile?.name || "",
+      });
+    }
+  }, [supplierProfile]);
+
+  const handleAccountChange = (field, value) => {
+    setAccountForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBusinessChange = (field, value) => {
+    setBusinessForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePasswordChange = (field, value) => {
+    setPasswordForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveAccount = async () => {
+    try {
+      setIsSavingAccount(true);
+      
+      // Update user account
+      if (user?._id || user?.id) {
+        await updateUser(user._id || user.id, {
+          name: accountForm.name,
+          email: accountForm.email,
+          phone: accountForm.phone,
+          phoneAreaCode: accountForm.phoneAreaCode,
+        });
+      }
+
+      // Update supplier profile phone if supplier exists
+      if (supplierId) {
+        await updateSupplierProfile(supplierId, {
+          phone: accountForm.phone,
+          phoneAreaCode: accountForm.phoneAreaCode,
+        });
+      }
+
+      await refreshProfile();
+      showSuccess("Account information updated successfully");
+    } catch (error) {
+      showError(error.message || "Failed to update account information");
+    } finally {
+      setIsSavingAccount(false);
+    }
+  };
+
+  const handleSaveBusiness = async () => {
+    try {
+      setIsSavingBusiness(true);
+      
+      if (supplierId) {
+        await updateSupplierProfile(supplierId, {
+          company: businessForm.company,
+          name: businessForm.company,
+        });
+      }
+
+      await refreshProfile();
+      showSuccess("Business information updated successfully");
+    } catch (error) {
+      showError(error.message || "Failed to update business information");
+    } finally {
+      setIsSavingBusiness(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      showError("New passwords do not match");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      showError("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      await changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      showSuccess("Password changed successfully");
+    } catch (error) {
+      showError(error.message || "Failed to change password");
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
@@ -16,8 +157,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="space-y-6 max-w-4xl">
           <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden">
             <CardHeader className="p-8 border-b border-slate-50">
               <CardTitle>Account Information</CardTitle>
@@ -25,20 +165,101 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-8">
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Account Name</span>
-                  <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100">{user?.name || "—"}</p>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Account Name</label>
+                  <input
+                    type="text"
+                    value={accountForm.name}
+                    onChange={(e) => handleAccountChange("name", e.target.value)}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                  />
                 </div>
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Email Address</span>
-                  <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100">{user?.email || "—"}</p>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Email Address</label>
+                  <input
+                    type="email"
+                    value={accountForm.email}
+                    onChange={(e) => handleAccountChange("email", e.target.value)}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                  />
                 </div>
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Primary Phone</span>
-                  <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    {supplierProfile?.phoneAreaCode || user?.phoneAreaCode ? `${supplierProfile?.phoneAreaCode || user?.phoneAreaCode}-` : ''}{user?.phone || supplierProfile?.phone || "—"}
-                  </p>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Primary Phone</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Area Code"
+                      value={accountForm.phoneAreaCode}
+                      onChange={(e) => handleAccountChange("phoneAreaCode", e.target.value)}
+                      className="w-24 px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone Number"
+                      value={accountForm.phone}
+                      onChange={(e) => handleAccountChange("phone", e.target.value)}
+                      className="flex-1 px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                    />
+                  </div>
                 </div>
+              </div>
+              <div className="mt-6">
+                <Button
+                  onClick={handleSaveAccount}
+                  disabled={isSavingAccount}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {isSavingAccount ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden">
+            <CardHeader className="p-8 border-b border-slate-50">
+              <CardTitle>Change Password</CardTitle>
+              <CardDescription>Update your account password for better security.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Current Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">New Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="mt-6">
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={isChangingPassword}
+                  className="gap-2"
+                >
+                  <Lock className="h-4 w-4" />
+                  {isChangingPassword ? "Changing..." : "Change Password"}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -51,58 +272,37 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="p-8">
                 <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Legal Company Name</span>
-                    <p className="text-sm font-bold text-slate-900 bg-indigo-50/30 p-3 rounded-xl border border-indigo-100/50">
-                      {supplierProfile.company || supplierProfile.name || "—"}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Contractual Payment Terms</span>
-                    <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      {supplierProfile.paymentTerms || "Standard Net 30"}
-                    </p>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Legal Company Name</label>
+                    <input
+                      type="text"
+                      value={businessForm.company}
+                      onChange={(e) => handleBusinessChange("company", e.target.value)}
+                      className="w-full px-4 py-3 text-sm font-bold text-slate-900 bg-white border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-app-accent focus:border-transparent"
+                    />
                   </div>
                   {supplierProfile.address && (
-                    <div className="md:col-span-2 space-y-1">
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Registered Office Address</span>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Registered Office Address</label>
                       <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
                         {supplierProfile.address}
                       </p>
                     </div>
                   )}
                 </div>
+                <div className="mt-6">
+                  <Button
+                    onClick={handleSaveBusiness}
+                    disabled={isSavingBusiness}
+                    className="gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    {isSavingBusiness ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
-        </div>
-
-        <div className="space-y-6">
-          <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden bg-slate-900 text-white">
-            <CardContent className="p-8">
-              <h3 className="text-lg font-bold mb-2">Need help?</h3>
-              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                If you need to update your business name, address, or bank details, please contact our procurement team directly.
-              </p>
-              <a 
-                href="mailto:procurement@klfashion.com" 
-                className="inline-flex items-center justify-center w-full bg-white text-slate-900 font-bold py-3 px-4 rounded-xl hover:bg-slate-100 transition-colors"
-              >
-                Contact Procurement
-              </a>
-            </CardContent>
-          </Card>
-          
-          <div className="rounded-3xl border border-dashed border-slate-200 p-8 text-center">
-            <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h4 className="text-sm font-bold text-slate-900 mb-1">Secure Account</h4>
-            <p className="text-xs text-slate-500">Your profile is protected with enterprise-grade encryption.</p>
-          </div>
-        </div>
       </div>
     </div>
   );

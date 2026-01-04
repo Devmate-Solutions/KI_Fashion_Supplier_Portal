@@ -323,7 +323,7 @@ export default function DispatchOrderDetailPage() {
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
             Total Value
           </span>
-          <p className="text-lg font-bold text-indigo-600">
+          <p className="text-lg font-bold text-slate-900">
             {currency(orderCalculations.grandTotal)}
           </p>
         </div>
@@ -332,17 +332,6 @@ export default function DispatchOrderDetailPage() {
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">
           <Card className="border-none shadow-md shadow-slate-200/50 overflow-hidden">
-            <CardHeader className="border-b border-slate-50 bg-slate-50/50 pb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">Manifest Items</CardTitle>
-                  <CardDescription>
-                    {orderCalculations.itemCount} distinct product variants
-                    included
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm border-collapse">
@@ -361,7 +350,7 @@ export default function DispatchOrderDetailPage() {
                         Return Value
                       </th>
                       <th className="px-6 py-4 font-semibold text-slate-900 text-right">
-                        Subtotal
+                        Total Value
                       </th>
                     </tr>
                   </thead>
@@ -455,15 +444,6 @@ export default function DispatchOrderDetailPage() {
             </CardHeader>
             <CardContent className="p-8 space-y-6">
               <div className="space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-slate-500">
-                    Gross Subtotal
-                  </span>
-                  <span className="font-bold text-slate-900">
-                    {currency(orderCalculations.grandTotal)}
-                  </span>
-                </div>
-
                 {orderCalculations.totalReturnedValue > 0 && (
                   <div className="flex justify-between items-center text-sm bg-red-50 p-3 rounded-xl border border-red-100 border-dashed">
                     <span className="font-bold text-red-600">Return Value</span>
