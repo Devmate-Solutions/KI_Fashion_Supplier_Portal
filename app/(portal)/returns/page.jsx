@@ -49,11 +49,11 @@ export default function ReturnsPage() {
       const term = searchTerm.trim().toLowerCase();
       const searchMatch = term
         ? [
-            returnDoc.dispatchOrder?.orderNumber,
-            returnDoc._id,
-          ]
-            .filter(Boolean)
-            .some((field) => String(field).toLowerCase().includes(term))
+          returnDoc.dispatchOrder?.orderNumber,
+          returnDoc._id,
+        ]
+          .filter(Boolean)
+          .some((field) => String(field).toLowerCase().includes(term))
         : true;
 
       return searchMatch;
@@ -96,7 +96,7 @@ export default function ReturnsPage() {
               <CardTitle className="text-lg">Return History</CardTitle>
               <CardDescription>Detailed log of all returned items and values</CardDescription>
             </div>
-            
+
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="flex items-center gap-2">
                 <div className="relative">
@@ -118,7 +118,7 @@ export default function ReturnsPage() {
                   <span className="absolute -top-2 left-2 bg-white px-1 text-[10px] font-bold text-slate-400">To</span>
                 </div>
               </div>
-              
+
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <Input
@@ -128,7 +128,7 @@ export default function ReturnsPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               <Button
                 variant="outline"
                 size="icon"
@@ -141,7 +141,7 @@ export default function ReturnsPage() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -155,8 +155,8 @@ export default function ReturnsPage() {
               </div>
               <h3 className="text-base font-semibold text-slate-900">No returns recorded</h3>
               <p className="mt-1 text-sm text-slate-500 max-w-xs">
-                {returns.length === 0 
-                  ? "Inventory returns from KL Fashion will be listed here." 
+                {returns.length === 0
+                  ? "Inventory returns from KL Fashion will be listed here."
                   : "No returns match your current date range or search filters."}
               </p>
             </div>
@@ -168,9 +168,10 @@ export default function ReturnsPage() {
                     <th className="px-6 py-4 font-semibold text-slate-900">Return Ref</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Dispatch Order</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Date</th>
-                    <th className="px-6 py-4 font-semibold text-slate-900">Items Count</th>
+                    <th className="px-6 py-4 font-semibold text-slate-900">Items</th>
+                    <th className="px-6 py-4 font-semibold text-slate-900">Quantity</th>
                     <th className="px-6 py-4 font-semibold text-slate-900 text-right">Return Value</th>
-                    <th className="px-6 py-4 font-semibold text-slate-900 text-right">Actions</th>
+                    <th className="px-6 py-4 font-semibold text-slate-900 text-right">Detail</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -202,14 +203,14 @@ export default function ReturnsPage() {
                           : "—"}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-slate-900 font-bold">
-                            {returnDoc.items?.reduce((sum, item) => sum + (item.returnedQuantity || 0), 0) || 0} units
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-medium">
-                            Across {returnDoc.items?.length || 0} SKU(s)
-                          </span>
-                        </div>
+                        <span className="text-slate-900 font-medium">
+                          {returnDoc.items?.length || 0} SKU(s)
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-slate-900 font-bold">
+                          {returnDoc.items?.reduce((sum, item) => sum + (item.returnedQuantity || 0), 0) || 0} units
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <span className="text-orange-600 font-bold">
