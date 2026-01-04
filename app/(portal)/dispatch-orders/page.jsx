@@ -152,7 +152,7 @@ export default function DispatchOrdersPage() {
               <CardTitle className="text-lg">Order Registry</CardTitle>
               <CardDescription>Filter and search your order history</CardDescription>
             </div>
-            
+
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -163,7 +163,7 @@ export default function DispatchOrdersPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <div className="relative flex-1 sm:flex-initial">
                   <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
@@ -179,7 +179,7 @@ export default function DispatchOrdersPage() {
                     ))}
                   </select>
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="icon"
@@ -194,7 +194,7 @@ export default function DispatchOrdersPage() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -208,8 +208,8 @@ export default function DispatchOrdersPage() {
               </div>
               <h3 className="text-base font-semibold text-slate-900">No orders found</h3>
               <p className="mt-1 text-sm text-slate-500 max-w-xs">
-                {dispatchOrders.length === 0 
-                  ? "Get started by creating your first dispatch order to KL Fashion." 
+                {dispatchOrders.length === 0
+                  ? "Get started by creating your first dispatch order to KL Fashion."
                   : "Try adjusting your search or filters to find what you're looking for."}
               </p>
               {dispatchOrders.length === 0 && (
@@ -263,7 +263,7 @@ export default function DispatchOrdersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge 
+                        <Badge
                           variant={STATUS_VARIANTS[order.status] || "warning"}
                           className="capitalize py-1 px-2.5 rounded-full text-[11px] font-bold tracking-wide shadow-sm ring-1 ring-inset ring-black/5"
                         >
@@ -281,7 +281,7 @@ export default function DispatchOrdersPage() {
                             <Eye className="h-3.5 w-3.5 mr-1.5" />
                             View
                           </Button>
-                          
+
                           {order.status === 'pending' && (
                             <>
                               <div className="h-4 w-[1px] bg-slate-200 mx-0.5"></div>

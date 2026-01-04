@@ -142,6 +142,7 @@ export default function LedgerPage() {
 
               <div className="overflow-hidden rounded-xl border border-app-border">
                 <table className="min-w-full divide-y divide-app-border text-sm">
+                  {JSON.stringify(allLedgerTransactions)}
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-4 py-3">Date</th>
@@ -198,10 +199,9 @@ export default function LedgerPage() {
 
   const paymentDetails = (
     <>
-      {/* {JSON.stringify(pendingBalances)} */}
       <Card>
         <CardHeader>
-          <CardTitle>Payment</CardTitle>
+          <CardTitle>Ledger</CardTitle>
         </CardHeader>
         <CardContent>
           {pendingBalancesLoading ? (
@@ -296,7 +296,7 @@ export default function LedgerPage() {
 
   const tabs = [
     {
-      label: "Payment",
+      label: "Ledger",
       content: paymentDetails,
     },
     // {
@@ -318,6 +318,100 @@ export default function LedgerPage() {
 
 
       <div className="">
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Ledger</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {pendingBalancesLoading ? (
+                <div className="p-8 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-accent"></div>
+                  <span className="ml-2 text-slate-600">Loading pending balances...</span>
+                </div>
+              ) : pendingBalances.length === 0 ? (
+                <div className="p-8 text-center text-slate-500">
+                  <p>No payment records found.</p>
+                  <p className="text-xs mt-2">No confirmed dispatch orders available.</p>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-xl border border-app-border">
+                  <table className="min-w-full divide-y divide-app-border text-sm">
+                    <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <tr>
+                        <th className="px-4 py-3">Date</th>
+                        <th className="px-4 py-3">Reference</th>
+                        <th className="px-4 py-3 text-right">Total Amount</th>
+                        <th className="px-4 py-3 text-right">Discount</th>
+                        <th className="px-4 py-3 text-right">Bank Paid</th>
+                        <th className="px-4 py-3 text-right">Cash Paid</th>
+                        <th className="px-4 py-3 text-right">Return Items Amount</th>
+                        <th className="px-4 py-3 text-right">Remaining</th>
+                        <th className="px-4 py-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-app-border bg-white">
+                      {pendingBalances.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50">
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
+                              <button
+                                onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
+                                className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
+                              >
+                                {row.reference || '-'}
+                              </button>
+                            ) : (
+                              <span className="font-medium text-blue-600">{row.reference || '-'}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-semibold tabular-nums">{currency(row.grossTotal || row.totalValue || ((row.totalAmount || 0) + (row.discount || 0) + (row.returnAmount || 0)))}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="tabular-nums text-slate-600">{currency(row.discount || 0)}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="tabular-nums text-green-600 font-medium">
+                              {currency(row.bankPaid || 0)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="tabular-nums text-green-600 font-medium">
+                              {currency(row.cashPaid || 0)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="tabular-nums text-orange-600 font-medium">
+                              {currency(row.returnAmount || 0)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                              {currency(row.amount || 0)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {row.status === 'paid' ? (
+                              <Badge className="bg-green-100 text-green-800">Paid</Badge>
+                            ) : row.status === 'partial' ? (
+                              <Badge className="bg-orange-100 text-orange-800">Partial</Badge>
+                            ) : (
+                              <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
         {/* <Tabs
           tabs={tabs}
           activeTab={activeTab}
@@ -325,7 +419,7 @@ export default function LedgerPage() {
           className="p-1"
         /> */}
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Ledger</CardTitle>
           </CardHeader>
@@ -345,7 +439,7 @@ export default function LedgerPage() {
                 <table className="min-w-full divide-y divide-app-border text-sm">
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-4 py-3">Date</th>
+                      <th className="px-4 py-3">Date dddxc</th>
                       <th className="px-4 py-3">Reference</th>
                       <th className="px-4 py-3 text-right">Total Amount</th>
                       <th className="px-4 py-3 text-right">Discount</th>
@@ -416,7 +510,7 @@ export default function LedgerPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
