@@ -224,6 +224,8 @@ export default function DispatchOrdersPage() {
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/30">
                     <th className="px-6 py-4 font-semibold text-slate-900">Order Number</th>
+                    <th className="px-6 py-4 font-semibold text-slate-900">Product Name</th>
+                    <th className="px-6 py-4 font-semibold text-slate-900">Code</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Date</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Logistics</th>
                     <th className="px-6 py-4 font-semibold text-slate-900 text-center">Items</th>
@@ -237,6 +239,21 @@ export default function DispatchOrdersPage() {
                       <td className="px-6 py-4">
                         <span className="font-mono font-bold text-slate-900 group-hover:text-app-accent transition-colors">
                           {order.orderNumber || "—"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-bold text-slate-900">
+                          {order.items?.[0]?.productName || "—"}
+                        </span>
+                        {order.items && order.items.length > 1 && (
+                          <span className="text-xs text-slate-400 ml-1">
+                            (+{order.items.length - 1} more)
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-mono text-slate-700">
+                          {order.items?.[0]?.productCode || "—"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-600">

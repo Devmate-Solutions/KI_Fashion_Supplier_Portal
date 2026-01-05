@@ -364,7 +364,9 @@ export default function DispatchOrderDetailPage() {
                         Cash Payment
                       </label>
                       <p className="font-bold text-slate-900 text-lg">
-                        {currency(dispatchOrder.paymentDetails.cashPayment || 0)}
+                        {currency(
+                          dispatchOrder.paymentDetails.cashPayment || 0
+                        )}
                       </p>
                     </div>
                     <div>
@@ -372,7 +374,9 @@ export default function DispatchOrderDetailPage() {
                         Bank Payment
                       </label>
                       <p className="font-bold text-slate-900 text-lg">
-                        {currency(dispatchOrder.paymentDetails.bankPayment || 0)}
+                        {currency(
+                          dispatchOrder.paymentDetails.bankPayment || 0
+                        )}
                       </p>
                     </div>
                   </>
@@ -433,40 +437,48 @@ export default function DispatchOrderDetailPage() {
                     {orderCalculations.itemsWithSubtotals.map((item, index) => {
                       const imageUrl =
                         item.product?.images?.[0] || item.productImage || null;
-                      
+
                       // Get confirmed quantity (after returns)
-                      const confirmedQtyObj = dispatchOrder?.confirmedQuantities?.find(
-                        (cq) => cq.itemIndex === index
-                      );
-                      const confirmedQty = confirmedQtyObj?.quantity ?? item.quantity;
-                      
+                      const confirmedQtyObj =
+                        dispatchOrder?.confirmedQuantities?.find(
+                          (cq) => cq.itemIndex === index
+                        );
+                      const confirmedQty =
+                        confirmedQtyObj?.quantity ?? item.quantity;
+
                       // Calculate total payment (supplier payment amount * confirmed quantity)
                       const totalPayment = (item.costPrice || 0) * confirmedQty;
-                      
+
                       // Get colors, sizes, season, packets
-                      const colors = Array.isArray(item.primaryColor) 
-                        ? item.primaryColor 
-                        : item.primaryColor 
-                          ? [item.primaryColor] 
-                          : [];
-                      const sizes = Array.isArray(item.size) 
-                        ? item.size 
-                        : item.size 
-                          ? [item.size] 
-                          : [];
-                      const seasons = Array.isArray(item.season) 
-                        ? item.season 
-                        : item.season 
-                          ? [item.season] 
-                          : [];
-                      
+                      const colors = Array.isArray(item.primaryColor)
+                        ? item.primaryColor
+                        : item.primaryColor
+                        ? [item.primaryColor]
+                        : [];
+                      const sizes = Array.isArray(item.size)
+                        ? item.size
+                        : item.size
+                        ? [item.size]
+                        : [];
+                      const seasons = Array.isArray(item.season)
+                        ? item.season
+                        : item.season
+                        ? [item.season]
+                        : [];
+
                       // Handle packets display
                       let packetsDisplay = "—";
-                      if (item.packets && Array.isArray(item.packets) && item.packets.length > 0) {
+                      if (
+                        item.packets &&
+                        Array.isArray(item.packets) &&
+                        item.packets.length > 0
+                      ) {
                         if (item.packets[0]?.isLoose) {
                           packetsDisplay = "Loose Items";
                         } else {
-                          packetsDisplay = `${item.packets.length} Packet${item.packets.length !== 1 ? 's' : ''}`;
+                          packetsDisplay = `${item.packets.length} Packet${
+                            item.packets.length !== 1 ? "s" : ""
+                          }`;
                         }
                       }
 
