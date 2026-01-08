@@ -162,41 +162,6 @@ export default function DispatchOrderDetailPage() {
     };
   }, [dispatchOrder, returns]);
 
-  // QR Code functionality temporarily disabled
-  // const handleGenerateQR = async () => {
-  //   setIsGeneratingQR(true);
-  //   try {
-  //     await generateQRCode(orderId);
-  //     mutate();
-  //   } catch (err) {
-  //     console.error("Error generating QR code:", err);
-  //     alert(err.message || "Failed to generate QR code");
-  //   } finally {
-  //     setIsGeneratingQR(false);
-  //   }
-  // };
-
-  // const handleDownloadPDF = async (size) => {
-  //   if (!dispatchOrder?.qrCode?.dataUrl) {
-  //     alert("QR code not available. Please generate it first.");
-  //     return;
-  //   }
-
-  //   setIsGeneratingPDF(true);
-  //   try {
-  //     await generateQRCodePDF(
-  //       dispatchOrder.qrCode.dataUrl,
-  //       dispatchOrder.orderNumber || "N/A",
-  //       dispatchOrder.totalBoxes || 1,
-  //       size
-  //     );
-  //   } catch (err) {
-  //     console.error("Error generating PDF:", err);
-  //     alert(err.message || "Failed to generate PDF");
-  //   } finally {
-  //     setIsGeneratingPDF(false);
-  //   }
-  // };
 
   if (isLoading) {
     return (
@@ -289,9 +254,9 @@ export default function DispatchOrderDetailPage() {
           <p className="text-lg font-bold text-slate-900">
             {dispatchOrder.dispatchDate
               ? new Date(dispatchOrder.dispatchDate).toLocaleDateString(
-                  "en-GB",
-                  { day: "2-digit", month: "short", year: "numeric" }
-                )
+                "en-GB",
+                { day: "2-digit", month: "short", year: "numeric" }
+              )
               : "Not scheduled"}
           </p>
         </div>
@@ -453,18 +418,18 @@ export default function DispatchOrderDetailPage() {
                       const colors = Array.isArray(item.primaryColor)
                         ? item.primaryColor
                         : item.primaryColor
-                        ? [item.primaryColor]
-                        : [];
+                          ? [item.primaryColor]
+                          : [];
                       const sizes = Array.isArray(item.size)
                         ? item.size
                         : item.size
-                        ? [item.size]
-                        : [];
+                          ? [item.size]
+                          : [];
                       const seasons = Array.isArray(item.season)
                         ? item.season
                         : item.season
-                        ? [item.season]
-                        : [];
+                          ? [item.season]
+                          : [];
 
                       // Handle packets display
                       let packetsDisplay = "—";
@@ -476,9 +441,8 @@ export default function DispatchOrderDetailPage() {
                         if (item.packets[0]?.isLoose) {
                           packetsDisplay = "Loose Items";
                         } else {
-                          packetsDisplay = `${item.packets.length} Packet${
-                            item.packets.length !== 1 ? "s" : ""
-                          }`;
+                          packetsDisplay = `${item.packets.length} Packet${item.packets.length !== 1 ? "s" : ""
+                            }`;
                         }
                       }
 
@@ -572,7 +536,7 @@ export default function DispatchOrderDetailPage() {
                           </td>
                           <td className="px-6 py-5 text-right font-bold text-slate-900">
                             {item.adjustedQuantity !== undefined &&
-                            item.adjustedQuantity !== item.originalQuantity ? (
+                              item.adjustedQuantity !== item.originalQuantity ? (
                               <div className="flex flex-col items-end">
                                 <span className="text-[10px] text-slate-300 line-through">
                                   {item.originalQuantity}
@@ -598,7 +562,7 @@ export default function DispatchOrderDetailPage() {
                           </td>
                           <td className="px-6 py-5 text-right font-bold text-slate-900">
                             {item.adjustedSubtotal !== undefined &&
-                            item.adjustedSubtotal !== item.originalSubtotal ? (
+                              item.adjustedSubtotal !== item.originalSubtotal ? (
                               <div className="flex flex-col items-end">
                                 <span className="text-[10px] text-slate-300 line-through">
                                   {currency(item.originalSubtotal)}

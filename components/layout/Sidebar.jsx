@@ -11,6 +11,7 @@ import {
   RefreshCcw,
   Package,
   ClipboardList,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -21,8 +22,10 @@ export const NAV_ITEMS = [
   // { href: "/purchase-orders", label: "Purchase Orders", icon: ClipboardList },
   { href: "/returns", label: "Returns", icon: RefreshCcw },
   { href: "/ledger", label: "Ledger", icon: Receipt },
+  { href: "/supplier-ledger", label: "Supplier Ledger", icon: BookOpen },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
+
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -74,14 +77,14 @@ export function Sidebar() {
             </div>
             <p className="text-xs font-semibold text-slate-900">Need assistance?</p>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-500">Our support team is available for any questions about your orders.</p>
-            <a 
-              href="mailto:suppliers@klfashion.com" 
+            <a
+              href="mailto:suppliers@klfashion.com"
               className="mt-3 block text-center rounded-lg bg-white py-1.5 text-[11px] font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 transition-colors"
             >
               Contact Support
             </a>
           </div>
-          
+
           <div className="flex items-center gap-3 border-t border-app-border pt-4 px-2">
             <div className="h-8 w-8 rounded-full bg-app-accent/10 flex items-center justify-center text-app-accent font-bold text-xs uppercase">
               {user?.name?.charAt(0) || "S"}
