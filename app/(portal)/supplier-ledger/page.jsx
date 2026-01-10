@@ -302,6 +302,7 @@ export default function SupplierLedgerPage() {
                                     <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         <tr>
                                             <th className="px-4 py-3">Date</th>
+                                            <th className="px-4 py-3">Entry Number</th>
                                             <th className="px-4 py-3">Type</th>
                                             <th className="px-4 py-3">Reference</th>
                                             <th className="px-4 py-3 text-right">Debit (Owe)</th>
