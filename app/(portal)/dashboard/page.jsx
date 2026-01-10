@@ -43,7 +43,7 @@ export default function DashboardPage() {
   // Totals from backend
   const totalCashPayment = ledgerData?.totalCashPayment || 0;
   const totalBankPayment = ledgerData?.totalBankPayment || 0;
-  
+
   // Calculate total purchases (what supplier has sold)
   const totalPurchases = useMemo(() => {
     return entries
@@ -59,8 +59,9 @@ export default function DashboardPage() {
   // When totalPaid > totalAmount, the difference is outstanding (supplier owes admin)
   const totalOutstandingBalance = ledgerData?.totalOutstandingBalance || 0;
 
-  // Total Balance: Positive = admin owes supplier, Negative = supplier owes admin
-  const totalBalance = totalRemainingBalance - totalOutstandingBalance;
+  // Total Balance: Use currentBalance directly from backend (SSOT - already calculated as SUM(debit - credit))
+  // Positive = admin owes supplier, Negative = supplier owes admin
+  const totalBalance = currentBalance;
   const isPositive = totalBalance > 0;
   const isNegative = totalBalance < 0;
 
@@ -126,21 +127,19 @@ export default function DashboardPage() {
 
         {/* Total Balance - Combined Remaining and Outstanding */}
         <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${isNegative ? 'ring-2 ring-red-400/50' : ''}`}>
-          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${
-            isPositive 
-              ? 'bg-gradient-to-br from-white to-green-50/30' 
-              : isNegative 
-              ? 'bg-gradient-to-br from-white to-red-50/30' 
-              : 'bg-gradient-to-br from-white to-slate-50/30'
-          }`}>
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Balance</CardTitle>
-            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-              isPositive 
-                ? 'bg-green-50' 
-                : isNegative 
-                ? 'bg-red-50' 
-                : 'bg-slate-100'
+          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${isPositive
+              ? 'bg-gradient-to-br from-white to-green-50/30'
+              : isNegative
+                ? 'bg-gradient-to-br from-white to-red-50/30'
+                : 'bg-gradient-to-br from-white to-slate-50/30'
             }`}>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Balance</CardTitle>
+            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${isPositive
+                ? 'bg-green-50'
+                : isNegative
+                  ? 'bg-red-50'
+                  : 'bg-slate-100'
+              }`}>
               {isPositive ? (
                 <TrendingUp className="h-4 w-4 text-green-600" />
               ) : isNegative ? (
@@ -151,13 +150,12 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className={`text-2xl font-bold ${
-              isPositive 
-                ? 'text-green-600' 
-                : isNegative 
-                ? 'text-red-600' 
-                : 'text-slate-400'
-            }`}>
+            <div className={`text-2xl font-bold ${isPositive
+                ? 'text-green-600'
+                : isNegative
+                  ? 'text-red-600'
+                  : 'text-slate-400'
+              }`}>
               {ledgerLoading ? (
                 <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
               ) : (
@@ -167,25 +165,23 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${
-              isPositive 
-                ? 'text-green-600' 
-                : isNegative 
-                ? 'text-red-600' 
-                : 'text-slate-500'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${
-                isPositive 
-                  ? 'bg-green-500' 
-                  : isNegative 
-                  ? 'bg-red-500' 
-                  : 'bg-slate-300'
-              }`}></span>
-              {isPositive 
-                ? 'Admin owes you' 
-                : isNegative 
-                ? 'You owe admin' 
-                : 'No balance'}
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${isPositive
+                ? 'text-green-600'
+                : isNegative
+                  ? 'text-red-600'
+                  : 'text-slate-500'
+              }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${isPositive
+                  ? 'bg-green-500'
+                  : isNegative
+                    ? 'bg-red-500'
+                    : 'bg-slate-300'
+                }`}></span>
+              {isPositive
+                ? 'Admin owes you'
+                : isNegative
+                  ? 'You owe admin'
+                  : 'No balance'}
             </p>
           </CardContent>
         </Card>
