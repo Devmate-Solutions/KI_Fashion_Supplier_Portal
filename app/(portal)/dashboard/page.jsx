@@ -34,9 +34,6 @@ export default function DashboardPage() {
   // ===== DERIVED VALUES FROM LEDGER DATA (Single Source of Truth) =====
   const entries = ledgerData?.entries || [];
 
-  // Current balance from backend (already calculated)
-  const currentBalance = ledgerData?.currentBalance || ledgerData?.totalBalance || 0;
-
   // Transaction count
   const recentTransactionsCount = entries.length;
 
@@ -59,11 +56,20 @@ export default function DashboardPage() {
   // When totalPaid > totalAmount, the difference is outstanding (supplier owes admin)
   const totalOutstandingBalance = ledgerData?.totalOutstandingBalance || 0;
 
-  // Total Balance: Use currentBalance directly from backend (SSOT - already calculated as SUM(debit - credit))
+  // Total Balance: Calculate directly from ledger entries (SUM(debit) - SUM(credit))
   // Positive = admin owes supplier, Negative = supplier owes admin
-  const totalBalance = currentBalance;
-  const isPositive = totalBalance > 0;
-  const isNegative = totalBalance < 0;
+  const _totalBalance = useMemo(() => {
+    if (!entries || entries.length === 0) return 0;
+    
+    // Calculate: SUM(debit) - SUM(credit) from all ledger entries
+    const totalDebit = entries.reduce((sum, entry) => sum + (Number(entry.debit) || 0), 0);
+    const totalCredit = entries.reduce((sum, entry) => sum + (Number(entry.credit)|| 0), 0);
+    
+    return totalDebit - totalCredit;
+  }, [entries]);
+  
+  const isPositive = _totalBalance > 0;
+  const isNegative = _totalBalance < 0;
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
@@ -85,6 +91,7 @@ export default function DashboardPage() {
 
       {/* Financial Statistics - 3 Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* {JSON.stringify(ledgerData)} */}
         {/* Cash Payment */}
         <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-blue-50/30">
@@ -161,7 +168,8 @@ export default function DashboardPage() {
               ) : (
                 <span>
                   {isNegative && '-'}
-                  {currency(Math.abs(totalBalance))}
+                  {currency(Math.abs(_totalBalance))}
+                  
                 </span>
               )}
             </div>

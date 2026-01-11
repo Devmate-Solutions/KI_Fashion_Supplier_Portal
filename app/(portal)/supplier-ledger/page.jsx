@@ -22,6 +22,15 @@ const formatNumber = (n) => {
     });
 };
 
+function formatDateTime(_date) {
+    const dateTime = _date.createdAt || _date.date;
+    if (!dateTime) return "-";
+    const d = new Date(dateTime);
+    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const date = d.toLocaleDateString('en-GB');
+    return `${date} ${time}`;
+}
+
 
 
 export default function SupplierLedgerPage() {
@@ -96,13 +105,49 @@ export default function SupplierLedgerPage() {
             let readableReference = '-';
             if (entry.referenceId) {
                 if (typeof entry.referenceId === 'object' && entry.referenceId !== null) {
-                    readableReference = entry.referenceId.orderNumber || entry.referenceId.purchaseNumber || entry.referenceId._id || '-';
+                    // For returns, handle specially
+                    if (entry.referenceModel === 'Return' || entry.transactionType === 'return') {
+                        // Try orderNumber first (from associated dispatch order)
+                        if (entry.referenceId.orderNumber) {
+                            readableReference = entry.referenceId.orderNumber;
+                        } else {
+                            // Try to extract order number from description
+                            const description = entry.description || entry.notes || '';
+                            // Pattern: "Return from Dispatch Order DO-1234" or "Order: DO-1234"
+                            const orderMatch = description.match(/(?:Order|Dispatch Order):?\s*([A-Z0-9-]+)/i) || 
+                                             description.match(/Dispatch Order\s+([A-Z0-9-]+)/i);
+                            if (orderMatch && orderMatch[1]) {
+                                readableReference = orderMatch[1];
+                            } else {
+                                // Format return ID as RET-{last6chars} for readability
+                                const returnId = entry.referenceId._id?.toString() || entry.referenceId.toString();
+                                readableReference = returnId ? `RET-${returnId.slice(-6).toUpperCase()}` : '-';
+                            }
+                        }
+                    } else {
+                        // For non-returns, use standard logic
+                        readableReference = entry.referenceId.orderNumber || entry.referenceId.purchaseNumber || entry.referenceId._id || '-';
+                    }
                 } else {
                     readableReference = entry.referenceId.toString();
                 }
             } else if (entry.reference || entry.referenceNumber) {
                 readableReference = entry.reference || entry.referenceNumber;
             }
+
+
+            // Get readable reference (order number, purchase number, etc.)
+            // let readableReference = '-'
+            // if (entry.referenceId) {
+            //     if (typeof entry.referenceId === 'object' && entry.referenceId !== null) {
+            //         readableReference = entry.referenceId.orderNumber || entry.referenceId.purchaseNumber || entry.referenceId._id || '-'
+            //     } else {
+            //         readableReference = entry.referenceId.toString()
+            //     }
+            // } else if (entry.reference || entry.referenceNumber) {
+            //     readableReference = entry.reference || entry.referenceNumber
+            // }
+
 
             // Calculate separate payment amounts
             const cashPaid = (entry.transactionType === 'payment' && entry.paymentMethod === 'cash') ? (entry.credit || 0) : 0;
@@ -140,6 +185,7 @@ export default function SupplierLedgerPage() {
                 referenceModel: entry.referenceModel || '-',
                 paymentMethod: entry.paymentMethod || null,
                 paymentDetails: entry.paymentDetails || null,
+                entryNumber: entry.entryNumber || '-',
                 raw: entry
             };
         });
@@ -165,8 +211,38 @@ export default function SupplierLedgerPage() {
     // =====================================================
     // TAB 2: PENDING PAYMENTS - Orders needing payment
     // =====================================================
+    // Create a map of referenceId to entryNumber for pending balances
+    const pendingBalancesWithEntryNumbers = useMemo(() => {
+        const entries = ledgerData?.entries || ledgerData?.data?.entries || (Array.isArray(ledgerData) ? ledgerData : []);
+
+        // Create a map: referenceId -> entryNumber for purchase entries
+        const purchaseEntryMap = new Map();
+        entries.forEach(entry => {
+            if (entry.transactionType === 'purchase' && entry.referenceId) {
+                const refId = typeof entry.referenceId === 'object' && entry.referenceId !== null
+                    ? entry.referenceId._id?.toString() || entry.referenceId.toString()
+                    : entry.referenceId.toString();
+                purchaseEntryMap.set(refId, entry.entryNumber || '-');
+            }
+        });
+
+        return pendingBalances.map(balance => {
+            // Normalize referenceId for matching
+            const balanceRefId = balance.referenceId
+                ? (typeof balance.referenceId === 'object' && balance.referenceId !== null
+                    ? balance.referenceId._id?.toString() || balance.referenceId.toString()
+                    : balance.referenceId.toString())
+                : null;
+
+            return {
+                ...balance,
+                entryNumber: balanceRefId ? (purchaseEntryMap.get(balanceRefId) || '-') : '-'
+            };
+        });
+    }, [pendingBalances, ledgerData]);
+
     const filteredPendingBalances = useMemo(() => {
-        const sorted = [...pendingBalances].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+        const sorted = [...pendingBalancesWithEntryNumbers].sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
 
         if (!searchTerm.trim()) {
             return sorted;
@@ -176,7 +252,7 @@ export default function SupplierLedgerPage() {
             const reference = (row.reference || "").toLowerCase();
             return reference.includes(searchLower);
         });
-    }, [pendingBalances, searchTerm]);
+    }, [pendingBalancesWithEntryNumbers, searchTerm]);
 
     // =====================================================
     // TAB 3: PAYMENT HISTORY - Payment entries only
@@ -211,12 +287,13 @@ export default function SupplierLedgerPage() {
                 id: entry._id || entry.id,
                 date: entry.date || entry.createdAt,
                 reference,
-                referenceId: (entry.referenceId && typeof entry.referenceId === 'object' && entry.referenceId._id)
-                    ? entry.referenceId._id.toString()
-                    : (entry.referenceId ? entry.referenceId.toString() : null),
+                // referenceId: (entry.referenceId && typeof entry.referenceId === 'object' && entry.referenceId._id)
+                //     ? entry.referenceId._id.toString()
+                //     : (entry.referenceId ? entry.referenceId.toString() : null),
                 paymentMethod: entry.paymentMethod || 'cash',
                 amount: entry.credit || 0,
                 notes: entry.description || entry.remarks || '-',
+                entryNumber: entry.entryNumber || '-',
                 raw: entry
             };
         }).sort((a, b) => new Date(b.raw.createdAt || b.date) - new Date(a.raw.createdAt || a.date));
@@ -244,8 +321,30 @@ export default function SupplierLedgerPage() {
     }, [paymentHistoryTransactions]);
 
     // Calculate totals for display
-    const calculatedTotalBalance = ledgerData?.currentBalance || ledgerData?.totalBalance || 0;
-    const calculatedTotalPending = filteredPendingBalances.reduce((sum, balance) => sum + (balance.amount || 0), 0);
+    // Use client-side calculated running balance (same as table's top row)
+    // This ensures the summary card matches the Balance column of the first row in the table
+    const calculatedTotalBalance = useMemo(() => {
+        // Get the balance from the first entry (newest after sorting/reversing)
+        // This represents the current running balance
+        if (allLedgerTransactions.length > 0) {
+            return allLedgerTransactions[0].balance || 0;
+        }
+        // Fallback to backend totalBalance for empty data case
+        return ledgerData?.totalBalance || 0;
+    }, [allLedgerTransactions, ledgerData]);
+
+    // Calculate total pending: Use ledger balance when positive (accounts for excess payments)
+    // The sum of pending payment rows doesn't account for excess payments not tied to orders
+    const calculatedTotalPending = useMemo(() => {
+        // If ledger balance is positive, that's the true pending amount (includes excess payments)
+        // If negative or zero, use sum of pending rows (which should be 0 or negative)
+        const ledgerBalance = calculatedTotalBalance;
+        if (ledgerBalance > 0) {
+            return ledgerBalance;
+        }
+        // Fallback to sum of pending rows for edge cases
+        return filteredPendingBalances.reduce((sum, balance) => sum + (balance.amount || 0), 0);
+    }, [calculatedTotalBalance, filteredPendingBalances]);
 
     if (!supplierId) {
         return (
@@ -289,8 +388,9 @@ export default function SupplierLedgerPage() {
                                 </div>
                                 <div className="bg-slate-50 rounded-lg p-6 space-y-1">
                                     <p className="text-sm text-slate-500">Current Balance</p>
-                                    <p className={`text-2xl font-bold ${calculatedTotalBalance >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                        {formatNumber(Math.abs(calculatedTotalBalance))}
+                                    <p className={`text-2xl font-bold ${calculatedTotalBalance <= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                        {/* {formatNumber(Math.abs(calculatedTotalBalance))} */}
+                                        {formatNumber(calculatedTotalBalance)}
                                     </p>
 
                                 </div>
@@ -298,6 +398,7 @@ export default function SupplierLedgerPage() {
 
                             {/* Ledger Table */}
                             <div className="overflow-hidden rounded-xl border border-app-border">
+                                {/* {JSON.stringify(allLedgerTransactions)} */}
                                 <table className="min-w-full divide-y divide-app-border text-sm">
                                     <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                         <tr>
@@ -305,10 +406,11 @@ export default function SupplierLedgerPage() {
                                             <th className="px-4 py-3">Entry Number</th>
                                             <th className="px-4 py-3">Type</th>
                                             <th className="px-4 py-3">Reference</th>
-                                            <th className="px-4 py-3 text-right">Debit (Owe)</th>
-                                            <th className="px-4 py-3 text-right">Cash Paid</th>
-                                            <th className="px-4 py-3 text-right">Bank Paid</th>
-                                            <th className="px-4 py-3 text-right">Return</th>
+                                            <th className="px-4 py-3 text-right">Recievable</th>
+                                            <th className="px-4 py-3 text-right">Cash Received</th>
+                                            <th className="px-4 py-3 text-right">Bank Recieved</th>
+                                            <th className="px-4 py-3 text-right">Returned Amount</th>
+                                            <th className="px-4 py-3 text-right">Discount</th>
                                             <th className="px-4 py-3 text-right">Balance</th>
                                         </tr>
                                     </thead>
@@ -316,13 +418,33 @@ export default function SupplierLedgerPage() {
                                         {allLedgerTransactions.map((row) => (
                                             <tr key={row.id} className="hover:bg-slate-50">
                                                 <td className="px-4 py-3 whitespace-nowrap">
-                                                    {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                                                    {formatDateTime(row)}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="font-medium">{row.entryNumber}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <span>{row.type}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    {row.referenceId ? (
+
+
+
+                                                    {row.raw?.referenceId ? (
+                                                        <button
+                                                            onClick={() => router.push(`/dispatch-orders/${typeof row.raw.referenceId === 'object' ? row.raw.referenceId._id : row.raw.referenceId}`)}
+                                                            className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
+                                                        >
+                                                            {row.reference || '-'}
+                                                        </button>
+                                                    ) : (
+                                                        <span className="font-medium">{row.raw?.reference || '-'}</span>
+                                                    )}
+
+
+
+
+                                                    {/* {row.referenceId ? (
                                                         <button
                                                             onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
                                                             className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
@@ -331,7 +453,7 @@ export default function SupplierLedgerPage() {
                                                         </button>
                                                     ) : (
                                                         <span className="font-medium">{row.reference || '-'}</span>
-                                                    )}
+                                                    )} */}
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
                                                     <span className={`tabular-nums font-semibold ${row.debit > 0 ? 'text-red-600' : 'text-slate-400'}`}>
@@ -351,6 +473,11 @@ export default function SupplierLedgerPage() {
                                                 <td className="px-4 py-3 text-right">
                                                     <span className={`tabular-nums font-semibold ${row.returnAmount > 0 ? 'text-orange-600' : 'text-slate-400'}`}>
                                                         {row.returnAmount > 0 ? formatNumber(row.returnAmount) : '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <span className={`tabular-nums font-semibold ${row.discount > 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                                                        {row.discount > 0 ? formatNumber(row.discount) : '-'}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
@@ -437,6 +564,7 @@ export default function SupplierLedgerPage() {
                                 <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                     <tr>
                                         <th className="px-4 py-3">Date</th>
+                                        <th className="px-4 py-3">Entry Number</th>
                                         <th className="px-4 py-3">Reference</th>
                                         <th className="px-4 py-3 text-right">Total Amount</th>
                                         <th className="px-4 py-3 text-right">Discount</th>
@@ -460,6 +588,9 @@ export default function SupplierLedgerPage() {
                                             <tr key={row.id} className="hover:bg-slate-50">
                                                 <td className="px-4 py-3 whitespace-nowrap">
                                                     {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="font-medium">{row.entryNumber || '-'}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
@@ -527,7 +658,7 @@ export default function SupplierLedgerPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardDescription>Total Payments</CardDescription>
+                        <CardDescription>Total Payments Received</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">
@@ -612,6 +743,7 @@ export default function SupplierLedgerPage() {
                                 <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                     <tr>
                                         <th className="px-4 py-3">Date</th>
+                                        <th className="px-4 py-3">Entry Number</th>
                                         <th className="px-4 py-3">Reference</th>
                                         <th className="px-4 py-3">Method</th>
                                         <th className="px-4 py-3 text-right">Amount</th>
@@ -623,6 +755,9 @@ export default function SupplierLedgerPage() {
                                         <tr key={row.id} className="hover:bg-slate-50">
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <span className="font-medium">{row.entryNumber || '-'}</span>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {row.referenceId ? (
