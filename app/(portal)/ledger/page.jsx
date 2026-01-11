@@ -37,15 +37,33 @@ export default function LedgerPage() {
 
   const pendingBalances = pendingBalancesData?.balances || [];
 
-  // Filter pending balances by reference number
+  // Filter pending balances - search across multiple fields like admin portal
   const filteredPendingBalances = useMemo(() => {
     if (!searchTerm.trim()) {
       return pendingBalances;
     }
     const searchLower = searchTerm.toLowerCase().trim();
     return pendingBalances.filter((row) => {
+      // Search across multiple fields
       const reference = (row.reference || "").toLowerCase();
-      return reference.includes(searchLower);
+      const date = row.date ? new Date(row.date).toLocaleDateString('en-GB').toLowerCase() : "";
+      const totalAmount = String(row.grossTotal || row.totalValue || row.totalAmount || 0).toLowerCase();
+      const discount = String(row.discount || 0).toLowerCase();
+      const bankPaid = String(row.bankPaid || 0).toLowerCase();
+      const cashPaid = String(row.cashPaid || 0).toLowerCase();
+      const returnAmount = String(row.returnAmount || 0).toLowerCase();
+      const remaining = String(row.amount || 0).toLowerCase();
+      
+      return (
+        reference.includes(searchLower) ||
+        date.includes(searchLower) ||
+        totalAmount.includes(searchLower) ||
+        discount.includes(searchLower) ||
+        bankPaid.includes(searchLower) ||
+        cashPaid.includes(searchLower) ||
+        returnAmount.includes(searchLower) ||
+        remaining.includes(searchLower)
+      );
     });
   }, [pendingBalances, searchTerm]);
 
@@ -122,6 +140,36 @@ export default function LedgerPage() {
     });
   }, [ledgerData]);
 
+  // Filter ledger transactions - search across multiple fields like admin portal
+  const filteredLedgerTransactions = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return allLedgerTransactions;
+    }
+    const searchLower = searchTerm.toLowerCase().trim();
+    return allLedgerTransactions.filter((row) => {
+      // Search across multiple fields
+      const date = row.date ? new Date(row.date).toLocaleDateString('en-GB').toLowerCase() : "";
+      const type = (row.type || "").toLowerCase();
+      const description = (row.description || "").toLowerCase();
+      const reference = (row.reference || "").toLowerCase();
+      const debit = String(row.debit || 0).toLowerCase();
+      const credit = String(row.credit || 0).toLowerCase();
+      const balance = String(row.balance || 0).toLowerCase();
+      const paymentMethod = (row.paymentMethod || "").toLowerCase();
+      
+      return (
+        date.includes(searchLower) ||
+        type.includes(searchLower) ||
+        description.includes(searchLower) ||
+        reference.includes(searchLower) ||
+        debit.includes(searchLower) ||
+        credit.includes(searchLower) ||
+        balance.includes(searchLower) ||
+        paymentMethod.includes(searchLower)
+      );
+    });
+  }, [allLedgerTransactions, searchTerm]);
+
   if (!supplierId) {
     return (
       <div className="space-y-6">
@@ -138,8 +186,21 @@ export default function LedgerPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Ledger Entries</CardTitle>
-          <CardDescription>View all your transactions and payments</CardDescription>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle>Ledger Entries</CardTitle>
+              <CardDescription>View all your transactions and payments</CardDescription>
+            </div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search date, type, reference, amounts..."
+                className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {ledgerLoading ? (
@@ -151,13 +212,15 @@ export default function LedgerPage() {
             <div className="p-12 text-center text-slate-500">
               <p>No ledger entries found</p>
             </div>
+          ) : filteredLedgerTransactions.length === 0 ? (
+            <div className="p-12 text-center text-slate-500">
+              <p>No results found for your search.</p>
+              <p className="text-xs mt-2">Try a different search term.</p>
+            </div>
           ) : (
             <>
-
-
               <div className="overflow-hidden rounded-xl border border-app-border">
                 <table className="min-w-full divide-y divide-app-border text-sm">
-                  {JSON.stringify(allLedgerTransactions)}
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-4 py-3">Date</th>
@@ -167,7 +230,7 @@ export default function LedgerPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-app-border bg-white">
-                    {allLedgerTransactions.map((row) => {
+                    {filteredLedgerTransactions.map((row) => {
                       // Calculate quantity
                       let quantity = '-';
                       if ((row.referenceModel === 'DispatchOrder' || row.referenceModel === 'Purchase') && row.raw?.referenceId) {
@@ -216,7 +279,18 @@ export default function LedgerPage() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Ledger</CardTitle>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <CardTitle>Pending Balances</CardTitle>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search reference, date, amounts..."
+                className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {pendingBalancesLoading ? (
@@ -308,13 +382,13 @@ export default function LedgerPage() {
 
   const tabs = [
     {
-      label: "Ledger",
+      label: "Pending Balances",
       content: paymentDetails,
     },
-    // {
-    //   label: "Ledger",
-    //   content: ledgerTabContent,
-    // },
+    {
+      label: "Ledger Entries",
+      content: ledgerTabContent,
+    },
   ];
 
   return (
@@ -330,112 +404,12 @@ export default function LedgerPage() {
 
 
       <div className="">
-        <>
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <CardTitle>Ledger</CardTitle>
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input
-                    placeholder="Search reference number..."
-                    className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {pendingBalancesLoading ? (
-                <div className="p-8 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-accent"></div>
-                  <span className="ml-2 text-slate-600">Loading pending balances...</span>
-                </div>
-              ) : pendingBalances.length === 0 ? (
-                <div className="p-8 text-center text-slate-500">
-                  <p>No payment records found.</p>
-                  <p className="text-xs mt-2">No confirmed dispatch orders available.</p>
-                </div>
-              ) : filteredPendingBalances.length === 0 ? (
-                <div className="p-8 text-center text-slate-500">
-                  <p>No results found for your search.</p>
-                  <p className="text-xs mt-2">Try a different reference number.</p>
-                </div>
-              ) : (
-                <div className="overflow-hidden rounded-xl border border-app-border">
-                  <table className="min-w-full divide-y divide-app-border text-sm">
-                    <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      <tr>
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3">Reference</th>
-                        <th className="px-4 py-3 text-right">Total Amount</th>
-                        <th className="px-4 py-3 text-right">Discount</th>
-                        <th className="px-4 py-3 text-right">Bank Paid</th>
-                        <th className="px-4 py-3 text-right">Cash Paid</th>
-                        <th className="px-4 py-3 text-right">Return Items Amount</th>
-                        <th className="px-4 py-3 text-right">Remaining</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-app-border bg-white">
-                      {filteredPendingBalances.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
-                          </td>
-                          <td className="px-4 py-3">
-                            {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
-                              <button
-                                onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
-                                className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
-                              >
-                                {row.reference || '-'}
-                              </button>
-                            ) : (
-                              <span className="font-medium text-blue-600">{row.reference || '-'}</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-semibold tabular-nums">{currency(row.grossTotal || row.totalValue || ((row.totalAmount || 0) + (row.discount || 0) + (row.returnAmount || 0)))}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="tabular-nums text-slate-600">{currency(row.discount || 0)}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="tabular-nums text-green-600 font-medium">
-                              {currency(row.bankPaid || 0)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="tabular-nums text-green-600 font-medium">
-                              {currency(row.cashPaid || 0)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="tabular-nums text-orange-600 font-medium">
-                              {currency(row.returnAmount || 0)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {currency(Math.abs(row.amount || 0))}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </>
-        {/* <Tabs
+        <Tabs
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           className="p-1"
-        /> */}
+        />
 
         {/* <Card>
           <CardHeader>

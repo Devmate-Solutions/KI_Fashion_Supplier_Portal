@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import {
   LayoutDashboard,
-  Receipt,
   Settings,
   Truck,
   RefreshCcw,
@@ -21,7 +20,6 @@ export const NAV_ITEMS = [
   // { href: "/products", label: "Products", icon: Package },
   // { href: "/purchase-orders", label: "Purchase Orders", icon: ClipboardList },
   { href: "/returns", label: "Returns", icon: RefreshCcw },
-  { href: "/ledger", label: "Ledger", icon: Receipt },
   { href: "/supplier-ledger", label: "Supplier Ledger", icon: BookOpen },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

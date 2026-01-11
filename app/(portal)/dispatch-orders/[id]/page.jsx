@@ -322,7 +322,7 @@ export default function DispatchOrderDetailPage() {
                     {dispatchOrder?.totalBoxes || 0}
                   </p>
                 </div>
-                {dispatchOrder?.paymentDetails && (
+                {(dispatchOrder?.paymentDetails || dispatchOrder?.computedPaymentDetails) && (
                   <>
                     <div>
                       <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">
@@ -330,7 +330,9 @@ export default function DispatchOrderDetailPage() {
                       </label>
                       <p className="font-bold text-slate-900 text-lg">
                         {currency(
-                          dispatchOrder.paymentDetails.cashPayment || 0
+                          dispatchOrder?.computedPaymentDetails?.cashPayment || 
+                          dispatchOrder?.paymentDetails?.cashPayment || 
+                          0
                         )}
                       </p>
                     </div>
@@ -340,7 +342,9 @@ export default function DispatchOrderDetailPage() {
                       </label>
                       <p className="font-bold text-slate-900 text-lg">
                         {currency(
-                          dispatchOrder.paymentDetails.bankPayment || 0
+                          dispatchOrder?.computedPaymentDetails?.bankPayment || 
+                          dispatchOrder?.paymentDetails?.bankPayment || 
+                          0
                         )}
                       </p>
                     </div>

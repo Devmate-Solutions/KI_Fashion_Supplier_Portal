@@ -208,6 +208,42 @@ export default function SupplierLedgerPage() {
         return mappedItems.reverse();
     }, [ledgerData]);
 
+    // Filter ledger transactions - search across multiple fields like admin portal
+    const filteredLedgerTransactions = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return allLedgerTransactions;
+        }
+        const searchLower = searchTerm.toLowerCase().trim();
+        return allLedgerTransactions.filter((row) => {
+            // Search across multiple fields
+            const date = row.date ? formatDateTime(row).toLowerCase() : "";
+            const entryNumber = (row.entryNumber || "").toLowerCase();
+            const type = (row.type || "").toLowerCase();
+            const reference = (row.reference || "").toLowerCase();
+            const description = (row.description || "").toLowerCase();
+            const debit = String(row.debit || 0).toLowerCase();
+            const cashPaid = String(row.cashPaid || 0).toLowerCase();
+            const bankPaid = String(row.bankPaid || 0).toLowerCase();
+            const returnAmount = String(row.returnAmount || 0).toLowerCase();
+            const discount = String(row.discount || 0).toLowerCase();
+            const balance = String(row.balance || 0).toLowerCase();
+            
+            return (
+                date.includes(searchLower) ||
+                entryNumber.includes(searchLower) ||
+                type.includes(searchLower) ||
+                reference.includes(searchLower) ||
+                description.includes(searchLower) ||
+                debit.includes(searchLower) ||
+                cashPaid.includes(searchLower) ||
+                bankPaid.includes(searchLower) ||
+                returnAmount.includes(searchLower) ||
+                discount.includes(searchLower) ||
+                balance.includes(searchLower)
+            );
+        });
+    }, [allLedgerTransactions, searchTerm]);
+
     // =====================================================
     // TAB 2: PENDING PAYMENTS - Orders needing payment
     // =====================================================
@@ -249,8 +285,30 @@ export default function SupplierLedgerPage() {
         }
         const searchLower = searchTerm.toLowerCase().trim();
         return sorted.filter((row) => {
+            // Search across multiple fields
+            const date = row.date ? new Date(row.date).toLocaleDateString('en-GB').toLowerCase() : "";
+            const entryNumber = (row.entryNumber || "").toLowerCase();
             const reference = (row.reference || "").toLowerCase();
-            return reference.includes(searchLower);
+            const totalAmount = String(row.grossTotal || row.totalValue || row.totalAmount || 0).toLowerCase();
+            const discount = String(row.discount || 0).toLowerCase();
+            const bankPaid = String(row.bankPaid || 0).toLowerCase();
+            const cashPaid = String(row.cashPaid || 0).toLowerCase();
+            const returnAmount = String(row.returnAmount || 0).toLowerCase();
+            const remaining = String(row.amount || 0).toLowerCase();
+            const status = (row.status || "").toLowerCase();
+            
+            return (
+                date.includes(searchLower) ||
+                entryNumber.includes(searchLower) ||
+                reference.includes(searchLower) ||
+                totalAmount.includes(searchLower) ||
+                discount.includes(searchLower) ||
+                bankPaid.includes(searchLower) ||
+                cashPaid.includes(searchLower) ||
+                returnAmount.includes(searchLower) ||
+                remaining.includes(searchLower) ||
+                status.includes(searchLower)
+            );
         });
     }, [pendingBalancesWithEntryNumbers, searchTerm]);
 
@@ -298,6 +356,32 @@ export default function SupplierLedgerPage() {
             };
         }).sort((a, b) => new Date(b.raw.createdAt || b.date) - new Date(a.raw.createdAt || a.date));
     }, [ledgerData, paymentHistoryMethodFilter]);
+
+    // Filter payment history transactions - search across multiple fields
+    const filteredPaymentHistoryTransactions = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return paymentHistoryTransactions;
+        }
+        const searchLower = searchTerm.toLowerCase().trim();
+        return paymentHistoryTransactions.filter((row) => {
+            // Search across multiple fields
+            const date = row.date ? new Date(row.date).toLocaleDateString('en-GB').toLowerCase() : "";
+            const entryNumber = (row.entryNumber || "").toLowerCase();
+            const reference = (row.reference || "").toLowerCase();
+            const paymentMethod = (row.paymentMethod || "").toLowerCase();
+            const amount = String(row.amount || 0).toLowerCase();
+            const notes = (row.notes || "").toLowerCase();
+            
+            return (
+                date.includes(searchLower) ||
+                entryNumber.includes(searchLower) ||
+                reference.includes(searchLower) ||
+                paymentMethod.includes(searchLower) ||
+                amount.includes(searchLower) ||
+                notes.includes(searchLower)
+            );
+        });
+    }, [paymentHistoryTransactions, searchTerm]);
 
     // Calculate payment summary for Tab 3
     const paymentSummary = useMemo(() => {
@@ -365,8 +449,21 @@ export default function SupplierLedgerPage() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Complete Ledger History</CardTitle>
-                    <CardDescription>All purchases, payments, and returns - complete accounting record</CardDescription>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <CardTitle>Complete Ledger History</CardTitle>
+                            <CardDescription>All purchases, payments, and returns - complete accounting record</CardDescription>
+                        </div>
+                        <div className="relative">
+                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Input
+                                placeholder="Search date, type, reference, amounts..."
+                                className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {ledgerLoading ? (
@@ -378,13 +475,18 @@ export default function SupplierLedgerPage() {
                         <div className="p-12 text-center text-slate-500">
                             <p>No ledger entries found</p>
                         </div>
+                    ) : filteredLedgerTransactions.length === 0 ? (
+                        <div className="p-12 text-center text-slate-500">
+                            <p>No results found for your search.</p>
+                            <p className="text-xs mt-2">Try a different search term.</p>
+                        </div>
                     ) : (
                         <>
                             {/* Summary Cards */}
                             <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="bg-slate-50 rounded-lg p-6 space-y-1">
                                     <p className="text-sm text-slate-500">Total Entries</p>
-                                    <p className="text-2xl font-bold">{allLedgerTransactions.length}</p>
+                                    <p className="text-2xl font-bold">{filteredLedgerTransactions.length}</p>
                                 </div>
                                 <div className="bg-slate-50 rounded-lg p-6 space-y-1">
                                     <p className="text-sm text-slate-500">Current Balance</p>
@@ -415,7 +517,7 @@ export default function SupplierLedgerPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-app-border bg-white">
-                                        {allLedgerTransactions.map((row) => (
+                                        {filteredLedgerTransactions.map((row) => (
                                             <tr key={row.id} className="hover:bg-slate-50">
                                                 <td className="px-4 py-3 whitespace-nowrap">
                                                     {formatDateTime(row)}
@@ -456,7 +558,7 @@ export default function SupplierLedgerPage() {
                                                     )} */}
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.debit > 0 ? 'text-red-600' : 'text-slate-400'}`}>
+                                                    <span className={`tabular-nums font-semibold ${row.debit < 0 ? 'text-red-600' : 'text-slate-800'}`}>
                                                         {row.debit > 0 ? formatNumber(row.debit) : '-'}
                                                     </span>
                                                 </td>
@@ -471,7 +573,7 @@ export default function SupplierLedgerPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.returnAmount > 0 ? 'text-orange-600' : 'text-slate-400'}`}>
+                                                    <span className={`tabular-nums font-semibold ${row.returnAmount > 0 ? 'text-red-600' : 'text-slate-400'}`}>
                                                         {row.returnAmount > 0 ? formatNumber(row.returnAmount) : '-'}
                                                     </span>
                                                 </td>
@@ -481,7 +583,8 @@ export default function SupplierLedgerPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums font-bold">{formatNumber(row.balance)}</span>
+                                                    <span className={`tabular-nums font-bold ${row.balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                                        {formatNumber(row.balance)}</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -534,7 +637,7 @@ export default function SupplierLedgerPage() {
                         <div className="relative">
                             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <Input
-                                placeholder="Search reference number..."
+                                placeholder="Search reference, date, amounts..."
                                 className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -568,8 +671,8 @@ export default function SupplierLedgerPage() {
                                         <th className="px-4 py-3">Reference</th>
                                         <th className="px-4 py-3 text-right">Total Amount</th>
                                         <th className="px-4 py-3 text-right">Discount</th>
-                                        <th className="px-4 py-3 text-right">Bank Paid</th>
-                                        <th className="px-4 py-3 text-right">Cash Paid</th>
+                                        <th className="px-4 py-3 text-right">Bank Received</th>
+                                        <th className="px-4 py-3 text-right">Cash Received</th>
                                         <th className="px-4 py-3 text-right">Return</th>
                                         <th className="px-4 py-3 text-right">Remaining</th>
                                         <th className="px-4 py-3">Status</th>
@@ -595,10 +698,10 @@ export default function SupplierLedgerPage() {
                                                 <td className="px-4 py-3">
                                                     {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
                                                         <button
-                                                            onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
+                                                            onClick={() => router.push(`/dispatch-orders/${row.referenceModel === 'Return' ? row.raw.referenceId.dispatchOrderId : row.referenceId}`)}
                                                             className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
                                                         >
-                                                            {row.reference || '-'}
+                                                            {row.reference || '-'} 
                                                         </button>
                                                     ) : (
                                                         <span className="font-medium text-blue-600">{row.reference || '-'}</span>
@@ -623,7 +726,7 @@ export default function SupplierLedgerPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums text-orange-600 font-medium">
+                                                    <span className="tabular-nums text-red-600 font-medium">
                                                         {formatNumber(row.returnAmount || 0)}
                                                     </span>
                                                 </td>
@@ -705,17 +808,28 @@ export default function SupplierLedgerPage() {
                             <CardTitle>Payment History</CardTitle>
                             <CardDescription>All payments received</CardDescription>
                         </div>
-                        <div className="w-[200px]">
-                            <Label htmlFor="payment-method-filter" className="sr-only">Payment Method</Label>
-                            <Select
-                                id="payment-method-filter"
-                                value={paymentHistoryMethodFilter}
-                                onChange={(e) => setPaymentHistoryMethodFilter(e.target.value)}
-                            >
-                                <option value="all">All Methods</option>
-                                <option value="cash">Cash</option>
-                                <option value="bank">Bank</option>
-                            </Select>
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <Input
+                                    placeholder="Search date, reference, amounts..."
+                                    className="pl-9 w-full sm:w-64 border-slate-200 focus:ring-app-accent/20"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <div className="w-[200px]">
+                                <Label htmlFor="payment-method-filter" className="sr-only">Payment Method</Label>
+                                <Select
+                                    id="payment-method-filter"
+                                    value={paymentHistoryMethodFilter}
+                                    onChange={(e) => setPaymentHistoryMethodFilter(e.target.value)}
+                                >
+                                    <option value="all">All Methods</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="bank">Bank</option>
+                                </Select>
+                            </div>
                         </div>
                     </div>
                 </CardHeader>
@@ -737,6 +851,11 @@ export default function SupplierLedgerPage() {
                                 </button>
                             )}
                         </div>
+                    ) : filteredPaymentHistoryTransactions.length === 0 ? (
+                        <div className="p-12 text-center text-slate-500">
+                            <p>No results found for your search.</p>
+                            <p className="text-xs mt-2">Try a different search term.</p>
+                        </div>
                     ) : (
                         <div className="overflow-hidden rounded-xl border border-app-border">
                             <table className="min-w-full divide-y divide-app-border text-sm">
@@ -751,7 +870,7 @@ export default function SupplierLedgerPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-app-border bg-white">
-                                    {paymentHistoryTransactions.map((row) => (
+                                    {filteredPaymentHistoryTransactions.map((row) => (
                                         <tr key={row.id} className="hover:bg-slate-50">
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
