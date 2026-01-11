@@ -23,7 +23,8 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { showError, showWarning } from "@/lib/utils/toast";
 import { SEASON_OPTIONS, normalizeSeasonArray } from "@/lib/constants/seasons";
 import PacketConfigurationModal from "@/components/modals/PacketConfigurationModal";
-
+import { Controller } from 'react-hook-form';
+import BritishDatePicker from "../BritishDatePicker";
 const boxSchema = z.object({
   boxNumber: z.number(),
   itemsPerBox: z.number().min(0).optional(),
@@ -134,11 +135,11 @@ export default function DispatchOrderForm({
         productName: item.productName || "",
         productCode: item.productCode || "",
         season: normalizeSeasonArray(
-          Array.isArray(item.season) 
-            ? item.season 
-            : item.season 
-              ? [item.season] 
-              : item.productType 
+          Array.isArray(item.season)
+            ? item.season
+            : item.season
+              ? [item.season]
+              : item.productType
                 ? (Array.isArray(item.productType) ? item.productType : [item.productType])
                 : []
         ),
@@ -1382,9 +1383,38 @@ export default function DispatchOrderForm({
               <label htmlFor="date" className={labelClasses}>
                 Dispatch Date <span className="text-red-500">*</span>
               </label>
-              <input
+              <Controller
+                name="date"
+                control={control}
+                rules={{
+                  required: "Dispatch date is required"
+                }}
+                render={({ field: { onChange, value, ref } }) => (
+                  <BritishDatePicker
+                    ref={ref}
+                    value={value}
+                    onChange={(date) => {
+                      // Convert Date object to ISO string format (YYYY-MM-DD)
+                      const dateString = date instanceof Date
+                        ? date.toISOString().split('T')[0]
+                        : date;
+                      onChange(dateString);
+                    }}
+                    maxDate={new Date()}
+                    className={`${inputClasses} ${errors.date
+                      ? "border-red-500 focus:ring-red-500"
+                      : "border-slate-300"
+                      }`}
+                    error={!!errors.date}
+                    placeholder="DD/MM/YYYY"
+                  />
+                )}
+              />
+              {/* <input
                 type="date"
                 id="date"
+                lang="en-GB"
+                max={new Date().toISOString().split('T')[0]}
                 className={`${inputClasses} ${errors.date
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"
@@ -1398,7 +1428,7 @@ export default function DispatchOrderForm({
                     focusNextInput("date", "logisticsCompany");
                   }
                 }}
-              />
+              /> */}
               {errors.date && (
                 <p
                   id="date-error"
@@ -1417,8 +1447,8 @@ export default function DispatchOrderForm({
               <select
                 id="logisticsCompany"
                 className={`${selectClasses} ${errors.logisticsCompany
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300"
                   }`}
                 {...register("logisticsCompany")}
                 aria-invalid={errors.logisticsCompany ? "true" : "false"}
@@ -1475,8 +1505,8 @@ export default function DispatchOrderForm({
                 id="new-product-name"
                 type="text"
                 className={`${inputClasses} ${newProductErrors.productName
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300"
                   }`}
                 value={newProduct.productName}
                 onChange={(e) =>
@@ -1504,8 +1534,8 @@ export default function DispatchOrderForm({
                 id="new-product-code"
                 type="text"
                 className={`${inputClasses} ${newProductErrors.productCode
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300"
                   }`}
                 value={newProduct.productCode}
                 onChange={(e) =>
@@ -1557,8 +1587,8 @@ export default function DispatchOrderForm({
                 type="text"
                 inputMode="decimal"
                 className={`${inputClasses} ${newProductErrors.costPrice
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300"
                   }`}
                 value={newProduct.costPrice}
                 onChange={(e) => {
@@ -1750,8 +1780,8 @@ export default function DispatchOrderForm({
                 type="text"
                 inputMode="numeric"
                 className={`${inputClasses} ${newProductErrors.quantity
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-300"
                   }`}
                 value={newProduct.quantity}
                 onChange={(e) => {
@@ -2111,8 +2141,8 @@ export default function DispatchOrderForm({
                             ) : (
                               <div
                                 className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productName
-                                    ? "border border-red-300"
-                                    : ""
+                                  ? "border border-red-300"
+                                  : ""
                                   }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "productName")
@@ -2190,8 +2220,8 @@ export default function DispatchOrderForm({
                             ) : (
                               <div
                                 className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.productCode
-                                    ? "border border-red-300"
-                                    : ""
+                                  ? "border border-red-300"
+                                  : ""
                                   }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "productCode")
@@ -2250,8 +2280,8 @@ export default function DispatchOrderForm({
                             ) : (
                               <div
                                 className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 ${productErrors?.season
-                                    ? "border border-red-300"
-                                    : ""
+                                  ? "border border-red-300"
+                                  : ""
                                   }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "season")
@@ -2330,8 +2360,8 @@ export default function DispatchOrderForm({
                             ) : (
                               <div
                                 className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${productErrors?.costPrice
-                                    ? "border border-red-300"
-                                    : ""
+                                  ? "border border-red-300"
+                                  : ""
                                   }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "costPrice")
@@ -2706,8 +2736,8 @@ export default function DispatchOrderForm({
                             ) : (
                               <div
                                 className={`cursor-pointer hover:bg-slate-100 rounded px-2 py-1 -mx-2 -my-1 inline-block ${productErrors?.quantity
-                                    ? "border border-red-300"
-                                    : ""
+                                  ? "border border-red-300"
+                                  : ""
                                   }`}
                                 onClick={() =>
                                   handleCellClick(productIndex, "quantity")
@@ -2849,8 +2879,8 @@ export default function DispatchOrderForm({
                                                   <span
                                                     key={key}
                                                     className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
-                                                        ? "bg-red-100 text-red-700 border-red-300"
-                                                        : "bg-slate-100 text-slate-700 border-slate-200"
+                                                      ? "bg-red-100 text-red-700 border-red-300"
+                                                      : "bg-slate-100 text-slate-700 border-slate-200"
                                                       }`}
                                                   >
                                                     {key}: {qty}
@@ -3037,8 +3067,8 @@ export default function DispatchOrderForm({
                           type="button"
                           onClick={() => setDiscountType("percentage")}
                           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${discountType === "percentage"
-                              ? "bg-blue-600 text-white"
-                              : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
+                            ? "bg-blue-600 text-white"
+                            : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                             }`}
                         >
                           Percentage
@@ -3047,8 +3077,8 @@ export default function DispatchOrderForm({
                           type="button"
                           onClick={() => setDiscountType("amount")}
                           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${discountType === "amount"
-                              ? "bg-blue-600 text-white"
-                              : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
+                            ? "bg-blue-600 text-white"
+                            : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                             }`}
                         >
                           Amount
