@@ -322,19 +322,27 @@ export default function PacketConfigurationModal({
       return;
     }
 
-    // Clean up and save
-    const cleanPackets = packets.map((packet) => ({
-      packetNumber: packet.packetNumber,
-      totalItems: parseInt(packet.totalItems) || 0,
-      composition: packet.composition
-        .filter((item) => item.size && item.color && item.quantity)
-        .map((item) => ({
-          size: item.size.trim(),
-          color: item.color.trim(),
-          quantity: parseInt(item.quantity) || 0,
-        })),
-      isLoose: configMode === "loose",
-    }));
+    // Clean up packets and filter out any with empty compositions
+    const cleanPackets = packets
+      .map((packet) => ({
+        packetNumber: packet.packetNumber,
+        totalItems: parseInt(packet.totalItems) || 0,
+        composition: packet.composition
+          .filter((item) => item.size && item.color && item.quantity)
+          .map((item) => ({
+            size: item.size.trim(),
+            color: item.color.trim(),
+            quantity: parseInt(item.quantity) || 0,
+          })),
+        isLoose: configMode === "loose",
+      }))
+      // Filter out packets with empty composition arrays
+      .filter((packet) => packet.composition.length > 0);
+    
+    // Re-number packets after filtering
+    cleanPackets.forEach((packet, index) => {
+      packet.packetNumber = index + 1;
+    });
 
     const updatedMap = {
       ...packetsByItem,

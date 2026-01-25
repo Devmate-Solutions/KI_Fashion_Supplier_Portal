@@ -1267,7 +1267,16 @@ export default function DispatchOrderForm({
       // Add packet configuration if variant tracking is enabled
       if (productPackets[index]?.useVariantTracking) {
         item.useVariantTracking = true;
-        item.packets = productPackets[index]?.packets || [];
+        // Filter out packets with empty compositions and re-number them
+        const validPackets = (productPackets[index]?.packets || [])
+          .filter(p => p.composition && p.composition.length > 0 && 
+                       p.composition.some(c => c.size && c.color && c.quantity > 0))
+          .map((p, idx) => ({
+            ...p,
+            packetNumber: idx + 1,
+            composition: p.composition.filter(c => c.size && c.color && c.quantity > 0)
+          }));
+        item.packets = validPackets;
       }
 
       return item;
