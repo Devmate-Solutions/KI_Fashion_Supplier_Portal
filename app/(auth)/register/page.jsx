@@ -142,27 +142,27 @@ export default function RegisterPage() {
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-1 bg-app-accent"></div>
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-app-accent/5 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-app-accent/5 rounded-full blur-3xl"></div>
 
       <div className="w-full max-w-2xl z-10">
         <div className="text-center mb-10">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent shadow-xl shadow-app-accent/20 mb-6">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20 mb-6">
             <span className="text-2xl font-black text-white">KL</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Partner with KL Fashion</h1>
-          <p className="text-slate-800 mt-3 font-semibold">Create your supplier account to start your journey with us</p>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Partner with KL Fashion</h1>
+          <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Create your supplier account to start your journey with us</p>
         </div>
 
-        <Card className="rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/50 overflow-hidden">
+        <Card className="rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/30 overflow-hidden">
           <CardHeader className="p-8 border-b border-slate-200">
             <CardTitle>Supplier Onboarding</CardTitle>
-            <CardDescription className="font-semibold mt-1 text-slate-700">We'll use these details to create your secure login and business profile.</CardDescription>
+            <CardDescription className="font-medium mt-1 text-slate-600">We'll use these details to create your secure login and business profile.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 md:p-10">
             <form className="space-y-8" onSubmit={handleSubmit(onSubmit, onError)}>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">
+                  <label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-slate-700">
                     Your Full Name *
                   </label>
                   <div className="relative">
@@ -173,16 +173,16 @@ export default function RegisterPage() {
                       type="text"
                       placeholder="John Doe"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
-                        ${errors.name ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
-                        focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
-                        placeholder:text-slate-500
+                        w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
+                        ${errors.name ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-2 focus:ring-app-accent/20'}
+                        focus:outline-none transition-all duration-200
+                        placeholder:text-slate-400
                       `}
                       autoComplete="name"
                     />
                   </div>
                   {errors.name && (
-                    <p className="mt-1.5 text-xs font-bold text-red-500 ml-1">{errors.name.message}</p>
+                    <p id="name-error" className="mt-1.5 text-xs font-medium text-red-600" role="alert">{errors.name.message}</p>
                   )}
                 </div>
                 
@@ -198,7 +198,7 @@ export default function RegisterPage() {
                       type="text"
                       placeholder="Acme Textiles Ltd."
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.company ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                         focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                         placeholder:text-slate-500
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="+88"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                          w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                           ${errors.phoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                           focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                           placeholder:text-slate-500
@@ -245,7 +245,7 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="01712345678"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                          w-full px-4 py-3 rounded-md border bg-white text-slate-900 text-sm font-medium min-h-[44px]
                           ${errors.phone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                           focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                           placeholder:text-slate-500
@@ -272,7 +272,7 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="+88"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                          w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                           ${errors.additionalPhoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                           focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                           placeholder:text-slate-500
@@ -293,7 +293,7 @@ export default function RegisterPage() {
                         type="tel"
                         placeholder="01812345678"
                         className={`
-                          w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900
+                          w-full px-4 py-3 rounded-md border bg-white text-slate-900 text-sm font-medium min-h-[44px]
                           ${errors.additionalPhone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                           focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                           placeholder:text-slate-500
@@ -319,7 +319,7 @@ export default function RegisterPage() {
                       type="email"
                       placeholder="supplier@company.com"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                         focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                         placeholder:text-slate-500
@@ -344,7 +344,7 @@ export default function RegisterPage() {
                       rows={3}
                       placeholder="123 Textile Ave, Dhaka, Bangladesh"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border bg-white text-slate-900 pl-11
+                        w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.companyAddress ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                         focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold resize-none
                         placeholder:text-slate-500
@@ -369,7 +369,7 @@ export default function RegisterPage() {
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white text-slate-900
+                        w-full px-4 py-3 rounded-md border pr-12 bg-white text-slate-900 text-sm font-medium min-h-[44px]
                         ${errors.password ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                         focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                         placeholder:text-slate-500
@@ -379,13 +379,14 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2"
                       tabIndex={-1}
                     >
                       {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
+                        <EyeOff className="w-5 h-5" aria-hidden="true" />
                       ) : (
-                        <Eye className="w-5 h-5" />
+                        <Eye className="w-5 h-5" aria-hidden="true" />
                       )}
                     </button>
                   </div>
@@ -405,7 +406,7 @@ export default function RegisterPage() {
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       className={`
-                        w-full px-4 py-3.5 rounded-2xl border pr-12 bg-white text-slate-900
+                        w-full px-4 py-3 rounded-md border pr-12 bg-white text-slate-900 text-sm font-medium min-h-[44px]
                         ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
                         focus:ring-4 focus:outline-none transition-all duration-200 text-sm font-semibold
                         placeholder:text-slate-500
@@ -432,26 +433,28 @@ export default function RegisterPage() {
               </div>
 
               {serverError && (
-                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start animate-in shake duration-300">
-                  <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm font-semibold text-red-600">{serverError}</p>
+                <div className="p-4 bg-red-50 border border-red-200 rounded-md flex items-start gap-3 animate-in fade-in duration-200" role="alert">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <p className="text-sm font-medium text-red-700">{serverError}</p>
                 </div>
               )}
 
               <button 
                 type="submit" 
                 className="
-                  w-full bg-app-accent hover:bg-app-accent/90 text-white font-bold 
-                  py-4 px-6 rounded-2xl transition-all duration-200 text-sm
+                  w-full bg-app-accent hover:bg-app-accent/90 text-white font-semibold 
+                  py-3.5 px-6 rounded-md transition-all duration-200 text-sm
                   disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center shadow-lg shadow-app-accent/25
-                  hover:shadow-app-accent/40 active:scale-[0.98]
+                  flex items-center justify-center shadow-sm shadow-app-accent/20
+                  hover:shadow-md hover:shadow-app-accent/30 active:scale-[0.98]
+                  focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2
+                  min-h-[44px]
                 "
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3" />
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-2.5" aria-hidden="true" />
                     Processing Registration...
                   </>
                 ) : (
@@ -465,7 +468,7 @@ export default function RegisterPage() {
         <div className="mt-10 pt-8 text-center border-t border-slate-200">
           <p className="text-sm font-semibold text-slate-900">
             Already have a partner account?{" "}
-            <Link className="text-app-accent hover:text-indigo-700 transition-colors font-bold" href="/login">
+              <Link className="text-app-accent hover:text-app-accent/80 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded" href="/login">
               Sign in here
             </Link>
           </p>

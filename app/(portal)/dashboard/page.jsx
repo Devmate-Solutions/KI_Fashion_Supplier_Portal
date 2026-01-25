@@ -72,119 +72,130 @@ export default function DashboardPage() {
   const isNegative = _totalBalance < 0;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome back!</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Welcome back!</h1>
+        <p className="mt-2 text-sm text-slate-600">
           Here's what's happening with your account today.
         </p>
       </div>
 
-      {/* Debug: Show errors if any API fails */}
+      {/* Error Alert */}
       {ledgerError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="font-semibold text-red-800">Error loading dashboard data</p>
-          <p className="text-sm text-red-700">Ledger: {ledgerError.message}</p>
-          <p className="text-xs text-red-600 mt-2">Supplier ID: {supplierId || 'Not found'}</p>
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 flex items-start gap-3" role="alert">
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <p className="font-semibold text-red-800 text-sm">Error loading dashboard data</p>
+            <p className="text-sm text-red-700 mt-1">Ledger: {ledgerError.message}</p>
+          </div>
         </div>
       )}
 
       {/* Financial Statistics - 3 Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* {JSON.stringify(ledgerData)} */}
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Cash Payment */}
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-blue-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Cash Payment</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Banknote className="h-4 w-4 text-blue-600" />
+        <Card className="overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-11 w-11 rounded-md bg-blue-100 flex items-center justify-center shrink-0 border border-blue-200/50">
+                <Banknote className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-700">Cash Payment</CardTitle>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl md:text-3xl font-semibold text-slate-900 tabular-nums mb-2">
               {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+                <div className="h-8 w-32 bg-slate-100 animate-pulse rounded-md"></div>
               ) : currency(totalCashPayment)}
             </div>
-            <p className="mt-1 text-xs text-slate-500 font-medium">
+            <p className="text-xs text-slate-500 font-medium">
               Total cash received
             </p>
           </CardContent>
         </Card>
 
         {/* Bank Payment */}
-        <Card className="overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-white to-indigo-50/30">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Bank Payment</CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-indigo-600" />
+        <Card className="overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-11 w-11 rounded-md bg-app-accent/15 flex items-center justify-center shrink-0 border border-app-accent/20">
+                <CreditCard className="h-5 w-5 text-app-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-700">Bank Payment</CardTitle>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl md:text-3xl font-semibold text-slate-900 tabular-nums mb-2">
               {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+                <div className="h-8 w-32 bg-slate-100 animate-pulse rounded-md"></div>
               ) : currency(totalBankPayment)}
             </div>
-            <p className="mt-1 text-xs text-slate-500 font-medium">
+            <p className="text-xs text-slate-500 font-medium">
               Total bank transfers
             </p>
           </CardContent>
         </Card>
 
         {/* Total Balance - Combined Remaining and Outstanding */}
-        <Card className={`overflow-hidden border-none shadow-md shadow-slate-200/50 hover:shadow-lg transition-shadow duration-300 ${isNegative ? 'ring-2 ring-red-400/50' : ''}`}>
-          <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${isPositive
-              ? 'bg-gradient-to-br from-white to-green-50/30'
-              : isNegative
-                ? 'bg-gradient-to-br from-white to-red-50/30'
-                : 'bg-gradient-to-br from-white to-slate-50/30'
-            }`}>
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Balance</CardTitle>
-            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${isPositive
-                ? 'bg-green-50'
-                : isNegative
-                  ? 'bg-red-50'
-                  : 'bg-slate-100'
+        <Card className={`overflow-hidden border transition-all duration-200 shadow-sm hover:shadow-md ${
+          isNegative 
+            ? 'border-red-200 bg-red-50/30 hover:border-red-300' 
+            : isPositive 
+              ? 'border-green-200 bg-green-50/30 hover:border-green-300'
+              : 'border-slate-200 hover:border-slate-300'
+        }`}>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-5">
+              <div className={`h-11 w-11 rounded-md flex items-center justify-center shrink-0 ${
+                isPositive
+                  ? 'bg-green-100 border border-green-200/50'
+                  : isNegative
+                    ? 'bg-red-100 border border-red-200/50'
+                    : 'bg-slate-100 border border-slate-200/50'
               }`}>
-              {isPositive ? (
-                <TrendingUp className="h-4 w-4 text-green-600" />
-              ) : isNegative ? (
-                <AlertCircle className="h-4 w-4 text-red-600" />
-              ) : (
-                <TrendingUp className="h-4 w-4 text-slate-400" />
-              )}
+                {isPositive ? (
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                ) : isNegative ? (
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                ) : (
+                  <TrendingUp className="h-5 w-5 text-slate-400" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-700">Total Balance</CardTitle>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className={`text-2xl font-bold ${isPositive
+            <div className={`text-2xl md:text-3xl font-semibold tabular-nums mb-2 ${
+              isPositive
                 ? 'text-green-600'
                 : isNegative
                   ? 'text-red-600'
                   : 'text-slate-400'
-              }`}>
+            }`}>
               {ledgerLoading ? (
-                <div className="h-8 w-24 bg-slate-100 animate-pulse rounded"></div>
+                <div className="h-8 w-32 bg-slate-100 animate-pulse rounded-md"></div>
               ) : (
                 <span>
                   {isNegative && '-'}
                   {currency(Math.abs(_totalBalance))}
-                  
                 </span>
               )}
             </div>
-            <p className={`mt-1 text-xs font-medium flex items-center gap-1 ${isPositive
+            <p className={`text-xs font-medium flex items-center gap-1.5 ${
+              isPositive
                 ? 'text-green-600'
                 : isNegative
                   ? 'text-red-600'
                   : 'text-slate-500'
-              }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${isPositive
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${
+                isPositive
                   ? 'bg-green-500'
                   : isNegative
                     ? 'bg-red-500'
                     : 'bg-slate-300'
-                }`}></span>
+              }`}></span>
               {isPositive
                 ? 'Admin owes you'
                 : isNegative
@@ -195,42 +206,51 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-none shadow-md shadow-slate-200/50 flex flex-col">
-          <CardHeader>
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
-            <CardDescription>Commonly used shortcuts</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 pt-2">
-            <Button asChild className="w-full justify-between h-11 px-4 bg-app-accent hover:bg-app-accent/90 shadow-sm shadow-app-accent/20">
-              <Link href="/dispatch-orders/create">
-                <span className="flex items-center gap-3">
-                  <Plus className="h-4.5 w-4.5" />
-                  Create Dispatch Order
-                </span>
-                <div className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</div>
+      <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-semibold text-slate-900">Quick Actions</CardTitle>
+          <CardDescription className="text-sm text-slate-600 mt-1.5">Commonly used shortcuts</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button asChild className="w-full sm:flex-1 sm:min-w-[200px] justify-start h-12 px-4 bg-app-accent hover:bg-app-accent/90 shadow-sm hover:shadow-md transition-all min-h-[44px] text-left">
+              <Link href="/dispatch-orders/create" className="flex items-center gap-3 w-full justify-start text-left">
+                <div className="h-8 w-8 rounded-md bg-white/20 flex items-center justify-center shrink-0">
+                  <Plus className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-semibold text-sm whitespace-nowrap text-left">Create Dispatch Order</span>
+                <div className="h-6 w-6 rounded-full bg-white/25 flex items-center justify-center text-[11px] font-semibold text-white shrink-0 ml-auto">
+                  1
+                </div>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="w-full justify-start h-11 px-4 hover:bg-slate-50 border-slate-200">
-              <Link href="/dispatch-orders" className="flex items-center gap-3">
-                <Package className="h-4.5 w-4.5 text-slate-400" />
-                Track All Shipments
+            <Button asChild variant="outline" className="w-full sm:flex-1 sm:min-w-[160px] justify-start h-12 px-4 hover:bg-app-accent/10 hover:border-app-accent hover:text-app-accent border-slate-200 transition-all min-h-[44px] group text-left">
+              <Link href="/dispatch-orders" className="flex items-center gap-3 w-full justify-start text-left">
+                <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-app-accent/15 flex items-center justify-center shrink-0 transition-colors">
+                  <Package className="h-4 w-4 text-slate-600 group-hover:text-app-accent transition-colors" />
+                </div>
+                <span className="font-medium text-sm whitespace-nowrap group-hover:text-app-accent transition-colors text-left">Track All Shipments</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="w-full justify-start h-11 px-4 hover:bg-slate-50 border-slate-200">
-              <Link href="/ledger" className="flex items-center gap-3">
-                <Receipt className="h-4.5 w-4.5 text-slate-400" />
-                Check Payments
+            <Button asChild variant="outline" className="w-full sm:flex-1 sm:min-w-[160px] justify-start h-12 px-4 hover:bg-app-accent/10 hover:border-app-accent hover:text-app-accent border-slate-200 transition-all min-h-[44px] group text-left">
+              <Link href="/supplier-ledger" className="flex items-center gap-3 w-full justify-start text-left">
+                <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-app-accent/15 flex items-center justify-center shrink-0 transition-colors">
+                  <Receipt className="h-4 w-4 text-slate-600 group-hover:text-app-accent transition-colors" />
+                </div>
+                <span className="font-medium text-sm whitespace-nowrap group-hover:text-app-accent transition-colors text-left">Check Payments</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="w-full justify-start h-11 px-4 hover:bg-slate-50 border-slate-200">
-              <Link href="/returns" className="flex items-center gap-3">
-                <RefreshCcwDot className="h-4.5 w-4.5 text-slate-400" />
-                Monitor Returns
+            <Button asChild variant="outline" className="w-full sm:flex-1 sm:min-w-[160px] justify-start h-12 px-4 hover:bg-app-accent/10 hover:border-app-accent hover:text-app-accent border-slate-200 transition-all min-h-[44px] group text-left">
+              <Link href="/returns" className="flex items-center gap-3 w-full justify-start text-left">
+                <div className="h-8 w-8 rounded-md bg-slate-100 group-hover:bg-app-accent/15 flex items-center justify-center shrink-0 transition-colors">
+                  <RefreshCcwDot className="h-4 w-4 text-slate-600 group-hover:text-app-accent transition-colors" />
+                </div>
+                <span className="font-medium text-sm whitespace-nowrap group-hover:text-app-accent transition-colors text-left">Monitor Returns</span>
               </Link>
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
         {/* <Card className="border-none shadow-md shadow-slate-200/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -315,14 +335,14 @@ export default function DashboardPage() {
               </div>
 
               {user?.supplier?.company && (
-                <div className="flex items-center justify-between p-3 rounded-xl bg-indigo-50/50 border border-indigo-100/50 transition-colors hover:border-indigo-200">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-app-accent/5 border border-app-accent/10 transition-colors hover:border-app-accent/20">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-indigo-400">
+                    <div className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-app-accent">
                       <LayoutDashboard className="h-4 w-4" />
                     </div>
-                    <span className="text-indigo-700 font-medium">Company</span>
+                    <span className="text-app-accent font-medium">Company</span>
                   </div>
-                  <span className="font-bold text-indigo-900">{user.supplier.company}</span>
+                  <span className="font-bold text-app-accent">{user.supplier.company}</span>
                 </div>
               )}
             </div>
@@ -334,7 +354,7 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card> */}
-      </div>
+
     </div>
   );
 }
