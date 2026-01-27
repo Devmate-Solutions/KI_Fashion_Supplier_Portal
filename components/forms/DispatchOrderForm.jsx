@@ -1654,7 +1654,6 @@ export default function DispatchOrderForm({
                   <Button
                     type="button"
                     variant="secondary"
-                    size="sm"
                     onClick={() => {
                       const input =
                         document.getElementById("new-primary-color");
@@ -1668,7 +1667,7 @@ export default function DispatchOrderForm({
                         input.focus();
                       }
                     }}
-                    className="px-3"
+                    className="px-3 h-[42px] min-h-[42px] flex items-center justify-center"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -1735,7 +1734,6 @@ export default function DispatchOrderForm({
                   <Button
                     type="button"
                     variant="secondary"
-                    size="sm"
                     onClick={() => {
                       const input = document.getElementById("new-size");
                       const value = input.value.trim();
@@ -1748,7 +1746,7 @@ export default function DispatchOrderForm({
                         input.focus();
                       }
                     }}
-                    className="px-3"
+                    className="px-3 h-[42px] min-h-[42px] flex items-center justify-center"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -1935,7 +1933,7 @@ export default function DispatchOrderForm({
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-app-border">
+            <div className="overflow-hidden rounded-lg border border-app-border">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-app-border text-sm">
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">

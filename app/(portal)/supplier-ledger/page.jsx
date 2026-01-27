@@ -499,49 +499,47 @@ export default function SupplierLedgerPage() {
                             </div>
 
                             {/* Ledger Table */}
-                            <div className="overflow-hidden rounded-xl border border-app-border">
-                                {/* {JSON.stringify(allLedgerTransactions)} */}
-                                <table className="min-w-full divide-y divide-app-border text-sm">
-                                    <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                        <tr>
-                                            <th className="px-4 py-3">Date</th>
-                                            <th className="px-4 py-3">Entry Number</th>
-                                            <th className="px-4 py-3">Type</th>
-                                            <th className="px-4 py-3">Reference</th>
-                                            <th className="px-4 py-3 text-right">Recievable</th>
-                                            <th className="px-4 py-3 text-right">Cash Received</th>
-                                            <th className="px-4 py-3 text-right">Bank Recieved</th>
-                                            <th className="px-4 py-3 text-right">Returned Amount</th>
-                                            <th className="px-4 py-3 text-right">Discount</th>
-                                            <th className="px-4 py-3 text-right">Balance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-app-border bg-white">
-                                        {filteredLedgerTransactions.map((row) => (
-                                            <tr key={row.id} className="hover:bg-slate-50">
-                                                <td className="px-4 py-3 whitespace-nowrap">
-                                                    {formatDateTime(row)}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="font-medium">{row.entryNumber}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span>{row.type}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-
-
-
-                                                    {row.raw?.referenceId ? (
-                                                        <button
-                                                            onClick={() => router.push(`/dispatch-orders/${typeof row.raw.referenceId === 'object' ? row.raw.referenceId._id : row.raw.referenceId}`)}
-                                                            className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
-                                                        >
-                                                            {row.reference || '-'}
-                                                        </button>
-                                                    ) : (
-                                                        <span className="font-medium">{row.raw?.reference || '-'}</span>
-                                                    )}
+                            <div className="overflow-x-auto -mx-4 md:mx-0">
+                                <div className="inline-block min-w-full align-middle px-4 md:px-0">
+                                    <div className="overflow-hidden rounded-lg border border-app-border">
+                                        <table className="min-w-full divide-y divide-app-border text-sm">
+                                            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                                <tr>
+                                                    <th className="px-3 md:px-4 py-3">Date</th>
+                                                    <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>
+                                                    <th className="px-3 md:px-4 py-3">Type</th>
+                                                    <th className="px-3 md:px-4 py-3">Reference</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right">Receivable</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">Cash Received</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">Bank Received</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">Returned</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">Discount</th>
+                                                    <th className="px-3 md:px-4 py-3 text-right">Balance</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-app-border bg-white">
+                                                {filteredLedgerTransactions.map((row) => (
+                                                    <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
+                                                        <td className="px-3 md:px-4 py-3 whitespace-nowrap text-slate-700">
+                                                            {formatDateTime(row)}
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 hidden sm:table-cell">
+                                                            <span className="font-medium text-slate-600">{row.entryNumber}</span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3">
+                                                            <span className="text-slate-700">{row.type}</span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3">
+                                                            {row.raw?.referenceId ? (
+                                                                <button
+                                                                    onClick={() => router.push(`/dispatch-orders/${typeof row.raw.referenceId === 'object' ? row.raw.referenceId._id : row.raw.referenceId}`)}
+                                                                    className="font-medium text-app-accent hover:text-app-accent/80 hover:underline cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-1 rounded"
+                                                                >
+                                                                    {row.reference || '-'}
+                                                                </button>
+                                                            ) : (
+                                                                <span className="font-medium text-slate-700">{row.raw?.reference || '-'}</span>
+                                                            )}
 
 
 
@@ -549,7 +547,7 @@ export default function SupplierLedgerPage() {
                                                     {/* {row.referenceId ? (
                                                         <button
                                                             onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
-                                                            className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
+                                                            className="font-medium text-app-accent hover:underline cursor-pointer text-left"
                                                         >
                                                             {row.reference || '-'}
                                                         </button>
@@ -557,40 +555,43 @@ export default function SupplierLedgerPage() {
                                                         <span className="font-medium">{row.reference || '-'}</span>
                                                     )} */}
                                                 </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.debit < 0 ? 'text-red-600' : 'text-slate-800'}`}>
-                                                        {row.debit > 0 ? formatNumber(row.debit) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.cashPaid > 0 ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                        {row.cashPaid > 0 ? formatNumber(row.cashPaid) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.bankPaid > 0 ? 'text-purple-600' : 'text-slate-400'}`}>
-                                                        {row.bankPaid > 0 ? formatNumber(row.bankPaid) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.returnAmount > 0 ? 'text-red-600' : 'text-slate-400'}`}>
-                                                        {row.returnAmount > 0 ? formatNumber(row.returnAmount) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${row.discount > 0 ? 'text-green-600' : 'text-slate-400'}`}>
-                                                        {row.discount > 0 ? formatNumber(row.discount) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-bold ${row.balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                                        {formatNumber(row.balance)}</span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                            <td className="px-3 md:px-4 py-3 text-right">
+                                                                <span className={`tabular-nums font-semibold ${row.debit < 0 ? 'text-red-600' : 'text-slate-800'}`}>
+                                                                    {row.debit > 0 ? formatNumber(row.debit) : '-'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">
+                                                                <span className={`tabular-nums font-semibold ${row.cashPaid > 0 ? 'text-app-accent' : 'text-slate-400'}`}>
+                                                                    {row.cashPaid > 0 ? formatNumber(row.cashPaid) : '-'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">
+                                                                <span className={`tabular-nums font-semibold ${row.bankPaid > 0 ? 'text-purple-600' : 'text-slate-400'}`}>
+                                                                    {row.bankPaid > 0 ? formatNumber(row.bankPaid) : '-'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">
+                                                                <span className={`tabular-nums font-semibold ${row.returnAmount > 0 ? 'text-red-600' : 'text-slate-400'}`}>
+                                                                    {row.returnAmount > 0 ? formatNumber(row.returnAmount) : '-'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">
+                                                                <span className={`tabular-nums font-semibold ${row.discount > 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                                                                    {row.discount > 0 ? formatNumber(row.discount) : '-'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 md:px-4 py-3 text-right">
+                                                                <span className={`tabular-nums font-semibold ${row.balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                                                    {formatNumber(row.balance)}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                         </>
                     )}
                 </CardContent>
@@ -662,24 +663,26 @@ export default function SupplierLedgerPage() {
                             <p className="text-xs mt-2">Try a different reference number.</p>
                         </div>
                     ) : (
-                        <div className="overflow-hidden rounded-xl border border-app-border">
-                            <table className="min-w-full divide-y divide-app-border text-sm">
-                                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                    <tr>
-                                        <th className="px-4 py-3">Date</th>
-                                        <th className="px-4 py-3">Entry Number</th>
-                                        <th className="px-4 py-3">Reference</th>
-                                        <th className="px-4 py-3 text-right">Total Amount</th>
-                                        <th className="px-4 py-3 text-right">Discount</th>
-                                        <th className="px-4 py-3 text-right">Bank Received</th>
-                                        <th className="px-4 py-3 text-right">Cash Received</th>
-                                        <th className="px-4 py-3 text-right">Return</th>
-                                        <th className="px-4 py-3 text-right">Remaining</th>
-                                        <th className="px-4 py-3">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-app-border bg-white">
-                                    {filteredPendingBalances.map((row) => {
+                        <div className="overflow-x-auto -mx-4 md:mx-0">
+                            <div className="inline-block min-w-full align-middle px-4 md:px-0">
+                                <div className="overflow-hidden rounded-lg border border-app-border">
+                                    <table className="min-w-full divide-y divide-app-border text-sm">
+                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <tr>
+                                                <th className="px-3 md:px-4 py-3">Date</th>
+                                                <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>
+                                                <th className="px-3 md:px-4 py-3">Reference</th>
+                                                <th className="px-3 md:px-4 py-3 text-right">Total Amount</th>
+                                                <th className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">Discount</th>
+                                                <th className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">Bank Received</th>
+                                                <th className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">Cash Received</th>
+                                                <th className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">Return</th>
+                                                <th className="px-3 md:px-4 py-3 text-right">Remaining</th>
+                                                <th className="px-3 md:px-4 py-3">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-app-border bg-white">
+                                            {filteredPendingBalances.map((row) => {
                                         const statusConfig = {
                                             paid: { label: 'Paid', className: 'bg-green-100 text-green-800' },
                                             partial: { label: 'Partial', className: 'bg-orange-100 text-orange-800' },
@@ -687,64 +690,66 @@ export default function SupplierLedgerPage() {
                                         };
                                         const config = statusConfig[row.status] || statusConfig.pending;
 
-                                        return (
-                                            <tr key={row.id} className="hover:bg-slate-50">
-                                                <td className="px-4 py-3 whitespace-nowrap">
-                                                    {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="font-medium">{row.entryNumber || '-'}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
-                                                        <button
-                                                            onClick={() => router.push(`/dispatch-orders/${row.referenceModel === 'Return' ? row.raw.referenceId.dispatchOrderId : row.referenceId}`)}
-                                                            className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
-                                                        >
-                                                            {row.reference || '-'} 
-                                                        </button>
-                                                    ) : (
-                                                        <span className="font-medium text-blue-600">{row.reference || '-'}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className="font-semibold tabular-nums">
-                                                        {formatNumber(row.grossTotal || row.totalValue || ((row.totalAmount || 0) + (row.discount || 0) + (row.returnAmount || 0)))}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums text-slate-600">{formatNumber(row.discount || 0)}</span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums text-green-600 font-medium">
-                                                        {formatNumber(row.bankPaid || 0)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums text-green-600 font-medium">
-                                                        {formatNumber(row.cashPaid || 0)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className="tabular-nums text-red-600 font-medium">
-                                                        {formatNumber(row.returnAmount || 0)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                                        {formatNumber(Math.abs(row.amount || 0))}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <Badge className={config.className}>
-                                                        {config.label}
-                                                    </Badge>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                                return (
+                                                    <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
+                                                        <td className="px-3 md:px-4 py-3 whitespace-nowrap text-slate-700">
+                                                            {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 hidden sm:table-cell">
+                                                            <span className="font-medium text-slate-600">{row.entryNumber || '-'}</span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3">
+                                                            {row.referenceId && row.referenceModel === 'DispatchOrder' ? (
+                                                                <button
+                                                                    onClick={() => router.push(`/dispatch-orders/${row.referenceModel === 'Return' ? row.raw.referenceId.dispatchOrderId : row.referenceId}`)}
+                                                                    className="font-medium text-app-accent hover:text-app-accent/80 hover:underline cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-1 rounded"
+                                                                >
+                                                                    {row.reference || '-'} 
+                                                                </button>
+                                                            ) : (
+                                                                <span className="font-medium text-app-accent">{row.reference || '-'}</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right">
+                                                            <span className="font-semibold tabular-nums text-slate-900">
+                                                                {formatNumber(row.grossTotal || row.totalValue || ((row.totalAmount || 0) + (row.discount || 0) + (row.returnAmount || 0)))}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">
+                                                            <span className="tabular-nums text-slate-600">{formatNumber(row.discount || 0)}</span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">
+                                                            <span className="tabular-nums text-green-600 font-medium">
+                                                                {formatNumber(row.bankPaid || 0)}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right hidden lg:table-cell">
+                                                            <span className="tabular-nums text-green-600 font-medium">
+                                                                {formatNumber(row.cashPaid || 0)}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right hidden xl:table-cell">
+                                                            <span className="tabular-nums text-red-600 font-medium">
+                                                                {formatNumber(row.returnAmount || 0)}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3 text-right">
+                                                            <span className={`tabular-nums font-semibold ${(row.amount || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                                                {formatNumber(Math.abs(row.amount || 0))}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 md:px-4 py-3">
+                                                            <Badge className={config.className}>
+                                                                {config.label}
+                                                            </Badge>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </CardContent>
@@ -844,7 +849,7 @@ export default function SupplierLedgerPage() {
                             <p>No payment history found</p>
                             {paymentHistoryMethodFilter !== 'all' && (
                                 <button
-                                    className="mt-4 text-sm text-blue-600 hover:underline"
+                                    className="mt-4 text-sm text-app-accent hover:underline"
                                     onClick={() => setPaymentHistoryMethodFilter('all')}
                                 >
                                     Clear Filter
@@ -857,61 +862,65 @@ export default function SupplierLedgerPage() {
                             <p className="text-xs mt-2">Try a different search term.</p>
                         </div>
                     ) : (
-                        <div className="overflow-hidden rounded-xl border border-app-border">
-                            <table className="min-w-full divide-y divide-app-border text-sm">
-                                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                    <tr>
-                                        <th className="px-4 py-3">Date</th>
-                                        <th className="px-4 py-3">Entry Number</th>
-                                        <th className="px-4 py-3">Reference</th>
-                                        <th className="px-4 py-3">Method</th>
-                                        <th className="px-4 py-3 text-right">Amount</th>
-                                        <th className="px-4 py-3">Notes</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-app-border bg-white">
-                                    {filteredPaymentHistoryTransactions.map((row) => (
-                                        <tr key={row.id} className="hover:bg-slate-50">
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <span className="font-medium">{row.entryNumber || '-'}</span>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                {row.referenceId ? (
-                                                    <button
-                                                        onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
-                                                        className="font-medium text-blue-600 hover:underline cursor-pointer text-left"
-                                                    >
-                                                        {row.reference || '-'}
-                                                    </button>
-                                                ) : (
-                                                    <span className="font-medium">{row.reference || '-'}</span>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <Badge
-                                                    variant="outline"
-                                                    className={row.paymentMethod === 'cash' ? 'border-green-500 text-green-700' : 'border-blue-500 text-blue-700'}
-                                                >
-                                                    {row.paymentMethod === 'cash' ? 'Cash' : 'Bank'}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <span className="tabular-nums font-semibold text-green-600">
-                                                    {formatNumber(row.amount)}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <span className="text-sm text-slate-600">
-                                                    {row.notes && row.notes.length > 50 ? row.notes.substring(0, 50) + '...' : row.notes || '-'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="overflow-x-auto -mx-4 md:mx-0">
+                            <div className="inline-block min-w-full align-middle px-4 md:px-0">
+                                <div className="overflow-hidden rounded-lg border border-app-border">
+                                    <table className="min-w-full divide-y divide-app-border text-sm">
+                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <tr>
+                                                <th className="px-3 md:px-4 py-3">Date</th>
+                                                <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>
+                                                <th className="px-3 md:px-4 py-3">Reference</th>
+                                                <th className="px-3 md:px-4 py-3">Method</th>
+                                                <th className="px-3 md:px-4 py-3 text-right">Amount</th>
+                                                <th className="px-3 md:px-4 py-3 hidden md:table-cell">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-app-border bg-white">
+                                            {filteredPaymentHistoryTransactions.map((row) => (
+                                                <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
+                                                    <td className="px-3 md:px-4 py-3 whitespace-nowrap text-slate-700">
+                                                        {row.date ? new Date(row.date).toLocaleDateString('en-GB') : "-"}
+                                                    </td>
+                                                    <td className="px-3 md:px-4 py-3 hidden sm:table-cell">
+                                                        <span className="font-medium text-slate-600">{row.entryNumber || '-'}</span>
+                                                    </td>
+                                                    <td className="px-3 md:px-4 py-3">
+                                                        {row.referenceId ? (
+                                                            <button
+                                                                onClick={() => router.push(`/dispatch-orders/${row.referenceId}`)}
+                                                                className="font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-1 rounded"
+                                                            >
+                                                                {row.reference || '-'}
+                                                            </button>
+                                                        ) : (
+                                                            <span className="font-medium text-slate-700">{row.reference || '-'}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-3 md:px-4 py-3">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={row.paymentMethod === 'cash' ? 'border-green-500 text-green-700' : 'border-app-accent text-app-accent'}
+                                                        >
+                                                            {row.paymentMethod === 'cash' ? 'Cash' : 'Bank'}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="px-3 md:px-4 py-3 text-right">
+                                                        <span className="tabular-nums font-semibold text-green-600">
+                                                            {formatNumber(row.amount)}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-3 md:px-4 py-3 hidden md:table-cell">
+                                                        <span className="text-sm text-slate-600">
+                                                            {row.notes && row.notes.length > 50 ? row.notes.substring(0, 50) + '...' : row.notes || '-'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </CardContent>
@@ -938,11 +947,11 @@ export default function SupplierLedgerPage() {
     ];
 
     return (
-        <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Supplier Ledger</h1>
-                    <p className="mt-2 text-slate-500">
+                    <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Supplier Ledger</h1>
+                    <p className="mt-2 text-sm text-slate-600">
                         View your complete transaction history, outstanding balances, and payment status.
                     </p>
                 </div>

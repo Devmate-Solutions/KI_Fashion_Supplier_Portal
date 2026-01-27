@@ -21,7 +21,7 @@
   --accent: #e9ecef;
   --accent-foreground: #212529;
 
-  --app-accent: #4f46e5; /* indigo-600 - vibrant blue for buttons and highlights */
+  --app-accent: #155dfc; /* primary blue for buttons and highlights */
   --app-accent-foreground: #ffffff;
 
   --destructive: #d64545; /* soft red */
@@ -83,7 +83,20 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  /* Improved focus states for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-app-accent;
+  }
+  
+  /* Better button and interactive element focus */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-2 outline-offset-2 outline-app-accent;
   }
 }

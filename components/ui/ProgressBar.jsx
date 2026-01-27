@@ -27,7 +27,7 @@ export default function ProgressBar({
   const roundedProgress = Math.round(clampedProgress);
 
   const variants = {
-    default: "bg-blue-600",
+    default: "bg-app-accent",
     success: "bg-green-600",
     error: "bg-red-600",
   };

@@ -21,7 +21,7 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 py-8 overflow-y-auto">
-      <div className={clsx("relative w-full rounded-2xl bg-white shadow-xl max-h-[calc(100vh-4rem)] flex flex-col", sizes[size])}>
+      <div className={clsx("relative w-full rounded-lg bg-white shadow-xl max-h-[calc(100vh-4rem)] flex flex-col", sizes[size])}>
         <div className="flex items-start justify-between gap-4 border-b border-app-border px-6 py-4 flex-shrink-0">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
