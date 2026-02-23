@@ -48,13 +48,26 @@ export default function EditDispatchOrderPage() {
   );
 
   // Check if order can be edited
-  if (dispatchOrder && dispatchOrder.status !== 'pending') {
+  const canEditOrder = (() => {
+    if (!dispatchOrder) return false;
+    // Always allow pending orders
+    if (dispatchOrder.status === 'pending') return true;
+    // Allow admins to edit orders in pending-approval
+    if (dispatchOrder.status === 'pending-approval' && user && (user.role === 'admin' || user.role === 'super-admin')) return true;
+    return false;
+  })();
+
+  if (!canEditOrder) {
+    const description = dispatchOrder && dispatchOrder.status === 'pending-approval'
+      ? 'Only admin users can edit orders that are pending approval. This order is pending approval.'
+      : 'Only pending dispatch orders can be edited. This order has already been confirmed.';
+
     return (
       <div className="space-y-6">
         <Alert
           variant="error"
           title="Cannot Edit Order"
-          description="Only pending dispatch orders can be edited. This order has already been confirmed."
+          description={description}
         />
         <Button onClick={() => router.push("/dispatch-orders")}>
           Back to Orders

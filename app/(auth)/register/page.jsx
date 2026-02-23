@@ -342,7 +342,7 @@ export default function RegisterPage() {
                       {...register("companyAddress")}
                       id="companyAddress"
                       rows={3}
-                      placeholder="123 Textile Ave, Dhaka, Bangladesh"
+                      placeholder="123 Textile Street, London E1 6AN, United Kingdom"
                       className={`
                         w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.companyAddress ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
