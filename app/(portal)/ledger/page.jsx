@@ -69,7 +69,7 @@ export default function LedgerPage() {
 
   // Debug: Log the first balance to see what data we're receiving
   if (pendingBalances.length > 0 && !pendingBalancesLoading) {
-    console.log('First pending balance data:', pendingBalances[0]);
+     
   }
 
   // Transform ledger entries for Tab 1

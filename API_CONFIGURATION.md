@@ -94,7 +94,7 @@ To verify the API configuration is correct:
 
    ```javascript
    // In browser console
-   console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
+    
    ```
 
 2. **Test API call:**
