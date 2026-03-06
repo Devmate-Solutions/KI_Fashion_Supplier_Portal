@@ -217,47 +217,9 @@ export default function CompositionEditor({
       </div>
 
       {/* Total Indicator */}
-      <div className={`p-3 rounded-lg border-2 ${
-        hasExpectedTotal
-          ? isValid
-            ? "border-green-200 bg-green-50"
-            : "border-orange-200 bg-orange-50"
-          : "border-slate-200 bg-slate-50"
-      }`}>
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Total Items:</span>
-          <div className="flex items-center gap-2">
-            <span className={`text-lg font-bold ${
-              hasExpectedTotal
-                ? isValid
-                  ? "text-green-600"
-                  : "text-orange-600"
-                : "text-slate-600"
-            }`}>
-              {grandTotal} {hasExpectedTotal && `/ ${expectedTotal}`} items
-            </span>
-            {hasExpectedTotal && (
-              isValid ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-orange-600" />
-              )
-            )}
-          </div>
-        </div>
-        {hasExpectedTotal && !isValid && (
-          <p className="text-xs text-slate-600 mt-1">
-            {grandTotal < expectedTotal
-              ? `Add ${expectedTotal - grandTotal} more items`
-              : `Remove ${grandTotal - expectedTotal} items`}
-          </p>
-        )}
-      </div>
+     
 
-      {/* Helper Text */}
-      <div className="text-xs text-slate-500 italic">
-        💡 Tip: Enter quantities for each size/color combination. Leave empty or 0 for combinations you don't need.
-      </div>
+
     </div>
   );
 }

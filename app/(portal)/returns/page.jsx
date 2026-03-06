@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { RefreshCcw, Search, Eye, Package, DollarSign } from "lucide-react";
+import { RefreshCcw, Search, Eye, Package } from "lucide-react";
 import BritishDatePicker from "@/components/BritishDatePicker";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -99,9 +99,6 @@ export default function ReturnsPage() {
               <div className="flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wider text-orange-600 mb-2">Accumulated Return Value</p>
                 <p className="text-3xl font-bold text-orange-700">{currency(totalValue)}</p>
-              </div>
-              <div className="h-11 w-11 rounded-lg bg-orange-100 border border-orange-200 flex items-center justify-center shrink-0">
-                <DollarSign className="h-5 w-5 text-orange-600" />
               </div>
             </div>
           </CardContent>
