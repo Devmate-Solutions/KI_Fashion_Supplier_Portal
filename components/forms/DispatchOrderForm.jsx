@@ -1071,6 +1071,22 @@ export default function DispatchOrderForm({
     // Clear box error if validation passes
     setBoxError(null);
 
+    // Ensure every product has at least one packet configured before submission
+    const unconfiguredProducts = values.products.filter((_, index) => {
+      const packets = productPackets[index]?.packets;
+      return !packets || packets.length === 0;
+    });
+
+    if (unconfiguredProducts.length > 0) {
+      const names = unconfiguredProducts
+        .map((p) => `"${p.productName || p.productCode}"` )
+        .join(", ");
+      showError(
+        `The following items have no packet configuration: ${names}. Please configure packets before submitting.`
+      );
+      return;
+    }
+
     // Validate packet configurations for all items that use variant tracking
     const mismatchItems = [];
     values.products.forEach((product, index) => {
