@@ -26,11 +26,11 @@ export default function PortalLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-app-surface">
+    <div className="flex h-full overflow-hidden bg-app-surface">
       <Sidebar />
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex flex-1 flex-col min-w-0 h-full">
         <Topbar />
-        <main className="flex-1 bg-app-surface px-4 py-6 md:px-8 max-w-full overflow-x-hidden">
+        <main className="flex-1 overflow-y-auto bg-app-surface px-4 py-6 md:px-8 overflow-x-hidden">
           <div className="mx-auto max-w-7xl w-full">
             {children}
           </div>

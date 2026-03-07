@@ -249,11 +249,11 @@ export default function DispatchOrdersPage() {
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-4 md:mx-0">
+            <div className="overflow-auto max-h-[calc(100vh-320px)] -mx-4 md:mx-0">
               <div className="inline-block min-w-full align-middle px-4 md:px-0">
                 <table className="w-full text-left text-sm border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50/50">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="border-b border-slate-200 bg-slate-50">
                       <th className="px-4 md:px-6 py-4 font-semibold text-slate-700 text-xs uppercase tracking-wider">Order Number</th>
                       <th className="px-4 md:px-6 py-4 font-semibold text-slate-700 text-xs uppercase tracking-wider">Product Name</th>
                       <th className="px-4 md:px-6 py-4 font-semibold text-slate-700 text-xs uppercase tracking-wider hidden sm:table-cell">Code</th>

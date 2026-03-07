@@ -204,10 +204,10 @@ export default function PurchaseOrdersPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[calc(100vh-320px)]">
               <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/30">
+                <thead className="sticky top-0 z-10">
+                  <tr className="border-b border-slate-100 bg-slate-50">
                     <th className="px-6 py-4 font-semibold text-slate-900">PO Number</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Dates</th>
                     <th className="px-6 py-4 font-semibold text-slate-900">Status</th>

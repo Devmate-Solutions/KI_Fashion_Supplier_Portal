@@ -30,7 +30,7 @@ export function Sidebar() {
   const { user } = useAuth();
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-app-border bg-white md:flex">
+    <aside className="hidden w-64 flex-col border-r border-app-border bg-white md:flex shrink-0 overflow-y-auto">
       <div className="flex h-16 items-center border-b border-app-border px-6 shrink-0">
         <Link className="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded-lg" href="/dashboard">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20">

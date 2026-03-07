@@ -219,9 +219,9 @@ export default function LedgerPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-hidden rounded-xl border border-app-border">
+              <div className="overflow-auto max-h-[calc(100vh-320px)] rounded-xl border border-app-border">
                 <table className="min-w-full divide-y divide-app-border text-sm">
-                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 sticky top-0 z-10">
                     <tr>
                       <th className="px-4 py-3">Date</th>
                       <th className="px-4 py-3">Type</th>
@@ -309,9 +309,9 @@ export default function LedgerPage() {
               <p className="text-xs mt-2">Try a different reference number.</p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-app-border">
+            <div className="overflow-auto max-h-[calc(100vh-320px)] rounded-xl border border-app-border">
               <table className="min-w-full divide-y divide-app-border text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 sticky top-0 z-10">
                   <tr>
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Reference</th>
@@ -427,9 +427,9 @@ export default function LedgerPage() {
                 <p className="text-xs mt-2">No confirmed dispatch orders available.</p>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-app-border">
+              <div className="overflow-auto max-h-[calc(100vh-320px)] rounded-xl border border-app-border">
                 <table className="min-w-full divide-y divide-app-border text-sm">
-                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 sticky top-0 z-10">
                     <tr>
                       <th className="px-4 py-3">Date dddxc</th>
                       <th className="px-4 py-3">Reference</th>

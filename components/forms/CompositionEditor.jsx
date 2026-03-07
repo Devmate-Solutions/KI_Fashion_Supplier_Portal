@@ -130,6 +130,7 @@ export default function CompositionEditor({
   const isValid = expectedTotal > 0 && grandTotal === expectedTotal;
   const hasExpectedTotal = expectedTotal > 0;
 
+  
   // Handle no sizes or colors
   if (availableSizes.length === 0 || availableColors.length === 0) {
     return (

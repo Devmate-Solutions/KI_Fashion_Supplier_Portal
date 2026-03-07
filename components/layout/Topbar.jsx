@@ -23,7 +23,7 @@ export function Topbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-app-border bg-white/95 backdrop-blur-sm">
+      <header className="shrink-0 z-30 border-b border-app-border bg-white/95 backdrop-blur-sm">
         <div className="flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-4 min-w-0">
             <Button

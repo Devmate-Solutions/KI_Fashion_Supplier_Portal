@@ -499,11 +499,11 @@ export default function SupplierLedgerPage() {
                             </div>
 
                             {/* Ledger Table */}
-                            <div className="overflow-x-auto -mx-4 md:mx-0">
+                            <div className="overflow-auto max-h-[calc(100vh-320px)] -mx-4 md:mx-0">
                                 <div className="inline-block min-w-full align-middle px-4 md:px-0">
                                     <div className="overflow-hidden rounded-lg border border-app-border">
                                         <table className="min-w-full divide-y divide-app-border text-sm">
-                                            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 sticky top-0 z-10">
                                                 <tr>
                                                     <th className="px-3 md:px-4 py-3">Date</th>
                                                     <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>
@@ -663,11 +663,11 @@ export default function SupplierLedgerPage() {
                             <p className="text-xs mt-2">Try a different reference number.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto -mx-4 md:mx-0">
+                        <div className="overflow-auto max-h-[calc(100vh-320px)] -mx-4 md:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 md:px-0">
                                 <div className="overflow-hidden rounded-lg border border-app-border">
                                     <table className="min-w-full divide-y divide-app-border text-sm">
-                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 sticky top-0 z-10">
                                             <tr>
                                                 <th className="px-3 md:px-4 py-3">Date</th>
                                                 <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>
@@ -862,11 +862,11 @@ export default function SupplierLedgerPage() {
                             <p className="text-xs mt-2">Try a different search term.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto -mx-4 md:mx-0">
+                        <div className="overflow-auto max-h-[calc(100vh-320px)] -mx-4 md:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 md:px-0">
                                 <div className="overflow-hidden rounded-lg border border-app-border">
                                     <table className="min-w-full divide-y divide-app-border text-sm">
-                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 sticky top-0 z-10">
                                             <tr>
                                                 <th className="px-3 md:px-4 py-3">Date</th>
                                                 <th className="px-3 md:px-4 py-3 hidden sm:table-cell">Entry Number</th>

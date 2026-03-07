@@ -20,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-sans antialiased bg-app-surface text-slate-900`}
+    <html lang="en" className="h-full overflow-hidden">
+      <body className={`${poppins.variable} font-sans antialiased bg-app-surface text-slate-900 h-full overflow-hidden`}
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>

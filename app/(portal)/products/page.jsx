@@ -270,11 +270,11 @@ export default function ProductsPage() {
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-4 md:mx-0">
+            <div className="overflow-auto max-h-[calc(100vh-320px)] -mx-4 md:mx-0">
               <div className="inline-block min-w-full align-middle px-4 md:px-0">
                 <table className="w-full text-left text-sm border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="border-b border-slate-100 bg-slate-50">
                       <th className="px-4 md:px-6 py-3.5 font-semibold text-slate-900 text-xs uppercase tracking-wider">Product Info</th>
                       <th className="px-4 md:px-6 py-3.5 font-semibold text-slate-900 text-xs uppercase tracking-wider">SKU</th>
                       <th className="px-4 md:px-6 py-3.5 font-semibold text-slate-900 text-xs uppercase tracking-wider hidden md:table-cell">Category</th>
