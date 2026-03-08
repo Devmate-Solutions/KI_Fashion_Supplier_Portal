@@ -59,6 +59,11 @@ export default function SettingsPage() {
   }, [supplierProfile]);
 
   const handleAccountChange = (field, value) => {
+    if (field === 'phoneAreaCode') {
+      value = value.replace(/[^\d+]/g, '');
+    } else if (field === 'phone') {
+      value = value.replace(/\D/g, '');
+    }
     setAccountForm((prev) => ({ ...prev, [field]: value }));
   };
 

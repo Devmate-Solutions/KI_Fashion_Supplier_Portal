@@ -231,6 +231,7 @@ export default function RegisterPage() {
                         `}
                         maxLength={5}
                         onChange={(e) => {
+                          e.target.value = e.target.value.replace(/[^\d+]/g, '');
                           register("phoneAreaCode").onChange(e);
                           if (e.target.value.length >= 5) {
                             setFocus("phone");
@@ -251,6 +252,10 @@ export default function RegisterPage() {
                           placeholder:text-slate-500
                         `}
                         autoComplete="tel"
+                        onChange={(e) => {
+                          e.target.value = e.target.value.replace(/\D/g, '');
+                          register("phone").onChange(e);
+                        }}
                       />
                     </div>
                   </div>
@@ -279,6 +284,7 @@ export default function RegisterPage() {
                         `}
                         maxLength={5}
                         onChange={(e) => {
+                          e.target.value = e.target.value.replace(/[^\d+]/g, '');
                           register("additionalPhoneAreaCode").onChange(e);
                           if (e.target.value.length >= 5) {
                             setFocus("additionalPhone");
@@ -299,6 +305,10 @@ export default function RegisterPage() {
                           placeholder:text-slate-500
                         `}
                         autoComplete="tel"
+                        onChange={(e) => {
+                          e.target.value = e.target.value.replace(/\D/g, '');
+                          register("additionalPhone").onChange(e);
+                        }}
                       />
                     </div>
                   </div>
