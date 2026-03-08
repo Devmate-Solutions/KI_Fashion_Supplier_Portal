@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { Building2, Mail, MapPin, Phone, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -146,8 +147,8 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-2xl z-10">
         <div className="text-center mb-10">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20 mb-6">
-            <span className="text-2xl font-black text-white">KL</span>
+          <div className="mb-6">
+            <Image src="/supplier-logo.png" alt="KI Supplier Portal" width={160} height={40} className="h-12 w-auto object-contain mx-auto" priority />
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Partner with KI Fashion</h1>
           <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Create your supplier account to start your journey with us</p>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { AlertCircle, Eye, EyeOff, LogIn } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -55,8 +56,8 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md z-10">
         <div className="text-center mb-8 md:mb-10">
-          <div className="inline-flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20 mb-5">
-            <span className="text-xl md:text-2xl font-semibold text-white">KL</span>
+          <div className="mb-5">
+            <Image src="/supplier-logo.png" alt="KI Supplier Portal" width={160} height={40} className="h-12 w-auto object-contain mx-auto" priority />
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Supplier Portal</h1>
           <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Manage your KI Fashion inventory and settlements</p>
