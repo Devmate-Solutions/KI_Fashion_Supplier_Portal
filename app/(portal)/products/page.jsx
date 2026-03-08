@@ -176,7 +176,7 @@ export default function ProductsPage() {
         <Alert
           variant="warning"
           title="Supplier profile missing"
-          description="Your user account is not linked to a supplier record yet. Contact the KL Fashion admin team to connect your profile before managing products."
+          description="Your user account is not linked to a supplier record yet. Contact the KI Fashion admin team to connect your profile before managing products."
         />
       )}
       
@@ -184,7 +184,7 @@ export default function ProductsPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Product Catalog</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Manage your inventory, metadata, and pricing for KL Fashion.
+            Manage your inventory, metadata, and pricing for KI Fashion.
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">

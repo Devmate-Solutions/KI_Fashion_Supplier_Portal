@@ -1,4 +1,4 @@
-# 🚀 Vercel Deployment Guide - KL Fashion Supplier Portal
+# 🚀 Vercel Deployment Guide - KI Fashion Supplier Portal
 
 ## 📋 Quick Start Checklist
 

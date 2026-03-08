@@ -112,7 +112,7 @@ export default function PurchaseOrdersPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Purchase Orders</h1>
           <p className="mt-2 text-slate-500">
-            Fulfill and track orders requested by KL Fashion.
+            Fulfill and track orders requested by KI Fashion.
           </p>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function PurchaseOrdersPage() {
               <h3 className="text-base font-semibold text-slate-900">No purchase orders</h3>
               <p className="mt-1 text-sm text-slate-500 max-w-xs">
                 {purchaseOrders.length === 0 
-                  ? "When KL Fashion requests inventory, they will appear here." 
+                  ? "When KI Fashion requests inventory, they will appear here." 
                   : "Try adjusting your filters to find specific orders."}
               </p>
             </div>

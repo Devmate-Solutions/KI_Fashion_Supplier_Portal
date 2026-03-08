@@ -149,7 +149,7 @@ export default function RegisterPage() {
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20 mb-6">
             <span className="text-2xl font-black text-white">KL</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Partner with KL Fashion</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Partner with KI Fashion</h1>
           <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Create your supplier account to start your journey with us</p>
         </div>
 
@@ -485,7 +485,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="mt-10 text-center text-xs font-bold text-slate-800 uppercase tracking-widest pb-10">
-          © 2025 KL Fashion CRM • Partner Network
+          © 2025 KI Fashion CRM • Partner Network
         </p>
       </div>
     </div>

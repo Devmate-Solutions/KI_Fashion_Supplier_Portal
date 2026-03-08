@@ -12,8 +12,8 @@ const poppins = Poppins({
 
 export const metadata = {
   title: {
-    default: "KL Supplier Portal",
-    template: "%s | KL Supplier Portal",
+    default: "KI Supplier Portal",
+    template: "%s | KI Supplier Portal",
   },
   description: "Supplier workspace for managing products, purchase order fulfillment, and ledger balances.",
 };

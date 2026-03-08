@@ -223,7 +223,7 @@ export default function CreateDispatchOrderPage() {
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Create Dispatch Order</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Add products and create a new dispatch order for KL Fashion.
+          Add products and create a new dispatch order for KI Fashion.
         </p>
       </div>
 

@@ -319,7 +319,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <CardTitle className="text-lg font-semibold text-slate-900">Business Identification</CardTitle>
-                    <CardDescription className="text-sm text-slate-600 mt-1">Verified supplier details linked to KL Fashion CRM</CardDescription>
+                    <CardDescription className="text-sm text-slate-600 mt-1">Verified supplier details linked to KI Fashion CRM</CardDescription>
                   </div>
                 </div>
               </CardHeader>

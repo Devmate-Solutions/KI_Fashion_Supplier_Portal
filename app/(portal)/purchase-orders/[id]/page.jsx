@@ -223,7 +223,7 @@ export default function PurchaseOrderDetailPage() {
               <div>
                 <CardTitle>Order summary</CardTitle>
                 <CardDescription>
-                  Requested by {purchase.createdBy?.name || "KL Fashion"}
+                  Requested by {purchase.createdBy?.name || "KI Fashion"}
                 </CardDescription>
               </div>
               <div className="grid gap-1 text-sm text-slate-600 md:text-right">
@@ -545,7 +545,7 @@ export default function PurchaseOrderDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Delivery confirmation history</CardTitle>
-                <CardDescription>Recorded when KL Fashion confirms receipt in the CRM.</CardDescription>
+                <CardDescription>Recorded when KI Fashion confirms receipt in the CRM.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 text-sm text-slate-600">

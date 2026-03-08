@@ -59,7 +59,7 @@ export default function LoginPage() {
             <span className="text-xl md:text-2xl font-semibold text-white">KL</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Supplier Portal</h1>
-          <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Manage your KL Fashion inventory and settlements</p>
+          <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Manage your KI Fashion inventory and settlements</p>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/30 p-6 md:p-8">
@@ -224,7 +224,7 @@ export default function LoginPage() {
           {/* Register Link */}
           <div className="mt-8 pt-6 border-t border-slate-200 text-center">
             <p className="text-sm font-medium text-slate-600">
-              New to KL Fashion?{" "}
+              New to KI Fashion?{" "}
               <Link 
                 href="/register" 
                 className="text-app-accent hover:text-app-accent/80 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded"
@@ -236,7 +236,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-8 text-center text-xs font-medium text-slate-500">
-          © 2025 KL Fashion CRM • Secure Access
+          © 2025 KI Fashion CRM • Secure Access
         </p>
       </div>
     </div>

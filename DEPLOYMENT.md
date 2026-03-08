@@ -1,11 +1,11 @@
-# Deployment Guide - KL Supplier Portal
+# Deployment Guide - KI Supplier Portal
 
 ## Prerequisites
 
 Before deploying to Vercel, ensure you have:
 
 1. A Vercel account (sign up at https://vercel.com)
-2. Your KL Fashion backend API URL
+2. Your KI Fashion backend API URL
 3. Vercel CLI installed (optional): `npm i -g vercel`
 
 ## Environment Variables Required
@@ -14,7 +14,7 @@ Before deploying to Vercel, ensure you have:
 
 | Variable Name              | Description                                 | Example                                               |
 | -------------------------- | ------------------------------------------- | ----------------------------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KL Fashion backend API | `https://kifashionbackend2-production.up.railway.app` |
+| `NEXT_PUBLIC_API_BASE_URL` | The base URL for the KI Fashion backend API | `https://kifashionbackend2-production.up.railway.app` |
 
 > **Note:** The `NEXT_PUBLIC_` prefix makes this variable accessible in the browser. This is required for API calls from the client side.
 

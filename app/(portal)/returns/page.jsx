@@ -186,7 +186,7 @@ export default function ReturnsPage() {
               <h3 className="text-lg font-semibold text-slate-900 mb-2">No returns recorded</h3>
               <p className="text-sm text-slate-600 max-w-sm">
                 {returns?.length === 0
-                  ? "Inventory returns from KL Fashion will be listed here."
+                  ? "Inventory returns from KI Fashion will be listed here."
                   : "No returns match your current date range or search filters."}
               </p>
             </div>

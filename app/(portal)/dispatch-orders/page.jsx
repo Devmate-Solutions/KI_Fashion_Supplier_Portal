@@ -117,7 +117,7 @@ export default function DispatchOrdersPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Dispatch Orders</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Monitor and manage your outbound shipments to KL Fashion.
+            Monitor and manage your outbound shipments to KI Fashion.
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
@@ -236,7 +236,7 @@ export default function DispatchOrdersPage() {
               <h3 className="text-lg font-semibold text-slate-900 mb-2">No orders found</h3>
               <p className="text-sm text-slate-600 max-w-sm mb-6">
                 {dispatchOrders.length === 0
-                  ? "Get started by creating your first dispatch order to KL Fashion."
+                  ? "Get started by creating your first dispatch order to KI Fashion."
                   : "Try adjusting your search or filters to find what you're looking for."}
               </p>
               {dispatchOrders.length === 0 && (
