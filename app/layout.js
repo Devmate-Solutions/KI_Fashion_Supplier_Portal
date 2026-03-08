@@ -16,6 +16,11 @@ export const metadata = {
     template: "%s | KI Supplier Portal",
   },
   description: "Supplier workspace for managing products, purchase order fulfillment, and ledger balances.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
