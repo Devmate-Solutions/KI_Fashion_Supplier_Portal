@@ -2851,21 +2851,66 @@ export default function DispatchOrderForm({
 
                                         {/* Variant Breakdown Display */}
                                         {(() => {
-                                          const packets =
-                                            productPackets[productIndex]
-                                              ?.packets || [];
+                                          const packets = productPackets[productIndex]?.packets || [];
                                           if (packets.length === 0) return null;
-                                          // Group packets by color signature
-                                          const colorGroupCount = {};
+
+                                          const isLoose = packets[0]?.isLoose;
                                           let totalConfigured = 0;
 
+                                          // LOOSE: flat color-size breakdown from single packet's composition
+                                          if (isLoose) {
+                                            const parts = [];
+                                            packets[0]?.composition?.forEach((c) => {
+                                              if (c.color && c.size && c.quantity > 0) {
+                                                parts.push({
+                                                  key: `${c.color}-${c.size}`,
+                                                  qty: parseInt(c.quantity) || 0,
+                                                });
+                                                totalConfigured += parseInt(c.quantity) || 0;
+                                              }
+                                            });
+
+                                            if (parts.length === 0) return null;
+
+                                            const productQuantity = product?.quantity || 0;
+                                            const hasMismatch = totalConfigured !== productQuantity;
+
+                                            return (
+                                              <div className="flex flex-col gap-1.5">
+                                                {hasMismatch && (
+                                                  <div className="flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1">
+                                                    <AlertCircle className="h-3 w-3" />
+                                                    <span>Configured {totalConfigured} of {productQuantity} items</span>
+                                                  </div>
+                                                )}
+                                                <div className="flex flex-wrap gap-1">
+                                                  {parts.map(({ key, qty }) => (
+                                                    <span
+                                                      key={key}
+                                                      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
+                                                          ? "bg-red-100 text-red-700 border-red-300"
+                                                          : "bg-slate-100 text-slate-700 border-slate-200"
+                                                        }`}
+                                                    >
+                                                      <span className="capitalize">{key}</span>
+                                                      <span className="ml-1 opacity-50">:</span>
+                                                      <span className="ml-0.5 font-semibold">{qty}</span>
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            );
+                                          }
+
+                                          // PACKETS: group by color signature → color × count
+                                          const colorGroupCount = {};
                                           packets.forEach((packet) => {
                                             if (!packet.composition?.length) return;
 
                                             const uniqueColors = [...new Set(
                                               packet.composition
-                                                .filter(c => c.color && c.quantity > 0)
-                                                .map(c => c.color)
+                                                .filter((c) => c.color && c.quantity > 0)
+                                                .map((c) => c.color)
                                             )];
 
                                             const signature = uniqueColors.join("/");
@@ -2873,8 +2918,7 @@ export default function DispatchOrderForm({
                                               colorGroupCount[signature] = (colorGroupCount[signature] || 0) + 1;
                                             }
 
-                                            // Still track total items for mismatch warning
-                                            packet.composition.forEach(c => {
+                                            packet.composition.forEach((c) => {
                                               totalConfigured += parseInt(c.quantity) || 0;
                                             });
                                           });

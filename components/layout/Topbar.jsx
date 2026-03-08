@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { LogOut, Menu, X } from "lucide-react";
@@ -42,7 +43,7 @@ export function Topbar() {
                 {currentPage?.label || "Dashboard"}
               </h1>
             </div>
-            <span className="text-base font-semibold text-slate-900 md:hidden truncate">KL Supplier</span>
+            <Image src="/supplier-logo.png" alt="Supplier Portal" width={120} height={32} className="h-8 w-auto object-contain md:hidden" priority />
           </div>
 
           <div className="flex items-center gap-4 shrink-0">
@@ -80,15 +81,7 @@ export function Topbar() {
           <div className="fixed inset-y-0 left-0 w-64 bg-white border-r border-app-border shadow-xl z-50 md:hidden animate-in slide-in-from-left duration-200">
             <div className="flex flex-col h-full">
               <div className="flex h-16 items-center border-b border-app-border px-6 shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-app-accent shadow-sm shadow-app-accent/20">
-                    <span className="text-sm font-bold text-app-accent-foreground">KL</span>
-                  </div>
-                  <div className="flex flex-col leading-tight">
-                    <span className="text-sm font-semibold text-slate-900">Supplier Portal</span>
-                    <span className="text-[10px] font-medium text-slate-400">Powered by KL CRM</span>
-                  </div>
-                </div>
+                  <Image src="/supplier-logo.png" alt="Supplier Portal" width={160} height={40} className="h-10 w-auto object-contain" priority />
               </div>
               <nav className="flex flex-col gap-1 p-4 overflow-y-auto" aria-label="Mobile navigation">
                 {NAV_ITEMS.map((item) => {
