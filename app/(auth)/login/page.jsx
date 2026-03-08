@@ -59,8 +59,6 @@ export default function LoginPage() {
           <div className="mb-5">
             <Image src="/supplier-logo.png" alt="KI Supplier Portal" width={160} height={40} className="h-12 w-auto object-contain mx-auto" priority />
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Supplier Portal</h1>
-          <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Manage your KI Fashion inventory and settlements</p>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/30 p-6 md:p-8">

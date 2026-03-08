@@ -150,8 +150,6 @@ export default function RegisterPage() {
           <div className="mb-6">
             <Image src="/supplier-logo.png" alt="KI Supplier Portal" width={160} height={40} className="h-12 w-auto object-contain mx-auto" priority />
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">Partner with KI Fashion</h1>
-          <p className="text-sm md:text-base text-slate-600 mt-2 font-medium">Create your supplier account to start your journey with us</p>
         </div>
 
         <Card className="rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/30 overflow-hidden">
