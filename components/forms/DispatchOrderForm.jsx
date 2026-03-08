@@ -1079,7 +1079,7 @@ export default function DispatchOrderForm({
 
     if (unconfiguredProducts.length > 0) {
       const names = unconfiguredProducts
-        .map((p) => `"${p.productName || p.productCode}"` )
+        .map((p) => `"${p.productName || p.productCode}"`)
         .join(", ");
       showError(
         `The following items have no packet configuration: ${names}. Please configure packets before submitting.`
@@ -1285,8 +1285,8 @@ export default function DispatchOrderForm({
         item.useVariantTracking = true;
         // Filter out packets with empty compositions and re-number them
         const validPackets = (productPackets[index]?.packets || [])
-          .filter(p => p.composition && p.composition.length > 0 && 
-                       p.composition.some(c => c.size && c.color && c.quantity > 0))
+          .filter(p => p.composition && p.composition.length > 0 &&
+            p.composition.some(c => c.size && c.color && c.quantity > 0))
           .map((p, idx) => ({
             ...p,
             packetNumber: idx + 1,
@@ -2855,58 +2855,56 @@ export default function DispatchOrderForm({
                                             productPackets[productIndex]
                                               ?.packets || [];
                                           if (packets.length === 0) return null;
-
-                                          // Calculate breakdown
-                                          const breakdown = {};
+                                          // Group packets by color signature
+                                          const colorGroupCount = {};
                                           let totalConfigured = 0;
-                                          packets.forEach((p) => {
-                                            p.composition?.forEach((c) => {
-                                              if (
-                                                c.color &&
-                                                c.size &&
-                                                c.quantity > 0
-                                              ) {
-                                                const key = `${c.color}-${c.size}`;
-                                                const qty =
-                                                  parseInt(c.quantity) || 0;
-                                                breakdown[key] =
-                                                  (breakdown[key] || 0) + qty;
-                                                totalConfigured += qty;
-                                              }
+
+                                          packets.forEach((packet) => {
+                                            if (!packet.composition?.length) return;
+
+                                            const uniqueColors = [...new Set(
+                                              packet.composition
+                                                .filter(c => c.color && c.quantity > 0)
+                                                .map(c => c.color)
+                                            )];
+
+                                            const signature = uniqueColors.join("/");
+                                            if (signature) {
+                                              colorGroupCount[signature] = (colorGroupCount[signature] || 0) + 1;
+                                            }
+
+                                            // Still track total items for mismatch warning
+                                            packet.composition.forEach(c => {
+                                              totalConfigured += parseInt(c.quantity) || 0;
                                             });
                                           });
 
-                                          const parts =
-                                            Object.entries(breakdown);
+                                          const parts = Object.entries(colorGroupCount);
                                           if (parts.length === 0) return null;
 
-                                          // Check if configured quantity exceeds product quantity
-                                          const productQuantity =
-                                            product?.quantity || 0;
-                                          const hasMismatch =
-                                            totalConfigured !== productQuantity;
+                                          const productQuantity = product?.quantity || 0;
+                                          const hasMismatch = totalConfigured !== productQuantity;
 
                                           return (
                                             <div className="flex flex-col gap-1.5">
                                               {hasMismatch && (
                                                 <div className="flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1">
                                                   <AlertCircle className="h-3 w-3" />
-                                                  <span>
-                                                    Configured {totalConfigured}{" "}
-                                                    of {productQuantity} items
-                                                  </span>
+                                                  <span>Configured {totalConfigured} of {productQuantity} items</span>
                                                 </div>
                                               )}
                                               <div className="flex flex-wrap gap-1">
-                                                {parts.map(([key, qty]) => (
+                                                {parts.map(([colorSignature, count]) => (
                                                   <span
-                                                    key={key}
+                                                    key={colorSignature}
                                                     className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
-                                                      ? "bg-red-100 text-red-700 border-red-300"
-                                                      : "bg-slate-100 text-slate-700 border-slate-200"
+                                                        ? "bg-red-100 text-red-700 border-red-300"
+                                                        : "bg-slate-100 text-slate-700 border-slate-200"
                                                       }`}
                                                   >
-                                                    {key}: {qty}
+                                                    <span className="capitalize">{colorSignature}</span>
+                                                    <span className="ml-1 opacity-50">×</span>
+                                                    <span className="ml-0.5 font-semibold">{count}</span>
                                                   </span>
                                                 ))}
                                               </div>
