@@ -86,7 +86,7 @@ export default function PurchaseOrderDetailPage() {
     defaultValues: {
       carrier: "",
       trackingNumber: "",
-      shipmentDate: new Date().toISOString().split("T")[0],
+      shipmentDate: new Date().toLocaleDateString('en-CA'),
       notes: "",
     },
   });
@@ -119,8 +119,8 @@ export default function PurchaseOrderDetailPage() {
       carrier: purchase.fulfillment.carrier || "",
       trackingNumber: purchase.fulfillment.trackingNumber || "",
       shipmentDate: purchase.fulfillment.shipmentDate
-        ? new Date(purchase.fulfillment.shipmentDate).toISOString().split("T")[0]
-        : new Date().toISOString().split("T")[0],
+        ? new Date(purchase.fulfillment.shipmentDate).toLocaleDateString('en-CA')
+        : new Date().toLocaleDateString('en-CA'),
       notes: purchase.fulfillment.notes || "",
     });
   }, [purchase, dispatchForm]);

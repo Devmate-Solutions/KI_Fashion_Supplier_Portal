@@ -164,7 +164,7 @@ export default function DispatchOrderForm({
             ? new Date(initialOrder.date || initialOrder.dispatchDate)
               .toISOString()
               .split("T")[0]
-            : new Date().toISOString().split("T")[0],
+            : new Date().toLocaleDateString('en-CA'),
         logisticsCompany:
           initialOrder.logisticsCompany?._id ||
           initialOrder.logisticsCompany ||
@@ -174,7 +174,7 @@ export default function DispatchOrderForm({
       };
     }
     return {
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toLocaleDateString('en-CA'),
       logisticsCompany: "",
       products: [],
       discount: 0,
@@ -1421,11 +1421,12 @@ export default function DispatchOrderForm({
                     onChange={(date) => {
                       // Convert Date object to ISO string format (YYYY-MM-DD)
                       const dateString = date instanceof Date
-                        ? date.toISOString().split('T')[0]
+                        ? date.toLocaleDateString('en-CA')
                         : date;
                       onChange(dateString);
                     }}
                     maxDate={new Date()}
+                    disabled={user?.role !== 'super-admin'}
                     className={`${inputClasses} ${errors.date
                       ? "border-red-500 focus:ring-red-500"
                       : "border-slate-300"
@@ -1439,7 +1440,7 @@ export default function DispatchOrderForm({
                 type="date"
                 id="date"
                 lang="en-GB"
-                max={new Date().toISOString().split('T')[0]}
+                max={new Date().toLocaleDateString('en-CA')}
                 className={`${inputClasses} ${errors.date
                     ? "border-red-500 focus:ring-red-500"
                     : "border-slate-300"

@@ -121,7 +121,7 @@ export default function ReturnsPage() {
                     value={startDate}
                     onChange={(date) => {
                       const dateString = date instanceof Date
-                        ? date.toISOString().split('T')[0]
+                        ? date.toLocaleDateString('en-CA')
                         : date || "";
                       setStartDate(dateString);
                     }}
@@ -136,7 +136,7 @@ export default function ReturnsPage() {
                     value={endDate}
                     onChange={(date) => {
                       const dateString = date instanceof Date
-                        ? date.toISOString().split('T')[0]
+                        ? date.toLocaleDateString('en-CA')
                         : date || "";
                       setEndDate(dateString);
                     }}
