@@ -5,13 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, Lock } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { NAV_ITEMS } from "./Sidebar";
+import { useRouter } from "next/navigation";
 
 export function Topbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -54,6 +56,17 @@ export function Topbar() {
                 <span className="text-sm font-semibold text-slate-900 truncate">{user?.name}</span>
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tight">Supplier</span>
               </div>
+              
+              <Button
+                className="h-9 w-9 rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-app-accent border border-slate-200 shrink-0"
+                variant="ghost"
+                size="icon"
+                title="Reset Password"
+                aria-label="Reset Password"
+                onClick={() => router.push(`/reset-password?email=${encodeURIComponent(user?.email || '')}`)}
+              >
+                <Lock className="h-4 w-4" />
+              </Button>
               
               <Button
                 className="h-9 w-9 rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-red-600 border border-slate-200 shrink-0"

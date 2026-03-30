@@ -125,7 +125,7 @@ export default function LoginPage() {
                   Password
                 </label>
                 <Link 
-                  href="/forgot-password" 
+                  href="/reset-password" 
                   className="text-xs font-medium text-app-accent hover:text-app-accent/80 transition-colors focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded"
                 >
                   Forgot?
