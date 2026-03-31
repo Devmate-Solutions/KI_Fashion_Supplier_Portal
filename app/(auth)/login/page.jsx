@@ -79,8 +79,8 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             {/* Email Field */}
             <div className="space-y-2">
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-xs font-semibold uppercase tracking-wider text-slate-700"
               >
                 Email Address
@@ -97,8 +97,8 @@ export default function LoginPage() {
                   className={`
                     w-full px-4 py-3 rounded-md border bg-white text-slate-900 text-sm font-medium
                     min-h-[44px]
-                    ${errors.email 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' 
+                    ${errors.email
+                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                       : 'border-slate-300 focus:border-app-accent focus:ring-2 focus:ring-app-accent/20'
                     }
                     focus:outline-none transition-all duration-200
@@ -118,18 +118,18 @@ export default function LoginPage() {
             {/* Password Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label 
-                  htmlFor="password" 
+                <label
+                  htmlFor="password"
                   className="block text-xs font-semibold uppercase tracking-wider text-slate-700"
                 >
                   Password
                 </label>
-                <Link 
+                {/* <Link 
                   href="/reset-password" 
                   className="text-xs font-medium text-app-accent hover:text-app-accent/80 transition-colors focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded"
                 >
                   Forgot?
-                </Link>
+                </Link> */}
               </div>
               <div className="relative">
                 <input
@@ -143,8 +143,8 @@ export default function LoginPage() {
                   className={`
                     w-full px-4 py-3 rounded-lg border pr-12 bg-white text-slate-900 text-sm font-medium
                     min-h-[44px]
-                    ${errors.password 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' 
+                    ${errors.password
+                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                       : 'border-slate-300 focus:border-app-accent focus:ring-2 focus:ring-app-accent/20'
                     }
                     focus:outline-none transition-all duration-200
@@ -224,8 +224,8 @@ export default function LoginPage() {
           <div className="mt-8 pt-6 border-t border-slate-200 text-center">
             <p className="text-sm font-medium text-slate-600">
               New to KI Fashion?{" "}
-              <Link 
-                href="/register" 
+              <Link
+                href="/register"
                 className="text-app-accent hover:text-app-accent/80 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2 rounded"
               >
                 Create an account
