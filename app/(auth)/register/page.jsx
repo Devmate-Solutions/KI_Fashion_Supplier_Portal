@@ -93,27 +93,30 @@ export default function RegisterPage() {
         additionalPhone: values.additionalPhone?.trim() || "",
         additionalPhoneAreaCode: values.additionalPhoneAreaCode?.trim() || "",
         email: values.email?.trim() || "",
+        companyAddress: values.companyAddress?.trim() || "",
         country: values.country?.trim() || "",
         password: values.password || "",
       };
 
       // Build supplier profile
       const supplierProfile = {
-        name: cleanValues.company || cleanValues.name, // Use company name or fallback to user name
+        name: cleanValues.name, // Use user name for person's name
         company: cleanValues.company || undefined,
         email: cleanValues.email,
         phone: cleanValues.phone,
         phoneAreaCode: cleanValues.phoneAreaCode || undefined,
         address: cleanValues.companyAddress
           ? {
+              street: cleanValues.companyAddress,
               fullAddress: cleanValues.companyAddress,
+              country: 'Pakistan'
             }
           : undefined,
         paymentTerms: "net30",
         notes: "Self-registered via supplier portal",
       };
 
-      // Add alternate phone if provided (backend may accept it even if not in validation schema)
+      // Add alternate phone if provided
       if (cleanValues.additionalPhone) {
         supplierProfile.alternatePhone = cleanValues.additionalPhone;
         supplierProfile.alternatePhoneAreaCode = cleanValues.additionalPhoneAreaCode || undefined;
@@ -124,6 +127,10 @@ export default function RegisterPage() {
         email: cleanValues.email,
         password: cleanValues.password,
         phone: cleanValues.phone,
+        phoneAreaCode: cleanValues.phoneAreaCode,
+        alternatePhone: cleanValues.additionalPhone || undefined,
+        alternatePhoneAreaCode: cleanValues.additionalPhoneAreaCode || undefined,
+        address: cleanValues.companyAddress || undefined,
         supplierProfile,
       });
 
