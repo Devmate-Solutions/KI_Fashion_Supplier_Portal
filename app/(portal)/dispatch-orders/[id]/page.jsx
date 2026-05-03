@@ -405,7 +405,9 @@ export default function DispatchOrderDetailPage() {
                   <tbody className="divide-y divide-slate-50">
                     {orderCalculations.itemsWithSubtotals.map((item, index) => {
                       const imageUrl =
-                        item.product?.images?.[0] || item.productImage || null;
+                        item.product?.images?.[0] || 
+                        (Array.isArray(item.productImage) ? item.productImage[0] : item.productImage) || 
+                        null;
 
                       // Get confirmed quantity (after returns)
                       const confirmedQtyObj =
