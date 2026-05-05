@@ -16,6 +16,9 @@ export function Topbar() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const supplierProfile = user?.supplier || user?.supplierProfile;
+  const companyName = supplierProfile?.company || supplierProfile?.name || user?.company;
+  const displayName = companyName || user?.name || "Supplier";
 
   const toggleMobileNav = () => setIsMobileNavOpen((prev) => !prev);
 
@@ -53,7 +56,7 @@ export function Topbar() {
             
             <div className="flex items-center gap-3">
               <div className="hidden text-right md:flex md:flex-col leading-tight min-w-0">
-                <span className="text-sm font-semibold text-slate-900 truncate">{user?.name}</span>
+                <span className="text-sm font-semibold text-slate-900 truncate">{displayName}</span>
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tight">Supplier</span>
               </div>
               
@@ -122,10 +125,10 @@ export function Topbar() {
               <div className="mt-auto border-t border-app-border p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 rounded-full bg-app-accent/10 flex items-center justify-center text-app-accent font-semibold text-xs uppercase shrink-0">
-                    {user?.name?.charAt(0) || "S"}
+                    {displayName?.charAt(0) || "S"}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-semibold text-slate-900 truncate">{user?.name}</span>
+                    <span className="text-xs font-semibold text-slate-900 truncate">{displayName}</span>
                     <span className="text-[10px] text-slate-500 truncate">{user?.email}</span>
                   </div>
                 </div>

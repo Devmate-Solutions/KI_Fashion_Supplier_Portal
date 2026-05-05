@@ -938,12 +938,16 @@ export default function DispatchOrderForm({
   const handleCellClick = (rowIndex, fieldName) => {
     const currentValue = watch(`products.${rowIndex}.${fieldName}`);
     setEditingCell({ rowIndex, fieldName });
-    if (fieldName === "primaryColor" || fieldName === "size" || fieldName === "season") {
+    if (fieldName === "primaryColor" || fieldName === "size") {
+      setEditValue("");
+      return;
+    }
+    if (fieldName === "season") {
       // For arrays, use the array value or empty array
       setEditValue(Array.isArray(currentValue) ? currentValue : []);
-    } else {
-      setEditValue(currentValue || "");
+      return;
     }
+    setEditValue(currentValue || "");
   };
 
   const handleCellChange = (value) => {
@@ -1960,8 +1964,8 @@ export default function DispatchOrderForm({
                       <th className="px-4 py-3">SKU/Code</th>
                       <th className="px-4 py-3">Season</th>
                       <th className="px-4 py-3 text-right">Cost Price</th>
-                      <th className="px-4 py-3">Primary Color</th>
-                      <th className="px-4 py-3">Size</th>
+                      <th className="px-4 py-3 min-w-[180px]">Primary Color</th>
+                      <th className="px-4 py-3 min-w-[180px]">Size</th>
                       <th className="px-4 py-3 text-right">Quantity</th>
                       <th className="px-4 py-3">Variants & Packets</th>
                       <th className="px-4 py-3 text-right">Actions</th>
@@ -1982,7 +1986,7 @@ export default function DispatchOrderForm({
                             }`}
                         >
                           {/* Image Column */}
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 min-w-[180px]">
                             {(() => {
                               const existingPreviews =
                                 imagePreviews[productIndex] || {};
@@ -2427,9 +2431,6 @@ export default function DispatchOrderForm({
                                           productIndex,
                                           "primaryColor"
                                         );
-                                        setEditValue("");
-                                        // Keep focus on color input (don't move to next field)
-                                        e.target.focus();
                                       } else if (e.key === "Escape") {
                                         handleCellCancel();
                                       } else if (
@@ -2441,7 +2442,6 @@ export default function DispatchOrderForm({
                                           productIndex,
                                           "primaryColor"
                                         );
-                                        setEditValue("");
                                         // Focus on size input
                                         setTimeout(() => {
                                           handleCellClick(productIndex, "size");
@@ -2449,7 +2449,7 @@ export default function DispatchOrderForm({
                                       }
                                     }}
                                     placeholder="Enter color and press Enter"
-                                    className="w-full px-2 py-1 border border-blue-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full min-w-[160px] px-2 py-1 border border-blue-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     autoFocus
                                   />
                                   <Button
@@ -2461,7 +2461,6 @@ export default function DispatchOrderForm({
                                         productIndex,
                                         "primaryColor"
                                       );
-                                      setEditValue("");
                                     }}
                                     className="h-6 w-6 p-0"
                                   >
@@ -2558,7 +2557,7 @@ export default function DispatchOrderForm({
                           </td>
 
                           {/* Size Column */}
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 min-w-[180px]">
                             {isEditing && editingCell.fieldName === "size" ? (
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
@@ -2572,9 +2571,6 @@ export default function DispatchOrderForm({
                                       if (e.key === "Enter") {
                                         e.preventDefault();
                                         handleCellSave(productIndex, "size");
-                                        setEditValue("");
-                                        // Keep focus on size input (don't move to next field)
-                                        e.target.focus();
                                       } else if (e.key === "Escape") {
                                         handleCellCancel();
                                       } else if (
@@ -2583,7 +2579,6 @@ export default function DispatchOrderForm({
                                       ) {
                                         e.preventDefault();
                                         handleCellSave(productIndex, "size");
-                                        setEditValue("");
                                         // Focus on quantity input
                                         setTimeout(() => {
                                           handleCellClick(
@@ -2594,7 +2589,7 @@ export default function DispatchOrderForm({
                                       }
                                     }}
                                     placeholder="Enter size and press Enter"
-                                    className="w-full px-2 py-1 border border-blue-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full min-w-[160px] px-2 py-1 border border-blue-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     autoFocus
                                   />
                                   <Button
@@ -2603,7 +2598,6 @@ export default function DispatchOrderForm({
                                     size="sm"
                                     onClick={() => {
                                       handleCellSave(productIndex, "size");
-                                      setEditValue("");
                                     }}
                                     className="h-6 w-6 p-0"
                                   >

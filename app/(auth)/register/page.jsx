@@ -94,7 +94,6 @@ export default function RegisterPage() {
         additionalPhoneAreaCode: values.additionalPhoneAreaCode?.trim() || "",
         email: values.email?.trim() || "",
         companyAddress: values.companyAddress?.trim() || "",
-        country: values.country?.trim() || "",
         password: values.password || "",
       };
 
@@ -109,11 +108,8 @@ export default function RegisterPage() {
           ? {
               street: cleanValues.companyAddress,
               fullAddress: cleanValues.companyAddress,
-              country: 'Pakistan'
             }
           : undefined,
-        paymentTerms: "net30",
-        notes: "Self-registered via supplier portal",
       };
 
       // Add alternate phone if provided
@@ -177,7 +173,6 @@ export default function RegisterPage() {
                       {...register("name")}
                       id="name"
                       type="text"
-                      placeholder="John Doe"
                       className={`
                         w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.name ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-2 focus:ring-app-accent/20'}
@@ -202,7 +197,6 @@ export default function RegisterPage() {
                       {...register("company")}
                       id="company"
                       type="text"
-                      placeholder="Acme Textiles Ltd."
                       className={`
                         w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.company ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -228,7 +222,6 @@ export default function RegisterPage() {
                         {...register("phoneAreaCode")}
                         id="phoneAreaCode"
                         type="tel"
-                        placeholder="+88"
                         className={`
                           w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                           ${errors.phoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -250,7 +243,6 @@ export default function RegisterPage() {
                         {...register("phone")}
                         id="phone"
                         type="tel"
-                        placeholder="01712345678"
                         className={`
                           w-full px-4 py-3 rounded-md border bg-white text-slate-900 text-sm font-medium min-h-[44px]
                           ${errors.phone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -281,7 +273,6 @@ export default function RegisterPage() {
                         {...register("additionalPhoneAreaCode")}
                         id="additionalPhoneAreaCode"
                         type="tel"
-                        placeholder="+88"
                         className={`
                           w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                           ${errors.additionalPhoneAreaCode ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -303,7 +294,6 @@ export default function RegisterPage() {
                         {...register("additionalPhone")}
                         id="additionalPhone"
                         type="tel"
-                        placeholder="01812345678"
                         className={`
                           w-full px-4 py-3 rounded-md border bg-white text-slate-900 text-sm font-medium min-h-[44px]
                           ${errors.additionalPhone ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -333,7 +323,6 @@ export default function RegisterPage() {
                       {...register("email")}
                       id="email"
                       type="email"
-                      placeholder="supplier@company.com"
                       className={`
                         w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}
@@ -358,7 +347,6 @@ export default function RegisterPage() {
                       {...register("companyAddress")}
                       id="companyAddress"
                       rows={3}
-                      placeholder="123 Textile Street, London E1 6AN, United Kingdom"
                       className={`
                         w-full px-4 py-3 rounded-md border bg-white text-slate-900 pl-11 text-sm font-medium min-h-[44px]
                         ${errors.companyAddress ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-300 focus:border-app-accent focus:ring-app-accent/10'}

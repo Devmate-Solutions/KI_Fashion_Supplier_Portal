@@ -90,7 +90,6 @@ export default function LoginPage() {
                   {...register('email')}
                   type="email"
                   id="email"
-                  placeholder="name@company.com"
                   autoComplete="email"
                   aria-invalid={errors.email ? "true" : "false"}
                   aria-describedby={errors.email ? "email-error" : undefined}
@@ -136,7 +135,6 @@ export default function LoginPage() {
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  placeholder="Enter your password"
                   autoComplete="current-password"
                   aria-invalid={errors.password ? "true" : "false"}
                   aria-describedby={errors.password ? "password-error" : undefined}
