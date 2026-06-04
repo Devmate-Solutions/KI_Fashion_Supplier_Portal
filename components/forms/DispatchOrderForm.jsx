@@ -87,6 +87,11 @@ export default function DispatchOrderForm({
   const initialImageUrlsRef = useRef({}); // { productIndex: imageUrl }
   const lastRestoreKeyRef = useRef(""); // Track last restore to prevent infinite loops
 
+  // Helper function to generate unique file ID
+  const getFileId = (file) => {
+    return `${file.name}-${file.size}-${file.lastModified}`;
+  };
+
   // Inline editing state
   const [editingCell, setEditingCell] = useState(null); // { rowIndex: number, fieldName: string } | null
   const [editValue, setEditValue] = useState("");
