@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -25,6 +27,7 @@ import { SEASON_OPTIONS, normalizeSeasonArray } from "@/lib/constants/seasons";
 import PacketConfigurationModal from "@/components/modals/PacketConfigurationModal";
 import { Controller } from 'react-hook-form';
 import BritishDatePicker from "../BritishDatePicker";
+
 const boxSchema = z.object({
   boxNumber: z.number(),
   itemsPerBox: z.number().min(0).optional(),
@@ -84,22 +87,17 @@ export default function DispatchOrderForm({
   const initialImageUrlsRef = useRef({}); // { productIndex: imageUrl }
   const lastRestoreKeyRef = useRef(""); // Track last restore to prevent infinite loops
 
-  // Helper function to generate unique file ID
-  const getFileId = (file) => {
-    return `${file.name}-${file.size}-${file.lastModified}`;
-  };
-
   // Inline editing state
   const [editingCell, setEditingCell] = useState(null); // { rowIndex: number, fieldName: string } | null
   const [editValue, setEditValue] = useState("");
 
   // Order-level box management state
-  const [totalBoxes, setTotalBoxes] = useState(0);
+  const [totalBoxes, setTotalBoxes] = useState("");
   const [orderBoxes, setOrderBoxes] = useState([]); // Array of { boxNumber, itemsPerBox }
 
   // Discount management state
   const [discountType, setDiscountType] = useState("amount"); // "percentage" or "amount"
-  const [discountValue, setDiscountValue] = useState(0);
+  const [discountValue, setDiscountValue] = useState(""); // Changed from 0 to ""
   const [discountError, setDiscountError] = useState("");
 
   // Single product form state (for adding new products)
@@ -278,8 +276,6 @@ export default function DispatchOrderForm({
       reset(values, { keepDefaultValues: false });
 
       // Set image previews for existing items
-      // Note: Backend may have single image or array of images
-      // Match the pattern used in the detail page: item.product?.images?.[0] || item.productImage
       const previews = {};
       const imageUrlsMap = {}; // Store initial image URLs for preservation
 
@@ -287,7 +283,6 @@ export default function DispatchOrderForm({
         let imageUrls = [];
 
         // Try multiple sources in order of preference (matching detail page pattern)
-        // 1. Check item.productImage (direct item image) - PRIMARY SOURCE for dispatch orders
         if (item.productImage) {
           if (Array.isArray(item.productImage)) {
             imageUrls = item.productImage.filter((url) => {
@@ -300,7 +295,6 @@ export default function DispatchOrderForm({
             imageUrls = [item.productImage];
           }
         }
-        // 2. Check item.product?.images array (populated product) - FALLBACK
         if (
           imageUrls.length === 0 &&
           item.product?.images &&
@@ -311,7 +305,6 @@ export default function DispatchOrderForm({
             (url) => url && typeof url === "string" && url.trim() !== ""
           );
         }
-        // 3. Check item.product?.image (single product image) - FALLBACK
         if (
           imageUrls.length === 0 &&
           item.product?.image &&
@@ -321,15 +314,12 @@ export default function DispatchOrderForm({
           imageUrls = [item.product.image];
         }
 
-        // Store images in previews with existing- prefix
         if (imageUrls.length > 0) {
           previews[index] = {};
-          // Store ALL image URLs in ref for preservation during updates (not just first)
           imageUrlsMap[index] = imageUrls;
 
           imageUrls.forEach((imgUrl, imgIndex) => {
             if (imgUrl && typeof imgUrl === "string" && imgUrl.trim() !== "") {
-              // Ensure we have a valid URL
               const key = `existing-${imgIndex}`;
               previews[index][key] = imgUrl.trim();
             }
@@ -337,9 +327,7 @@ export default function DispatchOrderForm({
         }
       });
 
-      // Store initial image URLs in ref for preservation
       initialImageUrlsRef.current = imageUrlsMap;
-
       setImagePreviews(previews);
 
       // Load boxes at order level: aggregate all boxes from all items
@@ -358,11 +346,10 @@ export default function DispatchOrderForm({
         const totalBoxesCount = uniqueBoxNumbers.length;
         setTotalBoxes(totalBoxesCount);
       } else {
-        setTotalBoxes(0);
+        setTotalBoxes(""); // Change to "" for explicitly empty state
       }
 
       // Initialize discount values
-      // Calculate grand total from items to determine if discount was percentage
       const calculatedGrandTotal = initialOrder.items.reduce((sum, item) => {
         const costPrice =
           typeof item.costPrice === "number"
@@ -374,31 +361,24 @@ export default function DispatchOrderForm({
 
       const initialDiscount = initialOrder.totalDiscount || 0;
 
-      // Try to determine if discount was originally a percentage
-      // Check if the discount amount matches a round percentage (within 0.02 tolerance for rounding)
       let detectedDiscountType = "amount";
       let detectedDiscountValue = initialDiscount;
 
       if (calculatedGrandTotal > 0 && initialDiscount > 0) {
         const percentage = (initialDiscount / calculatedGrandTotal) * 100;
-        const roundedPercentage = Math.round(percentage * 100) / 100; // Round to 2 decimal places
+        const roundedPercentage = Math.round(percentage * 100) / 100;
 
-        // Check if it's a round percentage (whole number or one decimal place like 12.5, 33.3)
-        // A round percentage is one where the value has at most one decimal place
         const hasOneDecimal =
           Math.round(roundedPercentage * 10) / 10 === roundedPercentage;
         const isRoundPercentage = roundedPercentage % 1 === 0 || hasOneDecimal;
 
-        // Calculate what the discount would be with this percentage
         const calculatedDiscountFromPercentage =
           Math.round(((calculatedGrandTotal * roundedPercentage) / 100) * 100) /
           100;
 
-        // Check if calculated discount matches stored discount (within 0.02 tolerance for rounding differences)
         const matchesStoredDiscount =
           Math.abs(calculatedDiscountFromPercentage - initialDiscount) <= 0.02;
 
-        // Only treat as percentage if it's a reasonable percentage (0-100) and matches
         if (
           isRoundPercentage &&
           matchesStoredDiscount &&
@@ -410,7 +390,7 @@ export default function DispatchOrderForm({
         }
       }
 
-      setDiscountValue(detectedDiscountValue);
+      setDiscountValue(detectedDiscountValue || ""); // Change to "" if 0
       setDiscountType(detectedDiscountType);
 
       // Reset productImages state (don't load existing files, only show previews)
@@ -436,27 +416,22 @@ export default function DispatchOrderForm({
       // Reset everything for new order
       setImagePreviews({});
       setProductImages({});
-      setTotalBoxes(0);
-      setDiscountValue(0);
+      setTotalBoxes(""); // Make explicitly empty
+      setDiscountValue(""); // Make explicitly empty
       setDiscountType("amount");
       setProductPackets({});
     }
   }, [initialOrder, getInitialValues, reset]);
 
   // Additional effect to ensure image previews persist and are properly maintained
-  // This ensures images don't get lost during re-renders or state updates
   useEffect(() => {
     if (initialOrder && initialOrder.items && initialOrder.items.length > 0) {
-      // Use a ref to track if we've already restored to prevent infinite loops
       const restoreKey = JSON.stringify(
         Object.keys(initialImageUrlsRef.current).sort()
       );
 
-      // Only restore if we haven't already done so for this set of images
       if (restoreKey !== lastRestoreKeyRef.current) {
-        // Ensure image previews are maintained even if state gets cleared
         setImagePreviews((prevPreviews) => {
-          // Check if we need to restore from ref
           const needsRestore = Object.keys(initialImageUrlsRef.current).some(
             (index) => {
               const idx = parseInt(index);
@@ -500,13 +475,11 @@ export default function DispatchOrderForm({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't trigger shortcuts when typing in inputs
       if (
         e.target.tagName === "INPUT" ||
         e.target.tagName === "TEXTAREA" ||
         e.target.tagName === "SELECT"
       ) {
-        // Allow Ctrl/Cmd + Enter to submit even in inputs
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
           e.preventDefault();
           handleSubmit(submitHandler)();
@@ -515,14 +488,12 @@ export default function DispatchOrderForm({
         return;
       }
 
-      // Ctrl/Cmd + K to show shortcuts
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setShowShortcuts(!showShortcuts);
         return;
       }
 
-      // Escape to close shortcuts
       if (e.key === "Escape" && showShortcuts) {
         setShowShortcuts(false);
         return;
@@ -578,7 +549,6 @@ export default function DispatchOrderForm({
     const newIndex = fields.length;
     append(productData);
 
-    // Handle images if provided
     if (newProductImage && newProductImage.length > 0) {
       setProductImages({ ...productImages, [newIndex]: newProductImage });
       setImagePreviews({
@@ -587,7 +557,6 @@ export default function DispatchOrderForm({
       });
     }
 
-    // Clear form
     setNewProduct({
       productName: "",
       productCode: "",
@@ -601,13 +570,11 @@ export default function DispatchOrderForm({
     setNewProductImagePreview({});
     setNewProductErrors({});
 
-    // Reset image input
     setTimeout(() => {
       const imageInput = document.getElementById("new-product-image");
       if (imageInput) {
         imageInput.value = "";
       }
-      // Focus on product name field
       const productNameInput = document.getElementById("new-product-name");
       if (productNameInput) {
         productNameInput.focus();
@@ -616,7 +583,6 @@ export default function DispatchOrderForm({
   };
 
   const handleRemoveProduct = (index) => {
-    // Get all indices that might have associated metadata
     const allMetadataIndices = new Set([
       ...Object.keys(productImages).map(Number),
       ...Object.keys(imagePreviews).map(Number),
@@ -626,15 +592,13 @@ export default function DispatchOrderForm({
 
     remove(index);
 
-    // Create new objects for adjusted metadata
     const adjustedImages = {};
     const adjustedPreviews = {};
     const adjustedRef = {};
     const adjustedPackets = {};
 
-    // Remap all metadata indices
     allMetadataIndices.forEach((idx) => {
-      if (idx === index) return; // Skip the removed index
+      if (idx === index) return; 
 
       const newIdx = idx > index ? idx - 1 : idx;
 
@@ -651,7 +615,6 @@ export default function DispatchOrderForm({
     initialImageUrlsRef.current = adjustedRef;
   };
 
-  // Packet configuration handlers
   const handleToggleVariantTracking = (productIndex) => {
     setProductPackets((prev) => ({
       ...prev,
@@ -680,17 +643,12 @@ export default function DispatchOrderForm({
   };
 
   const handleSavePackets = (packets, productItem) => {
-    // productItem is the item object passed from the modal, effectively the one being saved
-    // Ensure we use the index from productItem first, then fallback to packetModalProduct
-    // The index should be a number, not a string
     let index = productItem?.index;
 
-    // If index is undefined, try to get it from packetModalProduct
     if (index === undefined && packetModalProduct?.index !== undefined) {
       index = packetModalProduct.index;
     }
 
-    // If still undefined, try to parse from productItem.id (which is a string representation of index)
     if (index === undefined && productItem?.id !== undefined) {
       const parsedIndex = parseInt(productItem.id, 10);
       if (!isNaN(parsedIndex)) {
@@ -698,13 +656,11 @@ export default function DispatchOrderForm({
       }
     }
 
-    // Ensure index is a number
     if (typeof index === "string") {
       index = parseInt(index, 10);
     }
 
     if (index !== undefined && !isNaN(index)) {
-      // Deep copy packets to ensure isolation between products
       const deepCopiedPackets = (packets || []).map((packet) => ({
         packetNumber: packet.packetNumber,
         totalItems: parseInt(packet.totalItems) || 0,
@@ -733,7 +689,6 @@ export default function DispatchOrderForm({
         index,
       });
     }
-    // Don't auto-close here to allow "Save & Next" flow
   };
 
   const handleImageChange = (e, productIndex) => {
@@ -744,7 +699,6 @@ export default function DispatchOrderForm({
     const maxSize = 5 * 1024 * 1024; // 5MB
     const maxImages = 20;
 
-    // Get current images for this product - count both existing and new images
     const existingPreviews = imagePreviews[productIndex] || {};
     const existingImageKeys = Object.keys(existingPreviews).filter((key) =>
       key.startsWith("existing-")
@@ -766,7 +720,6 @@ export default function DispatchOrderForm({
     const invalidFiles = [];
 
     files.forEach((file) => {
-      // Validate file type
       if (!validTypes.includes(file.type)) {
         invalidFiles.push(
           `${file.name}: Invalid file type. Only JPG, PNG, and WebP are allowed.`
@@ -774,7 +727,6 @@ export default function DispatchOrderForm({
         return;
       }
 
-      // Validate file size
       if (file.size > maxSize) {
         invalidFiles.push(`${file.name}: File size exceeds 5MB limit.`);
         return;
@@ -788,12 +740,10 @@ export default function DispatchOrderForm({
     }
 
     if (validFiles.length > 0) {
-      // Add new files to existing ones
       const updatedImages = { ...productImages };
       updatedImages[productIndex] = [...currentImages, ...validFiles];
       setProductImages(updatedImages);
 
-      // Create previews for new files
       const updatedPreviews = { ...imagePreviews };
       if (!updatedPreviews[productIndex]) {
         updatedPreviews[productIndex] = {};
@@ -818,7 +768,6 @@ export default function DispatchOrderForm({
       });
     }
 
-    // Reset input value to allow selecting the same file again
     e.target.value = "";
   };
 
@@ -828,7 +777,6 @@ export default function DispatchOrderForm({
     updatedImages[productIndex] = (updatedImages[productIndex] || []).filter(
       (f) => {
         const fId = getFileId(f);
-        // Clean up object URL if it was created
         if (fId === fileId && f instanceof File) {
           const preview = imagePreviews[productIndex]?.[fileId];
           if (preview && preview.startsWith("blob:")) {
@@ -842,7 +790,6 @@ export default function DispatchOrderForm({
 
     const updatedPreviews = { ...imagePreviews };
     if (updatedPreviews[productIndex]) {
-      // Clean up object URL before removing
       const preview = updatedPreviews[productIndex][fileId];
       if (preview && preview.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
@@ -873,7 +820,6 @@ export default function DispatchOrderForm({
     const maxSize = 5 * 1024 * 1024; // 5MB
     const maxImages = 20;
 
-    // Check total image count
     const currentCount = newProductImage.length;
     if (currentCount + files.length > maxImages) {
       showWarning(
@@ -887,7 +833,6 @@ export default function DispatchOrderForm({
     const invalidFiles = [];
 
     files.forEach((file) => {
-      // Validate file type
       if (!validTypes.includes(file.type)) {
         invalidFiles.push(
           `${file.name}: Invalid file type. Only JPG, PNG, and WebP are allowed.`
@@ -895,7 +840,6 @@ export default function DispatchOrderForm({
         return;
       }
 
-      // Validate file size
       if (file.size > maxSize) {
         invalidFiles.push(`${file.name}: File size exceeds 5MB limit.`);
         return;
@@ -909,11 +853,9 @@ export default function DispatchOrderForm({
     }
 
     if (validFiles.length > 0) {
-      // Add new files to existing ones
       const updatedImages = [...newProductImage, ...validFiles];
       setNewProductImage(updatedImages);
 
-      // Create previews for new files
       validFiles.forEach((file) => {
         const fileId = getFileId(file);
         const reader = new FileReader();
@@ -930,11 +872,9 @@ export default function DispatchOrderForm({
       });
     }
 
-    // Reset input value to allow selecting the same file again
     e.target.value = "";
   };
 
-  // Inline editing handlers
   const handleCellClick = (rowIndex, fieldName) => {
     const currentValue = watch(`products.${rowIndex}.${fieldName}`);
     setEditingCell({ rowIndex, fieldName });
@@ -943,7 +883,6 @@ export default function DispatchOrderForm({
       return;
     }
     if (fieldName === "season") {
-      // For arrays, use the array value or empty array
       setEditValue(Array.isArray(currentValue) ? currentValue : []);
       return;
     }
@@ -955,7 +894,6 @@ export default function DispatchOrderForm({
   };
 
   const handleCellSave = async (rowIndex, fieldName) => {
-    // Validate based on field type
     let isValid = true;
     if (fieldName === "productName" || fieldName === "productCode") {
       if (!editValue.trim()) {
@@ -978,10 +916,9 @@ export default function DispatchOrderForm({
     }
 
     if (!isValid) {
-      return; // Don't save invalid values
+      return; 
     }
 
-    // Convert value based on field type
     let valueToSave = editValue;
     if (fieldName === "costPrice") {
       valueToSave = parseFloat(editValue) || 0;
@@ -990,7 +927,6 @@ export default function DispatchOrderForm({
     } else if (fieldName === "productName" || fieldName === "productCode") {
       valueToSave = editValue.trim();
     } else if (fieldName === "primaryColor" || fieldName === "size") {
-      // For arrays, add the new value to existing array
       const currentArray = Array.isArray(watchedProducts[rowIndex]?.[fieldName])
         ? watchedProducts[rowIndex][fieldName]
         : watchedProducts[rowIndex]?.[fieldName]
@@ -1003,30 +939,23 @@ export default function DispatchOrderForm({
         valueToSave = currentArray;
       }
     } else if (fieldName === "season") {
-      // For season, use the array value directly
       valueToSave = Array.isArray(editValue) ? editValue : [];
     }
 
-    // Update the form value - use shouldDirty and shouldValidate to trigger re-renders
     setValue(`products.${rowIndex}.${fieldName}`, valueToSave, {
       shouldDirty: true,
       shouldValidate: true,
       shouldTouch: true,
     });
 
-    // For costPrice and quantity changes, force recalculation immediately
     if (fieldName === "costPrice" || fieldName === "quantity") {
-      // Force recalculation by incrementing trigger state
-      // This ensures grand total updates immediately
       setRecalcTrigger((prev) => prev + 1);
 
-      // Also trigger validation to ensure form state is updated
       await Promise.all([
         trigger(`products.${rowIndex}.${fieldName}`),
         trigger("products"),
       ]);
     } else {
-      // For other fields, just trigger validation
       await trigger(`products.${rowIndex}.${fieldName}`);
     }
 
@@ -1039,19 +968,16 @@ export default function DispatchOrderForm({
     setEditValue("");
   };
 
-  // Get season names for display (replaces getProductTypeName)
   const getSeasonNames = (seasons) => {
     if (!seasons || !Array.isArray(seasons)) return "";
     return seasons.join(", ");
   };
 
-  // Helper function to focus next input field
   const focusNextInput = (currentId, nextId) => {
     setTimeout(() => {
       const nextElement = document.getElementById(nextId);
       if (nextElement) {
         nextElement.focus();
-        // For select elements, we might want to open them
         if (nextElement.tagName === "SELECT") {
           nextElement.focus();
         }
@@ -1060,22 +986,19 @@ export default function DispatchOrderForm({
   };
 
   const submitHandler = handleSubmit((values) => {
-    // Validate that at least one box is specified
-    if (totalBoxes <= 0) {
+    // Check if totalBoxes is empty or 0
+    if (!totalBoxes || parseInt(totalBoxes) <= 0) {
       setBoxError("You must specify at least one box to create an order");
-      // Scroll to the box section
       const boxSection = document.getElementById("total-boxes");
       if (boxSection) {
         boxSection.scrollIntoView({ behavior: "smooth", block: "center" });
         boxSection.focus();
       }
-      return; // Prevent submission
+      return; 
     }
 
-    // Clear box error if validation passes
     setBoxError(null);
 
-    // Ensure every product has at least one packet configured before submission
     const unconfiguredProducts = values.products.filter((_, index) => {
       const packets = productPackets[index]?.packets;
       return !packets || packets.length === 0;
@@ -1091,7 +1014,6 @@ export default function DispatchOrderForm({
       return;
     }
 
-    // Validate packet configurations for all items that use variant tracking
     const mismatchItems = [];
     values.products.forEach((product, index) => {
       if (productPackets[index]?.useVariantTracking) {
@@ -1127,10 +1049,9 @@ export default function DispatchOrderForm({
       showError(
         `Quantity mismatch in packet configuration:\n${errorMsg}\n\nPlease ensure all units are assigned to packets or loose items.`
       );
-      return; // Prevent submission
+      return; 
     }
 
-    // Calculate grand total for discount calculation - use same logic as display
     const grandTotal = values.products.reduce((sum, p) => {
       const costPrice =
         typeof p.costPrice === "number"
@@ -1140,39 +1061,32 @@ export default function DispatchOrderForm({
       return sum + costPrice * quantity;
     }, 0);
 
-    // Calculate discount amount based on current discount type and value
-    // Round to 2 decimal places to avoid precision issues
     let calculatedDiscount =
       discountType === "percentage"
         ? (grandTotal * (parseFloat(discountValue) || 0)) / 100
         : parseFloat(discountValue) || 0;
 
-    // Round to 2 decimal places to ensure precision
     const discountAmount = Math.round(calculatedDiscount * 100) / 100;
 
-    // Validate discount doesn't exceed grand total
     if (discountAmount > grandTotal) {
       showError(
         discountType === "percentage"
           ? `Discount percentage results in an amount (${discountAmount.toFixed(2)}) that exceeds the grand total (${grandTotal.toFixed(2)}). Maximum allowed: 100%`
           : `Discount amount (${discountAmount.toFixed(2)}) cannot exceed the grand total (${grandTotal.toFixed(2)})`
       );
-      return; // Prevent submission
+      return; 
     }
 
-    // Validate percentage doesn't exceed 100%
     if (discountType === "percentage" && parseFloat(discountValue) > 100) {
       showError("Discount percentage cannot exceed 100%");
-      return; // Prevent submission
+      return; 
     }
 
-    // Create boxes array with just box numbers (no items per box)
     const boxes = [];
     if (totalBoxes > 0) {
       for (let i = 1; i <= totalBoxes; i++) {
         boxes.push({
           boxNumber: i,
-          // itemsPerBox is optional and not tracked anymore
         });
       }
     }
@@ -1187,20 +1101,15 @@ export default function DispatchOrderForm({
             ? product.costPrice
             : parseFloat(product.costPrice) || 0,
         quantity: product.quantity,
-        quantity: product.quantity,
-        boxes: [], // Don't assign all boxes to every item to avoid multiplication issue
+        boxes: [], 
         unitWeight: 0,
       };
 
-      // ALWAYS preserve existing productImage when updating (unless new images are being uploaded)
-      // Match by productCode to handle cases where items are reordered or new items are added
       if (initialOrder && initialOrder.items && initialOrder.items.length > 0) {
-        // Try to find matching item by productCode first (more reliable)
         const matchingItem = initialOrder.items.find(
           (existingItem) => existingItem.productCode === product.productCode
         );
 
-        // If no match by productCode, try by index (for items that might have been reordered)
         const existingItem =
           matchingItem ||
           (index < initialOrder.items.length
@@ -1208,11 +1117,8 @@ export default function DispatchOrderForm({
             : null);
 
         if (existingItem) {
-          // Preserve existing images that haven't been removed by user
-          // New images will be appended by the backend upload route, not replacing existing ones
           let existingImages = [];
 
-          // Priority 1: Get from imagePreviews (user can remove images here, so this reflects current state)
           if (imagePreviews[index]) {
             const existingPreviews = imagePreviews[index];
             const existingImageKeys = Object.keys(existingPreviews).filter(
@@ -1220,7 +1126,6 @@ export default function DispatchOrderForm({
             );
             existingImages = existingImageKeys
               .sort((a, b) => {
-                // Sort by index to maintain order
                 const aIndex = parseInt(a.replace("existing-", ""));
                 const bIndex = parseInt(b.replace("existing-", ""));
                 return aIndex - bIndex;
@@ -1230,7 +1135,6 @@ export default function DispatchOrderForm({
                 (url) => url && typeof url === "string" && url.trim() !== ""
               );
           }
-          // Priority 2: Fallback to ref (stored during initialization, contains all original URLs)
           if (
             existingImages.length === 0 &&
             initialImageUrlsRef.current[index]
@@ -1238,14 +1142,12 @@ export default function DispatchOrderForm({
             const refImages = initialImageUrlsRef.current[index];
             existingImages = Array.isArray(refImages) ? refImages : [refImages];
           }
-          // Priority 3: Fallback to existingItem.productImage directly
           if (existingImages.length === 0 && existingItem.productImage) {
             existingImages = Array.isArray(existingItem.productImage)
               ? existingItem.productImage
               : [existingItem.productImage];
           }
 
-          // Set productImage as array (backend now expects array)
           if (existingImages.length > 0) {
             item.productImage = existingImages;
           }
@@ -1284,10 +1186,8 @@ export default function DispatchOrderForm({
         item.size = [product.size.trim()];
       }
 
-      // Add packet configuration if variant tracking is enabled
       if (productPackets[index]?.useVariantTracking) {
         item.useVariantTracking = true;
-        // Filter out packets with empty compositions and re-number them
         const validPackets = (productPackets[index]?.packets || [])
           .filter(p => p.composition && p.composition.length > 0 &&
             p.composition.some(c => c.size && c.color && c.quantity > 0))
@@ -1306,16 +1206,14 @@ export default function DispatchOrderForm({
       date: values.date,
       logisticsCompany: values.logisticsCompany,
       items,
-      totalDiscount: discountAmount, // Use calculated discount amount
+      totalDiscount: discountAmount, 
       totalBoxes: parseInt(totalBoxes) || 0,
     };
 
-    // Store the submit data and show confirmation dialog
     setPendingSubmit({ payload, productImages });
     setShowConfirmDialog(true);
   });
 
-  // Handle confirmed submission
   const handleConfirmedSubmit = () => {
     if (pendingSubmit) {
       setShowConfirmDialog(false);
@@ -1324,7 +1222,6 @@ export default function DispatchOrderForm({
     }
   };
 
-  // Handle cancel confirmation
   const handleCancelConfirm = () => {
     setShowConfirmDialog(false);
     setPendingSubmit(null);
@@ -1332,7 +1229,6 @@ export default function DispatchOrderForm({
 
   return (
     <div className="space-y-6">
-      {/* Keyboard Shortcuts Help */}
       {showShortcuts && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm shadow-sm">
           <div className="font-semibold mb-3 text-blue-900 flex items-center gap-2">
@@ -1382,26 +1278,20 @@ export default function DispatchOrderForm({
           submitHandler(e);
         }}
         onKeyDown={(e) => {
-          // Prevent Enter key from submitting form directly (unless it's Ctrl/Cmd+Enter)
           if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
-            // Check if the target is an input, textarea, or select
             const target = e.target;
             if (
               target.tagName === "INPUT" ||
               target.tagName === "TEXTAREA" ||
               target.tagName === "SELECT"
             ) {
-              // Let individual field handlers manage Enter key behavior
-              // Don't prevent default here - let the field handlers do it
               return;
             }
-            // If Enter is pressed outside of form fields, prevent form submission
             e.preventDefault();
           }
         }}
         className="space-y-6"
       >
-        {/* Order Header Section */}
         <div className="bg-slate-50 rounded-lg p-4 space-y-4 border border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">
             Order Information
@@ -1423,7 +1313,6 @@ export default function DispatchOrderForm({
                     ref={ref}
                     value={value}
                     onChange={(date) => {
-                      // Convert Date object to ISO string format (YYYY-MM-DD)
                       const dateString = date instanceof Date
                         ? date.toLocaleDateString('en-CA')
                         : date;
@@ -1440,25 +1329,6 @@ export default function DispatchOrderForm({
                   />
                 )}
               />
-              {/* <input
-                type="date"
-                id="date"
-                lang="en-GB"
-                max={new Date().toLocaleDateString('en-CA')}
-                className={`${inputClasses} ${errors.date
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-slate-300"
-                  }`}
-                {...register("date")}
-                aria-invalid={errors.date ? "true" : "false"}
-                aria-describedby={errors.date ? "date-error" : undefined}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    focusNextInput("date", "logisticsCompany");
-                  }
-                }}
-              /> */}
               {errors.date && (
                 <p
                   id="date-error"
@@ -1515,7 +1385,6 @@ export default function DispatchOrderForm({
           </div>
         </div>
 
-        {/* Add New Product Form Section */}
         <div className="bg-white rounded-lg p-4 space-y-4 border border-slate-200">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -1623,7 +1492,6 @@ export default function DispatchOrderForm({
                 value={newProduct.costPrice}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Allow only numbers and one decimal point
                   const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
                   setNewProduct({ ...newProduct, costPrice: sanitized });
                 }}
@@ -1663,10 +1531,8 @@ export default function DispatchOrderForm({
                           });
                           e.target.value = "";
                         }
-                        // Keep focus on color input (don't move to next field)
                         e.target.focus();
                       } else if (e.key === "Tab" && !e.shiftKey) {
-                        // Allow Tab to move to next field
                         e.preventDefault();
                         focusNextInput("new-primary-color", "new-size");
                       }
@@ -1744,10 +1610,9 @@ export default function DispatchOrderForm({
                           });
                           e.target.value = "";
                         }
-                        // Keep focus on size input (don't move to next field)
                         e.target.focus();
                       } else if (e.key === "Tab" && !e.shiftKey) {
-                        // Allow Tab to move to next field
+                        e.preventDefault();
                         focusNextInput("new-size", "new-quantity");
                       }
                     }}
@@ -1814,14 +1679,12 @@ export default function DispatchOrderForm({
                 value={newProduct.quantity}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Allow only numbers
                   const sanitized = value.replace(/[^0-9]/g, '');
                   setNewProduct({ ...newProduct, quantity: sanitized });
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    // Focus on Add to Table button or back to product name
                     const addButton = document.querySelector(
                       "[data-add-product-button]"
                     );
@@ -1850,7 +1713,6 @@ export default function DispatchOrderForm({
                 </span>
               </div>
 
-              {/* Image Gallery */}
               {newProductImage.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {newProductImage.map((file) => {
@@ -1885,7 +1747,6 @@ export default function DispatchOrderForm({
                 </div>
               )}
 
-              {/* File Input */}
               <input
                 id="new-product-image"
                 type="file"
@@ -1902,7 +1763,6 @@ export default function DispatchOrderForm({
                 onClick={() => {
                   const input = document.getElementById("new-product-image");
                   if (input && !input.disabled) {
-                    // Ensure multiple attribute is set
                     input.setAttribute("multiple", "");
                     input.multiple = true;
                     input.click();
@@ -1936,7 +1796,6 @@ export default function DispatchOrderForm({
           </div>
         </div>
 
-        {/* Products Table Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -1985,7 +1844,6 @@ export default function DispatchOrderForm({
                           className={`hover:bg-slate-50 transition-colors ${isEditing ? "bg-blue-50" : ""
                             }`}
                         >
-                          {/* Image Column */}
                           <td className="px-4 py-3 min-w-[180px]">
                             {(() => {
                               const existingPreviews =
@@ -1996,10 +1854,7 @@ export default function DispatchOrderForm({
                               const newFiles =
                                 productImages[productIndex] || [];
 
-                              // Debug: Log what we have for this product
-                              // Prepare images array for gallery component
                               const galleryImages = [
-                                // Existing images from backend - sort by index to maintain order
                                 ...existingImageKeys
                                   .sort((a, b) => {
                                     const aIndex =
@@ -2023,8 +1878,7 @@ export default function DispatchOrderForm({
                                       isExisting: true,
                                     };
                                   })
-                                  .filter((img) => img !== null), // Filter out any null entries
-                                // New file images
+                                  .filter((img) => img !== null), 
                                 ...newFiles.map((file) => {
                                   const fileId = getFileId(file);
                                   return {
@@ -2042,9 +1896,7 @@ export default function DispatchOrderForm({
                                 <ImageGallery
                                   images={galleryImages}
                                   onRemove={(imageId) => {
-                                    // Check if it's an existing image or a new file
                                     if (imageId.startsWith("existing-")) {
-                                      // Remove existing image from previews
                                       const updatedPreviews = {
                                         ...imagePreviews,
                                       };
@@ -2064,7 +1916,6 @@ export default function DispatchOrderForm({
                                       }
                                       setImagePreviews(updatedPreviews);
                                     } else {
-                                      // Remove new file image
                                       const fileToRemove = newFiles.find(
                                         (f) => getFileId(f) === imageId
                                       );
@@ -2097,7 +1948,6 @@ export default function DispatchOrderForm({
                               );
                             })()}
 
-                            {/* Hidden File Input */}
                             <input
                               type="file"
                               accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -2110,7 +1960,6 @@ export default function DispatchOrderForm({
                             />
                           </td>
 
-                          {/* Product Name Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
                               editingCell.fieldName === "productName" ? (
@@ -2128,7 +1977,6 @@ export default function DispatchOrderForm({
                                         productIndex,
                                         "productName"
                                       );
-                                      // Focus next field
                                       setTimeout(() => {
                                         handleCellClick(
                                           productIndex,
@@ -2189,7 +2037,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* SKU/Code Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
                               editingCell.fieldName === "productCode" ? (
@@ -2207,7 +2054,6 @@ export default function DispatchOrderForm({
                                         productIndex,
                                         "productCode"
                                       );
-                                      // Focus next field
                                       setTimeout(() => {
                                         handleCellClick(
                                           productIndex,
@@ -2268,7 +2114,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Season Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
                               editingCell.fieldName === "season" ? (
@@ -2328,7 +2173,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Cost Price Column */}
                           <td className="px-4 py-3 text-right">
                             {isEditing &&
                               editingCell.fieldName === "costPrice" ? (
@@ -2339,7 +2183,6 @@ export default function DispatchOrderForm({
                                   value={editValue}
                                   onChange={(e) => {
                                     const value = e.target.value;
-                                    // Allow only numbers and one decimal point
                                     const sanitized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
                                     handleCellChange(sanitized);
                                   }}
@@ -2347,7 +2190,6 @@ export default function DispatchOrderForm({
                                     if (e.key === "Enter") {
                                       e.preventDefault();
                                       handleCellSave(productIndex, "costPrice");
-                                      // Focus next field (quantity, skip color/size as they handle their own Enter)
                                       setTimeout(() => {
                                         handleCellClick(
                                           productIndex,
@@ -2412,7 +2254,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Primary Color Column */}
                           <td className="px-4 py-3">
                             {isEditing &&
                               editingCell.fieldName === "primaryColor" ? (
@@ -2442,7 +2283,6 @@ export default function DispatchOrderForm({
                                           productIndex,
                                           "primaryColor"
                                         );
-                                        // Focus on size input
                                         setTimeout(() => {
                                           handleCellClick(productIndex, "size");
                                         }, 100);
@@ -2556,7 +2396,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Size Column */}
                           <td className="px-4 py-3 min-w-[180px]">
                             {isEditing && editingCell.fieldName === "size" ? (
                               <div className="space-y-2">
@@ -2579,7 +2418,6 @@ export default function DispatchOrderForm({
                                       ) {
                                         e.preventDefault();
                                         handleCellSave(productIndex, "size");
-                                        // Focus on quantity input
                                         setTimeout(() => {
                                           handleCellClick(
                                             productIndex,
@@ -2689,7 +2527,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Quantity Column */}
                           <td className="px-4 py-3 text-right">
                             {isEditing &&
                               editingCell.fieldName === "quantity" ? (
@@ -2700,7 +2537,6 @@ export default function DispatchOrderForm({
                                   value={editValue}
                                   onChange={(e) => {
                                     const value = e.target.value;
-                                    // Allow only numbers
                                     const sanitized = value.replace(/[^0-9]/g, '');
                                     handleCellChange(sanitized);
                                   }}
@@ -2708,7 +2544,6 @@ export default function DispatchOrderForm({
                                     if (e.key === "Enter") {
                                       e.preventDefault();
                                       handleCellSave(productIndex, "quantity");
-                                      // Focus next product's first field, or wrap around
                                       setTimeout(() => {
                                         if (productIndex < fields.length - 1) {
                                           handleCellClick(
@@ -2716,7 +2551,6 @@ export default function DispatchOrderForm({
                                             "productName"
                                           );
                                         } else {
-                                          // Last product, focus back to first product's name
                                           handleCellClick(0, "productName");
                                         }
                                       }, 100);
@@ -2774,7 +2608,6 @@ export default function DispatchOrderForm({
                             )}
                           </td>
 
-                          {/* Variant Tracking & Packets Column */}
                           <td className="px-4 py-3">
                             <div className="flex flex-col gap-2">
                               {(() => {
@@ -2844,7 +2677,6 @@ export default function DispatchOrderForm({
                                           </Button>
                                         )}
 
-                                        {/* Variant Breakdown Display */}
                                         {(() => {
                                           const packets = productPackets[productIndex]?.packets || [];
                                           if (packets.length === 0) return null;
@@ -2852,7 +2684,6 @@ export default function DispatchOrderForm({
                                           const isLoose = packets[0]?.isLoose;
                                           let totalConfigured = 0;
 
-                                          // LOOSE: flat color-size breakdown from single packet's composition
                                           if (isLoose) {
                                             const parts = [];
                                             packets[0]?.composition?.forEach((c) => {
@@ -2883,8 +2714,8 @@ export default function DispatchOrderForm({
                                                     <span
                                                       key={key}
                                                       className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
-                                                          ? "bg-red-100 text-red-700 border-red-300"
-                                                          : "bg-slate-100 text-slate-700 border-slate-200"
+                                                        ? "bg-red-100 text-red-700 border-red-300"
+                                                        : "bg-slate-100 text-slate-700 border-slate-200"
                                                         }`}
                                                     >
                                                       <span className="capitalize">{key}</span>
@@ -2897,7 +2728,6 @@ export default function DispatchOrderForm({
                                             );
                                           }
 
-                                          // PACKETS: group by color signature → color × count
                                           const colorGroupCount = {};
                                           packets.forEach((packet) => {
                                             if (!packet.composition?.length) return;
@@ -2937,8 +2767,8 @@ export default function DispatchOrderForm({
                                                   <span
                                                     key={colorSignature}
                                                     className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${hasMismatch
-                                                        ? "bg-red-100 text-red-700 border-red-300"
-                                                        : "bg-slate-100 text-slate-700 border-slate-200"
+                                                      ? "bg-red-100 text-red-700 border-red-300"
+                                                      : "bg-slate-100 text-slate-700 border-slate-200"
                                                       }`}
                                                   >
                                                     <span className="capitalize">{colorSignature}</span>
@@ -2963,7 +2793,6 @@ export default function DispatchOrderForm({
                             </div>
                           </td>
 
-                          {/* Actions Column */}
                           <td className="px-4 py-3 text-right">
                             <Button
                               type="button"
@@ -2986,7 +2815,6 @@ export default function DispatchOrderForm({
           )}
         </div>
 
-        {/* Order-Level Box Management Section */}
         {fields.length > 0 && (
           <div className="bg-slate-50 rounded-lg p-4 space-y-4 border border-slate-200">
             <div>
@@ -2997,13 +2825,10 @@ export default function DispatchOrderForm({
             </div>
 
             {(() => {
-              // Calculate final amount after discount - this recalculates automatically
-              // when grandTotal or discountAmount changes due to their useMemo dependencies
               const finalAmount = Math.max(0, grandTotal - discountAmount);
 
               return (
                 <div className="space-y-4">
-                  {/* Number of Boxes Input */}
                   <div>
                     <label htmlFor="total-boxes" className={labelClasses}>
                       Number of Boxes <span className="text-red-500">*</span>
@@ -3017,7 +2842,6 @@ export default function DispatchOrderForm({
                       value={totalBoxes}
                       onChange={(e) => {
                         const val = e.target.value;
-                        // Allow only numbers
                         const sanitized = val.replace(/[^0-9]/g, '');
                         if (sanitized === "") {
                           setTotalBoxes("");
@@ -3025,7 +2849,6 @@ export default function DispatchOrderForm({
                           const numBoxes = parseInt(sanitized);
                           setTotalBoxes(isNaN(numBoxes) ? "" : sanitized);
                         }
-                        // Clear error when user enters specific valid number
                         const num = parseInt(sanitized);
                         if (boxError && !isNaN(num) && num > 0) {
                           setBoxError(null);
@@ -3051,7 +2874,6 @@ export default function DispatchOrderForm({
                     )}
                   </div>
 
-                  {/* Article Breakdown */}
                   {watchedProducts && watchedProducts.length > 0 && (
                     <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border-2 border-slate-200 p-4">
                       <h3 className="text-sm font-semibold mb-3 text-slate-700">
@@ -3101,7 +2923,6 @@ export default function DispatchOrderForm({
                     </div>
                   )}
 
-                  {/* Grand Total Display */}
                   <div className="bg-white rounded-lg border border-slate-300 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-slate-700">
@@ -3116,7 +2937,6 @@ export default function DispatchOrderForm({
                     </div>
                   </div>
 
-                  {/* Discount Management */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-4">
                       <label className="text-sm font-medium text-slate-700">
@@ -3159,7 +2979,6 @@ export default function DispatchOrderForm({
                         value={discountValue}
                         onChange={(e) => {
                           const val = e.target.value;
-                          // Allow only numbers and one decimal point
                           const sanitized = val.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
                           if (sanitized === "") {
                             setDiscountValue("");
@@ -3170,7 +2989,6 @@ export default function DispatchOrderForm({
                               setDiscountValue("");
                             } else {
                               setDiscountValue(sanitized);
-                              // Real-time validation
                               if (discountType === "percentage") {
                                 if (value > 100) {
                                   setDiscountError("Discount percentage cannot exceed 100%");
@@ -3183,7 +3001,6 @@ export default function DispatchOrderForm({
                                   }
                                 }
                               } else {
-                                // Amount type
                                 if (value > grandTotal) {
                                   setDiscountError(`Discount cannot exceed grand total (${grandTotal.toFixed(2)})`);
                                 } else {
@@ -3193,13 +3010,10 @@ export default function DispatchOrderForm({
                             }
                           }
                         }}
-                        placeholder={
-                          discountType === "percentage" ? "0.0" : "0.00"
-                        }
+                      
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            // Focus on submit button or back to first field
                             const submitButton = document.querySelector(
                               'button[type="submit"]'
                             );
@@ -3241,7 +3055,6 @@ export default function DispatchOrderForm({
                       )}
                     </div>
 
-                    {/* Final Amount Display */}
                     {discountAmount > 0 && (
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-4">
                         <div className="space-y-2">
@@ -3289,7 +3102,6 @@ export default function DispatchOrderForm({
           </div>
         )}
 
-        {/* Form Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
           <Button
             type="button"
@@ -3312,8 +3124,6 @@ export default function DispatchOrderForm({
         </div>
       </form>
 
-
-      {/* Confirmation Dialog */}
       <Modal
         open={showConfirmDialog}
         onClose={handleCancelConfirm}
@@ -3350,7 +3160,6 @@ export default function DispatchOrderForm({
         }
       />
 
-      {/* Packet Configuration Modal */}
       <PacketConfigurationModal
         isOpen={packetModalOpen}
         onClose={() => {
@@ -3359,7 +3168,6 @@ export default function DispatchOrderForm({
         }}
         onSave={handleSavePackets}
         items={watchedProducts.map((p, i) => {
-          // Deep copy packets to ensure isolation between products
           const packets = productPackets[i]?.packets || [];
           const deepCopiedPackets = packets.map((packet) => ({
             packetNumber: packet.packetNumber,
